@@ -1,10 +1,10 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { AwsConfig } from "../config/credentials.js";
 import {
   DynamoDBDocumentClient,
   PutCommand,
   ScanCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { AwsConfig } from "../config/credentials.js";
 
 const tableName = "users";
 const client = new DynamoDBClient(AwsConfig);
@@ -21,8 +21,7 @@ export const insertUser = async (user) => {
     await dynamodb.send(new PutCommand(params));
     return user;
   } catch (error) {
-    console.error("Erro ao cadastrar usuário:", error);
-    throw new Error("Erro ao cadastrar usuário");
+    throw new Error("Erro ao cadastrar usuário " + error);
   }
 };
 
@@ -45,7 +44,6 @@ export const selectUserByEmail = async (email) => {
     }
     return null;
   } catch (error) {
-    console.error("Erro ao buscar usuário:", error);
-    throw new Error("Erro ao buscar usuário");
+    throw new Error("Erro ao buscar usuário " + error);
   }
 };

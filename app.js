@@ -5,9 +5,12 @@ const app = express();
 app.use(bodyParser.json());
 
 // Rotas
-import usersRoute from "./src/routes/userRoute.js";
+import usersRoutes from "./src/routes/userRoutes.js";
+import reportRoutes from "./src/routes/reportRoutes.js";
+import authMiddlewares from "./src/middlewares/authMiddlewares.js";
 
 // Integrando rotas
-app.use("/users", usersRoute);
+app.use("/users", usersRoutes);
+app.use("/reports", authMiddlewares, reportRoutes);
 
 export default app;

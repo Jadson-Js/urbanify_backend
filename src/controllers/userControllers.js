@@ -1,3 +1,5 @@
+import errors from "../utils/errors.js";
+
 // Importando os serviços
 import { saveUser, findUser } from "../services/userServices.js";
 
