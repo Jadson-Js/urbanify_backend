@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { AwsConfig } from "../config/credentials.js";
+import { dynamoConfig } from "../config/credentials.js";
 import {
   DynamoDBDocumentClient,
   PutCommand,
@@ -7,7 +7,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 
 const tableName = "users";
-const client = new DynamoDBClient(AwsConfig);
+const client = new DynamoDBClient(dynamoConfig);
 const dynamodb = DynamoDBDocumentClient.from(client);
 
 // Inseri um novo usuario a tabela

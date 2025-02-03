@@ -1,11 +1,22 @@
+import { S3Client } from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
 dotenv.config();
 
-export const AwsConfig = {
-  region: process.env.DYNAMODB_REGION,
+const dynamoConfig = {
+  region: process.env.AWS_REGION,
   endpoint: process.env.DYNAMODB_ENDPOINT,
   credentials: {
-    accessKeyId: process.env.DYNAMODB_ACCESSKEYID,
-    secretAccessKey: process.env.DYNAMODB_SECRETACCESSKEY,
+    accessKeyId: process.env.AWS_ACCESSKEYID,
+    secretAccessKey: process.env.AWS_SECRETACCESSKEY,
   },
 };
+
+const s3Config = {
+  region: process.env.AWS_REGION, // Substitua pela sua região
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESSKEYID,
+    secretAccessKey: process.env.AWS_SECRETACCESSKEY,
+  },
+};
+
+export { dynamoConfig, s3Config };

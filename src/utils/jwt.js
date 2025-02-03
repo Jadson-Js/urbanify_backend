@@ -3,5 +3,5 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export function generateJWT(id) {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: 600 });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 }

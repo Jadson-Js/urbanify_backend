@@ -7,6 +7,8 @@ app.use(bodyParser.json());
 // Rotas
 import usersRoutes from "./src/routes/userRoutes.js";
 import reportRoutes from "./src/routes/reportRoutes.js";
+
+// Middlewares
 import authMiddlewares from "./src/middlewares/authMiddlewares.js";
 
 // Integrando rotas
