@@ -15,5 +15,5 @@ import authMiddlewares from "./src/middlewares/authMiddlewares.js";
 app.use("/users", usersRoutes);
 app.use("/reports", authMiddlewares, reportRoutes);
 
-// Exporta o APP
+// Exporta o APPe
 export default app;
