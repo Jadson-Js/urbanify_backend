@@ -13,7 +13,7 @@ export const saveUser = async (userData) => {
     email: userData.email,
     password: passwordEncrypt,
     active: true,
-    createdAt: new Date().toISOString(),
+    created_at: new Date().toISOString(),
   };
 
   // Invoca o model, onde este ira inserir um novo elemento na tabela user com os atributos igual ao do objeto
