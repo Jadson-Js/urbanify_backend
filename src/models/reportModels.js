@@ -28,6 +28,7 @@ const insertReport = async (report) => {
 
 const insertFileToS3 = async (file) => {
   try {
+    // envia o objeto tratado para o S3
     const response = await s3Client.send(new PutObjectCommand(file));
 
     return response;

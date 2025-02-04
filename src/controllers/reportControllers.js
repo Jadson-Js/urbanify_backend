@@ -8,23 +8,20 @@ export const createReport = async (req, res) => {
   if (!req.file) {
     return res.status(400).send("Nenhum arquivo foi enviado. ");
   }
+
+  // Defini o caminho e nome
   const filePath = req.file.path;
   const fileName = req.file.filename;
 
   try {
-    const file = await saveFileToUpload(filePath, fileName);
-    data.photo_name = fileName;
-    const report = await saveReport(data);
+    // Invoca service que tratar os parametros para inserir no S3
+    await saveFileToUpload(filePath, fileName);
 
-    console.log(file);
-    console.log(
-      "################################################################"
-    );
-    console.log(report);
+    // Invoca service que tratar o conteudo para inserir no Dynamo
+    const report = await saveReport(data, fileName);
 
     res.status(201).json({ message: "Report criado com sucesso!", report });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erro ao criar report.", error });
   }
 };
