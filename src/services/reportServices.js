@@ -6,15 +6,21 @@ import { insertReport, insertFileToS3 } from "../models/reportModels.js";
 const saveReport = async (data, s3_photo_key) => {
   const report = {
     id: crypto.randomBytes(32).toString("hex"),
-    coordinates: data.coordinates,
     status: "Reportado",
     created_at: new Date().toISOString(),
+    coordinates: {
+      latitude: data.coordinates.latitude,
+      longitude: data.coordinates.longitude,
+    },
     users: [
       {
         id: data.id,
-        coordinates: data.coordinates,
         s3_photo_key: s3_photo_key,
         severity: data.severity,
+        coordinates: {
+          latitude: data.coordinates.latitude,
+          longitude: data.coordinates.longitude,
+        },
       },
     ],
     // mais tarde, quando a obra for concluida, havera um novo atributo chamado "s3_registration_key"
