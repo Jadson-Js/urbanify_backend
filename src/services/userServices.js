@@ -12,6 +12,7 @@ export const saveUser = async (userData) => {
     id: crypto.randomBytes(32).toString("hex"),
     email: userData.email,
     password: passwordEncrypt,
+    role: "user",
     active: true,
     created_at: new Date().toISOString(),
   };
@@ -29,7 +30,7 @@ export const findUser = async (email, password) => {
     const passwordDecrypt = decrypt(user.password);
 
     if (password === passwordDecrypt) {
-      user.token = generateJWT(user.id);
+      user.token = generateJWT(user.id, user.role);
       return user;
     }
   }

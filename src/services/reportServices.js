@@ -8,6 +8,8 @@ const saveReport = async (data, s3_photo_key) => {
     id: crypto.randomBytes(32).toString("hex"),
     status: "Reportado",
     created_at: new Date().toISOString(),
+    neighborhood: data.neighborhood,
+    street: data.street,
     coordinates: {
       latitude: data.coordinates.latitude,
       longitude: data.coordinates.longitude,
@@ -17,6 +19,7 @@ const saveReport = async (data, s3_photo_key) => {
         id: data.id,
         s3_photo_key: s3_photo_key,
         severity: data.severity,
+        created_at: new Date().toISOString(),
         coordinates: {
           latitude: data.coordinates.latitude,
           longitude: data.coordinates.longitude,
