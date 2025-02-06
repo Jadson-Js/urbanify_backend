@@ -2,8 +2,10 @@
 import crypto from "crypto";
 import { readFileSync, unlinkSync } from "fs";
 import { insertReport, insertFileToS3 } from "../models/reportModels.js";
+import { compress } from "../utils/compress.js";
 
 const saveFileToUpload = async (data) => {
+  compress();
   const photo = data.photo;
 
   const file = readFileSync(photo.path); // ler o arquivo enviado no req
@@ -15,9 +17,6 @@ const saveFileToUpload = async (data) => {
     StorageClass: "STANDARD",
     Body: file,
   };
-
-  // apaga o arquvio no diretorio uploads
-  unlinkSync(photo.path);
 
   // Invoca o model, para inserir um novo objeto no S3
   return await insertFileToS3(putData);
