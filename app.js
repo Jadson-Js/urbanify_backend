@@ -7,7 +7,7 @@ app.use(bodyParser.json());
 // Rotas
 import usersRoutes from "./src/routes/userRoutes.js";
 import reportRoutes from "./src/routes/reportRoutes.js";
-import historyRoutes from "./src/routes/historyRoutes.js";
+import logRoutes from "./src/routes/logRoutes.js";
 
 // Middlewares
 import authMiddlewares from "./src/middlewares/authMiddlewares.js";
@@ -16,7 +16,7 @@ import authAdminMiddlewares from "./src/middlewares/authAdminMiddlewares.js";
 // Integrando rotas
 app.use("/user", usersRoutes);
 app.use("/report", authMiddlewares, reportRoutes);
-app.use("/history", authMiddlewares, authAdminMiddlewares, historyRoutes);
+app.use("/log", authMiddlewares, authAdminMiddlewares, logRoutes);
 
 // Exporta o APPe
 export default app;

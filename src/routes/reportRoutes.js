@@ -1,6 +1,8 @@
 // Setup inicial
 import express from "express";
 const router = express.Router();
+
+// Middlewares
 import uploadMiddlewares from "../middlewares/uploadMiddlewares.js";
 
 // Importando controllers

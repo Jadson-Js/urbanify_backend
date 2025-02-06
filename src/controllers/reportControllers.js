@@ -3,25 +3,21 @@ import { saveFileToUpload, saveReport } from "../services/reportServices.js";
 
 // Informa ao service o req.body, com a finalidade de salvar o usuario ao banco de dados
 export const createReport = async (req, res) => {
-  const data = JSON.parse(req.body.data);
-
-  if (!req.file) {
-    return res.status(400).send("Nenhum arquivo foi enviado. ");
-  }
-
-  // Defini o caminho e nome
-  const filePath = req.file.path;
-  const fileName = req.file.filename;
+  const data = {
+    report: JSON.parse(req.body.data),
+    photo: req.file,
+  };
 
   try {
     // Invoca service que tratar os parametros para inserir no S3
-    await saveFileToUpload(filePath, fileName);
+    await saveFileToUpload(data);
 
     // Invoca service que tratar o conteudo para inserir no Dynamo
-    const report = await saveReport(data, fileName);
+    const report = await saveReport(data);
 
     res.status(201).json({ message: "Report criado com sucesso!", report });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Erro ao criar report.", error });
   }
 };

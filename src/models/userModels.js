@@ -1,10 +1,6 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { dynamoConfig } from "../config/credentials.js";
-import {
-  DynamoDBDocumentClient,
-  PutCommand,
-  ScanCommand,
-} from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 
 const tableName = "users";
 const client = new DynamoDBClient(dynamoConfig);
@@ -29,20 +25,16 @@ export const insertUser = async (user) => {
 export const selectUserByEmail = async (email) => {
   const params = {
     TableName: tableName,
-    FilterExpression: "email = :email",
-    ExpressionAttributeValues: {
-      ":email": email,
+    Key: {
+      email: { S: email },
     },
   };
 
   try {
-    const command = new ScanCommand(params);
+    const command = new GetItemCommand(params);
     const data = await dynamodb.send(command);
 
-    if (data.Items && data.Items.length > 0) {
-      return data.Items[0]; // Retorna o primeiro usuário encontrado
-    }
-    return null;
+    return data.Item;
   } catch (error) {
     throw new Error("Erro ao buscar usuário " + error);
   }

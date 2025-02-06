@@ -11,6 +11,18 @@ const client = new DynamoDBClient(dynamoConfig);
 const dynamodb = DynamoDBDocumentClient.from(client);
 const s3Client = new S3Client(s3Config);
 
+const insertFileToS3 = async (file) => {
+  try {
+    // envia o objeto tratado para o S3
+    const response = await s3Client.send(new PutObjectCommand(file));
+
+    return response;
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    throw error;
+  }
+};
+
 // Inseri um novo usuario a tabela
 const insertReport = async (report) => {
   const params = {
@@ -23,18 +35,6 @@ const insertReport = async (report) => {
     return report;
   } catch (error) {
     throw new Error("Erro ao cadastrar report" + error);
-  }
-};
-
-const insertFileToS3 = async (file) => {
-  try {
-    // envia o objeto tratado para o S3
-    const response = await s3Client.send(new PutObjectCommand(file));
-
-    return response;
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    throw error;
   }
 };
 

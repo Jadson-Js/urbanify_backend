@@ -1,32 +1,29 @@
 // Setup inicial
-import { selectHistory, insertHistory } from "../models/historyModels.js";
+import { selectLogs, insertLog } from "../models/logModels.js";
 import crypto from "crypto";
-import { encrypt, decrypt } from "../utils/crypto.js";
 
 // Encontra o usuario validando sua senha e defini o token ao objeto usuario
-export const findHistory = async () => {
+export const findLogs = async () => {
   // retorna o usuario encontrado pelo email
-  const historical = await selectHistory();
+  const logs = await selectLogs();
 
-  if (historical) {
-    return historical;
+  if (logs) {
+    return logs;
   }
   return null;
 };
 
 // Encripta a senha do usuario, e monta o objeto com os seus atributo.
-export const saveHistory = async (data) => {
-  const history = {
+export const saveLog = async (data) => {
+  const log = {
     id: crypto.randomBytes(32).toString("hex"),
     created_at: new Date().toISOString(),
     report_count: data.report_count,
     status: data.status,
-    adress: {
-      district: data.district,
-      street: data.street,
-    },
+    district: data.district,
+    street: data.street,
   };
 
   // Invoca o model, onde este ira inserir um novo elemento na tabela user com os atributos igual ao do objeto
-  return await insertHistory(history);
+  return await insertLog(log);
 };
