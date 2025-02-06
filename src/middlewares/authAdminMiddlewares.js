@@ -12,11 +12,12 @@ export default function validateAdminRole(req, res, next) {
   }
 
   jwt.verify(token, process.env.JWT_SECRET, (error, decoded) => {
+    console.log(decoded);
     if (error) {
       return res.status(401).json({ auth: false, message: "Token inválido." });
     }
 
-    if (decoded.role !== "admin") {
+    if (decoded.role.S !== "admin") {
       return res.status(403).json({ auth: false, message: "Acesso negado." });
     }
 
