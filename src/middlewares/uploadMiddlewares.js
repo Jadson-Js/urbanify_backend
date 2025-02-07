@@ -14,23 +14,22 @@ const storage = multer.diskStorage({
   },
 });
 
+const filter = (req, file, cb) => {
+  const filetypes = /jpeg|jpg|png/;
+  const mimetype = filetypes.test(file.mimetype);
+  const extname = filetypes.test(file.originalname.toLowerCase());
+
+  if (mimetype && extname) {
+    return cb(null, true);
+  } else {
+    cb(new Error("Only .jpeg, .jpg and .png files are allowed!"));
+  }
+};
+
 const upload = multer({
   storage,
   limits: { fileSize: maxFileSize },
-  // fileFilter: filter,
-  // Limita o tamanho do arquivo
-}); // Aqui você especifica o campo do formulário para o arquivo
+  fileFilter: filter,
+});
 
 export default upload;
-
-// const filter = (req, file, cb) => {
-//   const filetypes = /jpeg|jpg|png/;
-//   const mimetype = filetypes.test(file.mimetype);
-//   const extname = filetypes.test(file.originalname.toLowerCase());
-
-//   if (mimetype && extname) {
-//     return cb(null, true);
-//   } else {
-//     cb(new Error("Only .jpeg, .jpg and .png files are allowed!"));
-//   }
-// };

@@ -17,7 +17,7 @@ const saveFileToUpload = async (data) => {
 
   // Invoca o model, para inserir um novo objeto no S3
   await insertFileToS3(putData);
-  // unlinkSync(photo.path);
+  unlinkSync(pathFile);
 };
 
 const saveReport = async (data) => {
