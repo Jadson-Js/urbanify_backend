@@ -2,28 +2,26 @@
 import crypto from "crypto";
 import { readFileSync, unlinkSync } from "fs";
 import { insertReport, insertFileToS3 } from "../models/reportModels.js";
-import { compress } from "../utils/compress.js";
+import path from "path";
 
 const saveFileToUpload = async (data) => {
-  compress();
-  const photo = data.photo;
-
-  const file = readFileSync(photo.path); // ler o arquivo enviado no req
+  const pathFile = data.pathFile;
 
   // trata o objeto definindo seus atributos
   const putData = {
     Bucket: process.env.S3_BUCKET,
-    Key: photo.filename,
+    Key: path.basename(pathFile),
     StorageClass: "STANDARD",
-    Body: file,
+    Body: readFileSync(pathFile),
   };
 
   // Invoca o model, para inserir um novo objeto no S3
-  return await insertFileToS3(putData);
+  await insertFileToS3(putData);
+  // unlinkSync(photo.path);
 };
 
 const saveReport = async (data) => {
-  const photo = data.photo;
+  const pathFile = data.pathFile;
   const report = data.report;
 
   const putData = {
@@ -41,7 +39,7 @@ const saveReport = async (data) => {
     childrens: [
       {
         user_id: report.user_id,
-        s3_photo_key: photo.filename,
+        s3_photo_key: path.basename(pathFile),
         severity: report.severity,
         created_at: new Date().toISOString(),
         coordinates: {

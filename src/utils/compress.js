@@ -19,6 +19,6 @@ export const compress = async () => {
     .toBuffer();
 
   await fs.writeFile(outputPath, compressed);
-
-  fs.unlink(inputPath);
+  return outputPath;
+  // fs.unlink(inputPath);
 };

@@ -1,11 +1,17 @@
+import fs from "fs/promises";
+import path from "path";
+
 // Importando os serviços
 import { saveFileToUpload, saveReport } from "../services/reportServices.js";
+import { compress } from "../utils/compress.js";
 
 // Informa ao service o req.body, com a finalidade de salvar o usuario ao banco de dados
 export const createReport = async (req, res) => {
+  // const filePath = path.join("compress", compress());
+
   const data = {
     report: JSON.parse(req.body.data),
-    photo: req.file,
+    pathFile: await compress(),
   };
 
   try {

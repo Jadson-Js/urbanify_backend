@@ -14,18 +14,6 @@ const storage = multer.diskStorage({
   },
 });
 
-const filter = (req, file, cb) => {
-  const filetypes = /jpeg|jpg|png/;
-  const mimetype = filetypes.test(file.mimetype);
-  const extname = filetypes.test(file.originalname.toLowerCase());
-
-  if (mimetype && extname) {
-    return cb(null, true);
-  } else {
-    cb(new Error("Only .jpeg, .jpg and .png files are allowed!"));
-  }
-};
-
 const upload = multer({
   storage,
   limits: { fileSize: maxFileSize },
@@ -34,3 +22,15 @@ const upload = multer({
 }); // Aqui você especifica o campo do formulário para o arquivo
 
 export default upload;
+
+// const filter = (req, file, cb) => {
+//   const filetypes = /jpeg|jpg|png/;
+//   const mimetype = filetypes.test(file.mimetype);
+//   const extname = filetypes.test(file.originalname.toLowerCase());
+
+//   if (mimetype && extname) {
+//     return cb(null, true);
+//   } else {
+//     cb(new Error("Only .jpeg, .jpg and .png files are allowed!"));
+//   }
+// };
