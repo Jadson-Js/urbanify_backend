@@ -3,8 +3,9 @@ import { dynamoConfig, s3Config } from "../config/credentials.js";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import {
   DynamoDBDocumentClient,
-  PutCommand,
   ScanCommand,
+  PutCommand,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 const tableName = "reports";
 const client = new DynamoDBClient(dynamoConfig);
@@ -38,4 +39,25 @@ const insertReport = async (report) => {
   }
 };
 
-export { insertReport, insertFileToS3 };
+const updateReport = async (children) => {
+  const params = {
+    TableName: tableName,
+    Key: {
+      id: "a053a49cd0763fa81c14c8af7d211764e1d903626fd0e34df65d0128cc1173bb",
+      created_at: "2025-02-07T15:47:59.615Z",
+    },
+    UpdateExpression: "SET childrens = list_append(childrens, :children)",
+    ExpressionAttributeValues: {
+      ":children": [children],
+    },
+    ReturnValues: "ALL_NEW",
+  };
+
+  try {
+    await dynamodb.send(new UpdateCommand(params));
+  } catch (error) {
+    throw new Error("Erro no update report" + error);
+  }
+};
+
+export { insertFileToS3, insertReport, updateReport };

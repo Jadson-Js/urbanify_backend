@@ -1,7 +1,11 @@
 // Setup inicial
 import crypto from "crypto";
 import { readFileSync, unlinkSync } from "fs";
-import { insertReport, insertFileToS3 } from "../models/reportModels.js";
+import {
+  insertFileToS3,
+  insertReport,
+  updateReport,
+} from "../models/reportModels.js";
 import path from "path";
 
 const saveFileToUpload = async (data) => {
@@ -48,11 +52,29 @@ const saveReport = async (data) => {
         },
       },
     ],
-    // mais tarde, quando a obra for concluida, havera um novo atributo chamado "s3_registration_key"
   };
 
   // Invoca o model, onde este ira inserir um novo elemento na tabela user com os atributos igual ao do objeto
   return await insertReport(putData);
 };
 
-export { saveReport, saveFileToUpload };
+async function saveChildrenReport(data) {
+  const pathFile = data.pathFile;
+  const report = data.report;
+
+  const putData = {
+    user_id: report.user_id,
+    s3_photo_key: path.basename(pathFile),
+    severity: report.severity,
+    created_at: new Date().toISOString(),
+    coordinates: {
+      latitude: report.coordinates.latitude,
+      longitude: report.coordinates.longitude,
+    },
+  };
+
+  // Invoca o model, onde este ira inserir um novo elemento na tabela user com os atributos igual ao do objeto
+  return await updateReport(putData);
+}
+
+export { saveReport, saveFileToUpload, saveChildrenReport };

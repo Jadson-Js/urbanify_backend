@@ -30,6 +30,8 @@ export const selectUserByEmail = async (email) => {
     },
   };
 
+  console.log(params);
+
   try {
     const command = new GetItemCommand(params);
     const data = await dynamodb.send(command);
