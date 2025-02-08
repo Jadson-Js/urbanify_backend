@@ -1,12 +1,9 @@
-import fs from "fs/promises";
-import path from "path";
-
 // Importando os serviços
 import {
-  saveFileToUpload,
-  saveReport,
-  saveChildrenReport,
-  findReportByGeo,
+  getReportService,
+  createFileService,
+  createReportService,
+  createChildrenService,
 } from "../services/reportServices.js";
 import { compress } from "../utils/compress.js";
 
@@ -18,26 +15,26 @@ export const createReport = async (req, res) => {
   };
 
   try {
-    const report = await findReportByGeo(
+    const report = await getReportService(
       data.report.district,
       data.report.coordinates.latitude,
       data.report.coordinates.longitude
     );
 
-    await saveFileToUpload(data);
+    await createFileService(data);
 
-    if (report) {
-      const putReport = await saveChildrenReport(data, report);
+    if (!report) {
+      const putReport = await createReportService(data);
 
       res
         .status(201)
-        .json({ message: "Report atualizado com sucesso! " + putReport });
+        .json({ message: "Report cadastrado com sucesso!", report: putReport });
     } else {
-      const putReport = await saveReport(data);
+      const putReport = await createChildrenService(data, report);
 
       res
         .status(201)
-        .json({ message: "Report cadastrado com sucesso! " + putReport });
+        .json({ message: "Report atualizado com sucesso!", report: putReport });
     }
   } catch (error) {
     console.log(error);

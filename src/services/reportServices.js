@@ -1,22 +1,22 @@
 // Setup inicial
 import crypto from "crypto";
 import { readFileSync, unlinkSync } from "fs";
+import path from "path";
 import {
-  scanReportByGeo,
-  insertFileToS3,
-  insertReport,
+  getReportByLocal,
+  uploadFile,
+  createReport,
   updateReport,
 } from "../models/reportModels.js";
-import path from "path";
 import { generateGeohash } from "../utils/geohash.js";
 
-const findReportByGeo = async (district, latitude, longitude) => {
+const getReportService = async (district, latitude, longitude) => {
   const geohash = generateGeohash(latitude, longitude);
 
-  return scanReportByGeo(district, geohash);
+  return getReportByLocal(district, geohash);
 };
 
-const saveFileToUpload = async (data) => {
+const createFileService = async (data) => {
   const pathFile = data.pathFile;
 
   // trata o objeto definindo seus atributos
@@ -28,11 +28,12 @@ const saveFileToUpload = async (data) => {
   };
 
   // Invoca o model, para inserir um novo objeto no S3
-  await insertFileToS3(putData);
+  await uploadFile(putData);
+
   unlinkSync(pathFile);
 };
 
-const saveReport = async (data) => {
+const createReportService = async (data) => {
   const pathFile = data.pathFile;
   const report = data.report;
 
@@ -65,10 +66,10 @@ const saveReport = async (data) => {
   };
 
   // Invoca o model, onde este ira inserir um novo elemento na tabela user com os atributos igual ao do objeto
-  return await insertReport(putData);
+  return await createReport(putData);
 };
 
-async function saveChildrenReport(data, reportFather) {
+async function createChildrenService(data, reportFather) {
   const pathFile = data.pathFile;
   const report = data.report;
 
@@ -87,4 +88,9 @@ async function saveChildrenReport(data, reportFather) {
   return await updateReport(putData, reportFather);
 }
 
-export { findReportByGeo, saveReport, saveFileToUpload, saveChildrenReport };
+export {
+  getReportService,
+  createFileService,
+  createReportService,
+  createChildrenService,
+};

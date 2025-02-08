@@ -7,7 +7,7 @@ const client = new DynamoDBClient(dynamoConfig);
 const dynamodb = DynamoDBDocumentClient.from(client);
 
 // Inseri um novo usuario a tabela
-export const insertUser = async (user) => {
+export const createUserModel = async (user) => {
   const params = {
     TableName: tableName,
     Item: user,
@@ -22,7 +22,7 @@ export const insertUser = async (user) => {
 };
 
 // Busca usuario pelo email
-export const selectUserByEmail = async (email) => {
+export const getUserByEmailModel = async (email) => {
   const params = {
     TableName: tableName,
     Key: {

@@ -11,7 +11,7 @@ const client = new DynamoDBClient(dynamoConfig);
 const dynamodb = DynamoDBDocumentClient.from(client);
 const s3Client = new S3Client(s3Config);
 
-const scanReportByGeo = async (district, geohash) => {
+const getReportByLocal = async (district, geohash) => {
   const params = {
     TableName: tableName,
     Key: {
@@ -30,7 +30,7 @@ const scanReportByGeo = async (district, geohash) => {
   }
 };
 
-const insertFileToS3 = async (file) => {
+const uploadFile = async (file) => {
   try {
     // envia o objeto tratado para o S3
     const response = await s3Client.send(new PutObjectCommand(file));
@@ -43,7 +43,7 @@ const insertFileToS3 = async (file) => {
 };
 
 // Inseri um novo usuario a tabela
-const insertReport = async (report) => {
+const createReport = async (report) => {
   const params = {
     TableName: tableName,
     Item: report,
@@ -76,13 +76,13 @@ const updateReport = async (children, reportFather) => {
     ReturnValues: "ALL_NEW",
   };
 
-  console.log(params);
-
   try {
-    await dynamodb.send(new UpdateCommand(params));
+    const children = await dynamodb.send(new UpdateCommand(params));
+
+    return children;
   } catch (error) {
     throw new Error("Erro no update report" + error);
   }
 };
 
-export { scanReportByGeo, insertFileToS3, insertReport, updateReport };
+export { getReportByLocal, uploadFile, createReport, updateReport };

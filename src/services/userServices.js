@@ -2,10 +2,10 @@
 import { generateJWT } from "../utils/jwt.js";
 import crypto from "crypto";
 import { encrypt, decrypt } from "../utils/crypto.js";
-import { insertUser, selectUserByEmail } from "../models/userModels.js";
+import { createUserModel, getUserByEmailModel } from "../models/userModels.js";
 
 // Encripta a senha do usuario, e monta o objeto com os seus atributo.
-export const saveUser = async (data) => {
+export const createUserService = async (data) => {
   const passwordEncrypt = encrypt(data.password);
 
   const user = {
@@ -18,14 +18,14 @@ export const saveUser = async (data) => {
   };
 
   // Invoca o model, onde este ira inserir um novo elemento na tabela user com os atributos igual ao do objeto
-  return await insertUser(user);
+  return await createUserModel(user);
 };
 
 // Encontra o usuario validando sua senha e defini o token ao objeto usuario
-export const findUser = async (email, password) => {
+export const getUserService = async (email, password) => {
   // retorna o usuario encontrado pelo email
 
-  const user = await selectUserByEmail(email);
+  const user = await getUserByEmailModel(email);
 
   if (user) {
     const passwordDecrypt = decrypt(user.password.S);
