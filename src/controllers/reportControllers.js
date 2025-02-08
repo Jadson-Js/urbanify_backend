@@ -6,6 +6,7 @@ import {
   saveFileToUpload,
   saveReport,
   saveChildrenReport,
+  findReportByGeo,
 } from "../services/reportServices.js";
 import { compress } from "../utils/compress.js";
 
@@ -17,16 +18,29 @@ export const createReport = async (req, res) => {
   };
 
   try {
-    // Invoca service que tratar os parametros para inserir no S3
+    const report = await findReportByGeo(
+      data.report.district,
+      data.report.coordinates.latitude,
+      data.report.coordinates.longitude
+    );
+
     await saveFileToUpload(data);
 
-    // Invoca service que tratar o conteudo para inserir no Dynamo
-    // const report = await saveReport(data);
-    const report = await saveChildrenReport(data);
+    if (report) {
+      const putReport = await saveChildrenReport(data, report);
 
-    res.status(201).json({ message: "Report atualizado com sucesso!", report });
+      res
+        .status(201)
+        .json({ message: "Report atualizado com sucesso! " + putReport });
+    } else {
+      const putReport = await saveReport(data);
+
+      res
+        .status(201)
+        .json({ message: "Report cadastrado com sucesso! " + putReport });
+    }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Erro ao atualizar report.", error });
+    res.status(500).json({ message: "Erro ao cadastrar report.", error });
   }
 };

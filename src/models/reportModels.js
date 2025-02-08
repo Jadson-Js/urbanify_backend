@@ -1,9 +1,8 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { dynamoConfig, s3Config } from "../config/credentials.js";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import {
   DynamoDBDocumentClient,
-  ScanCommand,
   PutCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
@@ -11,6 +10,25 @@ const tableName = "reports";
 const client = new DynamoDBClient(dynamoConfig);
 const dynamodb = DynamoDBDocumentClient.from(client);
 const s3Client = new S3Client(s3Config);
+
+const scanReportByGeo = async (district, geohash) => {
+  const params = {
+    TableName: tableName,
+    Key: {
+      district: { S: district },
+      geohash: { S: geohash },
+    },
+  };
+
+  try {
+    const command = new GetItemCommand(params);
+    const data = await dynamodb.send(command);
+
+    return data.Item;
+  } catch (error) {
+    throw new Error("Erro ao buscar report " + error);
+  }
+};
 
 const insertFileToS3 = async (file) => {
   try {
@@ -29,22 +47,27 @@ const insertReport = async (report) => {
   const params = {
     TableName: tableName,
     Item: report,
+    ConditionExpression:
+      "attribute_not_exists(district) AND attribute_not_exists(geohash)",
   };
 
   try {
     await dynamodb.send(new PutCommand(params));
+
     return report;
   } catch (error) {
+    console.log(error);
+
     throw new Error("Erro ao cadastrar report" + error);
   }
 };
 
-const updateReport = async (children) => {
+const updateReport = async (children, reportFather) => {
   const params = {
     TableName: tableName,
     Key: {
-      id: "a053a49cd0763fa81c14c8af7d211764e1d903626fd0e34df65d0128cc1173bb",
-      created_at: "2025-02-07T15:47:59.615Z",
+      district: reportFather.district.S,
+      geohash: reportFather.geohash.S,
     },
     UpdateExpression: "SET childrens = list_append(childrens, :children)",
     ExpressionAttributeValues: {
@@ -53,6 +76,8 @@ const updateReport = async (children) => {
     ReturnValues: "ALL_NEW",
   };
 
+  console.log(params);
+
   try {
     await dynamodb.send(new UpdateCommand(params));
   } catch (error) {
@@ -60,4 +85,4 @@ const updateReport = async (children) => {
   }
 };
 
-export { insertFileToS3, insertReport, updateReport };
+export { scanReportByGeo, insertFileToS3, insertReport, updateReport };
