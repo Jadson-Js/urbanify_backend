@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { dynamoConfig } from "../config/credentials.js";
+import { dynamoConfig } from "../config/environment.js";
 import {
   DynamoDBDocumentClient,
   PutCommand,
@@ -20,11 +20,7 @@ export const selectLogs = async () => {
     const command = new ScanCommand(params);
     const data = await dynamodb.send(command);
 
-    if (data.Items) {
-      return data.Items; // Retorna o primeiro usuário encontrado
-    }
-
-    return null;
+    return data; // Retorna o primeiro usuário encontrado
   } catch (error) {
     throw new Error("Erro ao buscar logs " + error);
   }
@@ -38,7 +34,9 @@ export const insertLog = async (log) => {
   };
 
   try {
-    await dynamodb.send(new PutCommand(params));
+    const log = await dynamodb.send(new PutCommand(params));
+
+    return log;
   } catch (error) {
     throw new Error("Erro ao cadastrar log " + error);
   }

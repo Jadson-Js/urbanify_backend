@@ -1,5 +1,5 @@
 // Importando os serviços
-import { findLogs, saveLog } from "../services/logServices.js";
+import { findLogs, saveLog } from "../../services/logServices.js";
 
 // Informa ao service o req.body, com a finalidade de salvar o usuario ao banco de dados
 export const getLogs = async (req, res) => {

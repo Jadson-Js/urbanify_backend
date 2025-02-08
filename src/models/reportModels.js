@@ -1,5 +1,5 @@
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
-import { dynamoConfig, s3Config } from "../config/credentials.js";
+import { dynamoConfig, s3Config } from "../config/environment.js";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import {
   DynamoDBDocumentClient,

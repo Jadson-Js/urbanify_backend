@@ -1,5 +1,5 @@
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
-import { dynamoConfig } from "../config/credentials.js";
+import { dynamoConfig } from "../config/environment.js";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 
 const tableName = "users";

@@ -1,5 +1,8 @@
 // Importando os serviços
-import { createUserService, getUserService } from "../services/userServices.js";
+import {
+  createUserService,
+  getUserService,
+} from "../../services/userServices.js";
 
 // Informa ao service o req.body, com a finalidade de salvar o usuario ao banco de dados
 export const signup = async (req, res) => {

@@ -9,6 +9,6 @@ import uploadMiddlewares from "../middlewares/uploadMiddlewares.js";
 import { createReport } from "../controllers/reportControllers.js";
 
 // Definindo as rotas
-router.post("", uploadMiddlewares.single("file"), createReport); //vai indentificar e tratar um arquivo single nomeando: file
+router.post("/", uploadMiddlewares.single("file"), createReport); //vai indentificar e tratar um arquivo single nomeando: file
 
 export default router;

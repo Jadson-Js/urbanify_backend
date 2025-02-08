@@ -5,13 +5,13 @@ const app = express();
 app.use(bodyParser.json());
 
 // Rotas
-import usersRoutes from "./src/routes/userRoutes.js";
-import reportRoutes from "./src/routes/reportRoutes.js";
-import logRoutes from "./src/routes/logRoutes.js";
+import usersRoutes from "./routes/userRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
+import logRoutes from "./routes/logRoutes.js";
 
 // Middlewares
-import authMiddlewares from "./src/middlewares/authMiddlewares.js";
-import authAdminMiddlewares from "./src/middlewares/authAdminMiddlewares.js";
+import authMiddlewares from "./middlewares/authMiddlewares.js";
+import authAdminMiddlewares from "./middlewares/authAdminMiddlewares.js";
 
 // Integrando rotas
 app.use("/user", usersRoutes);
