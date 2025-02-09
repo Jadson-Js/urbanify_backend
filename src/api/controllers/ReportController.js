@@ -14,8 +14,6 @@ class ReportController {
     try {
       const putReport = await ReportService.processReport(data);
 
-      console.log(putReport);
-
       res.status(201).json({
         message: "Report cadastrado com sucesso!",
         report: putReport,
