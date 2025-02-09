@@ -6,6 +6,22 @@ import ReportModel from "../models/ReportModel.js";
 import { generateGeohash } from "../utils/geohash.js";
 
 class ReportService {
+  async processReport(data) {
+    const report = await this.getByLocal(
+      data.report.district,
+      data.report.coordinates.latitude,
+      data.report.coordinates.longitude
+    );
+
+    await this.uploadFile(data);
+
+    if (!report) {
+      return await this.create(data);
+    } else {
+      return await this.update(data, report);
+    }
+  }
+
   async getByLocal(district, latitude, longitude) {
     const geohash = generateGeohash(latitude, longitude);
 

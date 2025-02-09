@@ -12,29 +12,12 @@ class ReportController {
     };
 
     try {
-      const report = await ReportService.getByLocal(
-        data.report.district,
-        data.report.coordinates.latitude,
-        data.report.coordinates.longitude
-      );
+      const putReport = ReportService.processReport(data);
 
-      await ReportService.uploadFile(data);
-
-      if (!report) {
-        const putReport = await ReportService.create(data);
-
-        res.status(201).json({
-          message: "Report cadastrado com sucesso!",
-          report: putReport,
-        });
-      } else {
-        const putReport = await ReportService.update(data, report);
-
-        res.status(201).json({
-          message: "Report atualizado com sucesso!",
-          report: putReport,
-        });
-      }
+      res.status(201).json({
+        message: "Report cadastrado com sucesso!",
+        report: putReport,
+      });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "Erro ao cadastrar report.", error });
