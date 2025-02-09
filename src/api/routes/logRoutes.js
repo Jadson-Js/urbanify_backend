@@ -3,10 +3,10 @@ import express from "express";
 const router = express.Router();
 
 // Importando controllers
-import { getLogs, postLog } from "../controllers/logControllers.js";
+import LogController from "../controllers/LogController.js";
 
 // Definindo as rotas
-router.get("/", getLogs); //vai indentificar e tratar um arquivo single nomeando: file
-router.post("/", postLog); //vai indentificar e tratar um arquivo single nomeando: file
+router.get("/", LogController.get); //vai indentificar e tratar um arquivo single nomeando: file
+router.post("/", LogController.create); //vai indentificar e tratar um arquivo single nomeando: file
 
 export default router;
