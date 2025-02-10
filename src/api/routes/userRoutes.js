@@ -1,9 +1,10 @@
 // Setup inicial
 import express from "express";
-const router = express.Router();
 
 // Importando controllers
 import UserController from "../controllers/UserController.js";
+
+const router = express.Router();
 
 // Definindo as rotas
 router.post("/signup", UserController.signup);

@@ -1,5 +1,5 @@
 // Importando os serviços
-import ReportService from "../../services/ReportService.js";
+import ReportService from "../../services/ReportServiceTest.js";
 import { compress } from "../../utils/compress.js";
 
 // Informa ao service o req.body, com a finalidade de salvar o usuario ao banco de dados

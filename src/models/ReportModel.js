@@ -62,12 +62,12 @@ class ReportModel {
     }
   }
 
-  async update(children, reportFather) {
+  async addChildren(children, report) {
     const params = {
       TableName: tableName,
       Key: {
-        district: reportFather.district.S,
-        geohash: reportFather.geohash.S,
+        district: report.district,
+        geohash: report.geohash,
       },
       UpdateExpression: "SET childrens = list_append(childrens, :children)",
       ExpressionAttributeValues: {
@@ -77,9 +77,9 @@ class ReportModel {
     };
 
     try {
-      const children = await dynamodb.send(new UpdateCommand(params));
+      const putChildren = await dynamodb.send(new UpdateCommand(params));
 
-      return children;
+      return putChildren;
     } catch (error) {
       throw new Error("Erro no update report" + error);
     }
