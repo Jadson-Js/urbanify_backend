@@ -5,52 +5,42 @@ import path from "path";
 import ReportModel from "../models/ReportModel.js";
 import { generateGeohash } from "../utils/geohash.js";
 
-class ReportService {
-  async processReport(data) {
-    await this.uploadFile(data);
+export default class ReportService {
+  constructor(data) {
+    (this.report = data.report),
+      (this.pathFile = data.pathFile),
+      (this.reportFormated = this.formatDataToReport()),
+      (this.childrenFormated = this.formatDataToChildren());
 
-    const childrenFormated = this.formatDataToChildren(data);
-    const reportFormated = this.formatDataToReport(data);
+    this.processReport();
+  }
+
+  async processReport() {
+    const { district, coordinates } = this.report;
+
+    await this.uploadFile();
 
     const report = await this.getByLocal(
-      data.report.district,
-      data.report.coordinates.latitude,
-      data.report.coordinates.longitude
+      district,
+      coordinates.latitude,
+      coordinates.longitude
     );
 
     if (!report) {
-      await ReportModel.create(reportFormated);
+      await this.create();
     }
 
-    return await ReportModel.addChildren(childrenFormated, reportFormated);
+    return await this.addChildren();
 
     // Ja tenho o children formatado, agora falta saber se esse vai se criar um novo report ou inseri-lo em um ja existente
   }
 
-  formatDataToChildren(data) {
-    const { pathFile } = data;
-    const { user_id, severity, coordinates } = data.report;
-
-    const children = {
-      user_id: user_id,
-      s3_photo_key: path.basename(pathFile),
-      severity: severity,
-      created_at: new Date().toISOString(),
-      coordinates: {
-        latitude: coordinates.latitude,
-        longitude: coordinates.longitude,
-      },
-    };
-
-    return children;
-  }
-
-  formatDataToReport(data) {
-    const { district, street, coordinates } = data.report;
+  formatDataToReport() {
+    const { district, street, coordinates } = this.report;
 
     const putData = {
       id: crypto.randomBytes(32).toString("hex"),
-      status: "Reportado",
+      status: "REPORTADO",
       created_at: new Date().toISOString(),
       district: district,
       street: street,
@@ -65,28 +55,62 @@ class ReportService {
     return putData;
   }
 
-  async getByLocal(district, latitude, longitude) {
-    const geohash = generateGeohash(latitude, longitude);
+  formatDataToChildren() {
+    const { user_id, severity, coordinates } = this.report;
 
-    return ReportModel.getByLocal(district, geohash);
+    const putData = {
+      user_id: user_id,
+      s3_photo_key: path.basename(this.pathFile),
+      severity: severity,
+      created_at: new Date().toISOString(),
+      coordinates: {
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
+      },
+    };
+
+    return putData;
   }
 
-  async uploadFile(data) {
-    const pathFile = data.pathFile;
-
+  async uploadFile() {
     // trata o objeto definindo seus atributos
     const putData = {
       Bucket: process.env.S3_BUCKET,
-      Key: path.basename(pathFile),
+      Key: path.basename(this.pathFile),
       StorageClass: "STANDARD",
-      Body: readFileSync(pathFile),
+      Body: readFileSync(this.pathFile),
     };
 
     // Invoca o model, para inserir um novo objeto no S3
     await ReportModel.uploadFile(putData);
 
-    unlinkSync(pathFile);
+    unlinkSync(this.pathFile);
+  }
+
+  async getByLocal() {
+    const { district, coordinates } = this.report;
+
+    const geohash = generateGeohash(
+      coordinates.latitude,
+      coordinates.longitude
+    );
+
+    return ReportModel.getByLocal(district, geohash);
+  }
+
+  async create() {
+    const report = this.reportFormated;
+
+    await ReportModel.create(report);
+  }
+
+  async addChildren() {
+    const report = this.reportFormated;
+    const children = this.childrenFormated;
+
+    console.log(report);
+    console.log(children);
+
+    ReportModel.addChildren(children, report);
   }
 }
-
-export default new ReportService();
