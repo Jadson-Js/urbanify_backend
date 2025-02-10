@@ -77,7 +77,6 @@ export default class ReportService {
   }
 
   async uploadFile() {
-    // trata o objeto definindo seus atributos
     const putData = {
       Bucket: process.env.S3_BUCKET,
       Key: path.basename(this.pathFile),
