@@ -35,7 +35,7 @@ class ReportController {
 
       res.status(201).json({
         message: "Report deletado com sucesso!",
-        report: putReport,
+        report: deleteReport,
       });
     } catch (error) {
       console.log(error);

@@ -130,6 +130,10 @@ export default class ReportService {
 
     const index = getIndexChildren(user_id, report);
 
-    return await ReportModel.removeChildren(index, address, geohash);
+    if (index >= 0) {
+      return await ReportModel.removeChildren(index, address, geohash);
+    } else {
+      return "Children não encontrado";
+    }
   }
 }

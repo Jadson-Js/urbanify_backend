@@ -91,17 +91,14 @@ class ReportModel {
         address: address,
         geohash: geohash,
       },
-      UpdateExpression: "SET childrens = list_append(childrens, :children)",
-      ExpressionAttributeValues: {
-        ":children": [children],
-      },
+      UpdateExpression: `REMOVE childrens[${index}]`,
       ReturnValues: "ALL_NEW",
     };
 
     try {
-      const deleteChildren = await dynamodb.send(new UpdateCommand(params));
+      const removeChildren = await dynamodb.send(new UpdateCommand(params));
 
-      return deleteChildren;
+      return removeChildren;
     } catch (error) {
       throw new Error("Erro no update report" + error);
     }
