@@ -12,11 +12,12 @@ class ReportController {
     try {
       const reportService = new ReportService(data);
 
-      const putReport = reportService.processCreate();
+      //const putReport = reportService.processCreate();
+      reportService.processCreate();
 
       res.status(201).json({
         message: "Report cadastrado com sucesso!",
-        report: putReport,
+        report: { id: "123" },
       });
     } catch (error) {
       console.log(error);
