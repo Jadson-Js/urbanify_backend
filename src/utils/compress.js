@@ -20,7 +20,7 @@ export const compress = async () => {
 
   await fs.writeFile(outputPath, compressed);
 
-  fs.unlink(inputPath);
+  await fs.unlink(inputPath);
 
   return outputPath;
 };
