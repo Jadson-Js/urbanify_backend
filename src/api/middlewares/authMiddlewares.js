@@ -18,6 +18,7 @@ export default function validateJWT(req, res, next) {
         .json({ auth: false, message: "Falha na autenticação do Token" });
     } else {
       req.user_id = decoded.id;
+      req.role = decoded.role.S;
       next();
     }
   });

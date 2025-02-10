@@ -7,5 +7,6 @@ import ReportController from "../controllers/ReportController.js";
 const router = express.Router();
 
 router.post("/", uploadMiddlewares.single("file"), ReportController.create);
+router.delete("/", ReportController.delete);
 
 export default router;

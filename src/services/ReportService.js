@@ -4,20 +4,22 @@ import path from "path";
 import ReportModel from "../models/ReportModel.js";
 import { generateGeohash } from "../utils/geohash.js";
 import { userExist } from "../utils/userExist.js";
+import { getIndexChildren } from "../utils/getIndexChildren.js";
 
 export default class ReportService {
-  constructor(data) {
-    (this.report = data.report),
-      (this.address = `${data.report.subregion}_${data.report.district}`),
-      (this.pathFile = data.pathFile),
-      (this.reportFormated = this.formatDataToReport()),
-      (this.childrenFormated = this.formatDataToChildren());
-
-    this.processReport();
+  constructor(data = undefined) {
+    if (data) {
+      (this.user_id = data.user_id),
+        (this.report = data.report),
+        (this.address = `${data.report.subregion}_${data.report.district}`),
+        (this.pathFile = data.pathFile),
+        (this.reportFormated = this.formatDataToReport()),
+        (this.childrenFormated = this.formatDataToChildren());
+    }
   }
 
-  async processReport() {
-    const { user_id, coordinates } = this.report;
+  async processCreate() {
+    const { coordinates } = this.report;
 
     const report = await this.getByLocal(
       this.address,
@@ -32,7 +34,7 @@ export default class ReportService {
     } else {
       const childrensLength = report.childrens.L.length;
 
-      if (userExist(user_id, report)) {
+      if (userExist(this.user_id, report)) {
         return "Usuário já reportou anteriormente";
       }
 
@@ -68,10 +70,10 @@ export default class ReportService {
   }
 
   formatDataToChildren() {
-    const { user_id, severity, coordinates } = this.report;
+    const { severity, coordinates } = this.report;
 
     const putData = {
-      user_id: user_id,
+      user_id: this.user_id,
       s3_photo_key: path.basename(this.pathFile),
       severity: severity,
       created_at: new Date().toISOString(),
@@ -82,6 +84,17 @@ export default class ReportService {
     };
 
     return putData;
+  }
+
+  async getByLocal() {
+    const { coordinates } = this.report;
+
+    const geohash = generateGeohash(
+      coordinates.latitude,
+      coordinates.longitude
+    );
+
+    return ReportModel.getByLocal(this.address, geohash);
   }
 
   async uploadFile() {
@@ -97,17 +110,6 @@ export default class ReportService {
     unlinkSync(this.pathFile);
   }
 
-  async getByLocal() {
-    const { coordinates } = this.report;
-
-    const geohash = generateGeohash(
-      coordinates.latitude,
-      coordinates.longitude
-    );
-
-    return ReportModel.getByLocal(this.address, geohash);
-  }
-
   async create() {
     const report = this.reportFormated;
 
@@ -119,5 +121,15 @@ export default class ReportService {
     const children = this.childrenFormated;
 
     ReportModel.addChildren(children, report);
+  }
+
+  async processDelete(user_id, data) {
+    const { address, geohash } = data;
+
+    const report = await ReportModel.getByLocal(address, geohash);
+
+    const index = getIndexChildren(user_id, report);
+
+    return await ReportModel.removeChildren(index, address, geohash);
   }
 }
