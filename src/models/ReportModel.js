@@ -12,11 +12,11 @@ const dynamodb = DynamoDBDocumentClient.from(client);
 const s3Client = new S3Client(s3Config);
 
 class ReportModel {
-  async getByLocal(district, geohash) {
+  async getByLocal(address, geohash) {
     const params = {
       TableName: tableName,
       Key: {
-        district: { S: district },
+        address: { S: address },
         geohash: { S: geohash },
       },
     };
@@ -48,7 +48,7 @@ class ReportModel {
       TableName: tableName,
       Item: report,
       ConditionExpression:
-        "attribute_not_exists(district) AND attribute_not_exists(geohash)",
+        "attribute_not_exists(address) AND attribute_not_exists(geohash)",
     };
 
     try {
@@ -66,7 +66,7 @@ class ReportModel {
     const params = {
       TableName: tableName,
       Key: {
-        district: report.district,
+        address: report.address,
         geohash: report.geohash,
       },
       UpdateExpression: "SET childrens = list_append(childrens, :children)",

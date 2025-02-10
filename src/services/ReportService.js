@@ -8,6 +8,7 @@ import { generateGeohash } from "../utils/geohash.js";
 export default class ReportService {
   constructor(data) {
     (this.report = data.report),
+      (this.address = `${data.report.subregion}_${data.report.district}`),
       (this.pathFile = data.pathFile),
       (this.reportFormated = this.formatDataToReport()),
       (this.childrenFormated = this.formatDataToChildren());
@@ -16,12 +17,12 @@ export default class ReportService {
   }
 
   async processReport() {
-    const { district, coordinates } = this.report;
+    const { coordinates } = this.report;
 
     await this.uploadFile();
 
     const report = await this.getByLocal(
-      district,
+      this.address,
       coordinates.latitude,
       coordinates.longitude
     );
@@ -36,13 +37,16 @@ export default class ReportService {
   }
 
   formatDataToReport() {
-    const { district, street, coordinates } = this.report;
+    const { subregion, district, street, coordinates } = this.report;
+
+    const report_id = crypto.randomBytes(32).toString("hex");
+    const address = `${subregion}_${district}`;
 
     const putData = {
-      id: crypto.randomBytes(32).toString("hex"),
+      id: report_id,
       status: "REPORTADO",
       created_at: new Date().toISOString(),
-      district: district,
+      address: address,
       street: street,
       geohash: generateGeohash(coordinates.latitude, coordinates.longitude),
       coordinates: {
@@ -88,14 +92,14 @@ export default class ReportService {
   }
 
   async getByLocal() {
-    const { district, coordinates } = this.report;
+    const { coordinates } = this.report;
 
     const geohash = generateGeohash(
       coordinates.latitude,
       coordinates.longitude
     );
 
-    return ReportModel.getByLocal(district, geohash);
+    return ReportModel.getByLocal(this.address, geohash);
   }
 
   async create() {
@@ -107,9 +111,6 @@ export default class ReportService {
   async addChildren() {
     const report = this.reportFormated;
     const children = this.childrenFormated;
-
-    console.log(report);
-    console.log(children);
 
     ReportModel.addChildren(children, report);
   }

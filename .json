@@ -1,0 +1,117 @@
+// Minha casa
+{
+  "user_id": "9dc0bc9b5f296fcbbcdea099ba4d67a6bac705ef4c6c20656674abd7ff2c4071",
+  "coordinates": {
+    "latitude": "-2.532442625724486",
+    "longitude": "-44.284024198277365"
+  },
+  "subregion": "São Luís",
+  "district": "Liberdade",
+  "street": "Rua",
+  "severity": "Moderado"
+}
+
+
+// Fundação //
+{
+  "user_id": "9dc0bc9b5f296fcbbcdea099ba4d67a6bac705ef4c6c20656674abd7ff2c4071",
+  "coordinates": {
+    "latitude": "-2.5330916929147436",
+    "longitude": "-44.284253091638234"
+  },
+  "subregion": "São Luís",
+  "district": "Liberdade",
+  "street": "Rua",
+  "severity": "Moderado"
+}
+
+// Odilon -2.532436370794621, -44.284062939880194
+{
+  "user_id": "9dc0bc9b5f296fcbbcdea099ba4d67a6bac705ef4c6c20656674abd7ff2c4071",
+  "coordinates": {
+    "latitude": "-2.532436370794621",
+    "longitude": "-44.284062939880194"
+  },
+  "subregion": "São Luís",
+  "district": "Liberdade",
+  "street": "Rua",
+  "severity": "Moderado"
+}
+
+//Lucy -2.532678166352831, -44.28402581812798
+{
+  "user_id": "9dc0bc9b5f296fcbbcdea099ba4d67a6bac705ef4c6c20656674abd7ff2c4071",
+  "coordinates": {
+    "latitude": "-2.5322940312451405",
+    "longitude": "-44.28402581812798"
+  },
+  "subregion": "São Luís",
+  "district": "Liberdade",
+  "street": "Rua",
+  "severity": "Moderado"
+}
+
+// Salão -2.5327896917934343, -44.28402869361632
+{
+  "user_id": "9dc0bc9b5f296fcbbcdea099ba4d67a6bac705ef4c6c20656674abd7ff2c4071",
+  "coordinates": {
+    "latitude": "-2.5327896917934343",
+    "longitude": "-44.28402869361632"
+  },
+  "subregion": "São Luís",
+  "district": "Liberdade",
+  "street": "Rua",
+  "severity": "Moderado"
+}
+
+// Clinica
+{
+  "user_id": "9dc0bc9b5f296fcbbcdea099ba4d67a6bac705ef4c6c20656674abd7ff2c4071",
+  "coordinates": {
+    "latitude": "-2.5331292378961026",
+    "longitude": "-44.28426098548843"
+  },
+  "subregion": "São Luís",
+  "district": "Monte Castelo",
+  "street": "Rua",
+  "severity": "Moderado"
+}
+
+// Casa dos primos
+{
+  "user_id": "9dc0bc9b5f296fcbbcdea099ba4d67a6bac705ef4c6c20656674abd7ff2c4071",
+  "coordinates": {
+    "latitude": "-2.539188866766546",
+    "longitude": "-44.283904471248995"
+  },
+  "subregion": "São Luís",
+  "district": "Monte Castelo",
+  "street": "Rua",
+  "severity": "Moderado"
+}
+
+// Casa antiga
+{
+  "user_id": "9dc0bc9b5f296fcbbcdea099ba4d67a6bac705ef4c6c20656674abd7ff2c4071",
+  "coordinates": {
+    "latitude": "-2.5442874601696097",
+    "longitude": "-44.287086618349534"
+  },
+  "subregion": "São Luís",
+  "district": "Fátima",
+  "street": "Rua",
+  "severity": "Moderado"
+}
+
+// Liberdade - SP -23.559979338836754, -46.63130663946477
+{
+  "user_id": "9dc0bc9b5f296fcbbcdea099ba4d67a6bac705ef4c6c20656674abd7ff2c4071",
+  "coordinates": {
+    "latitude": "-23.559979338836754",
+    "longitude": "-46.63130663946477"
+  },
+  "subregion": "São Luís",
+  "district": "Liberdade",
+  "street": "Rua",
+  "severity": "Moderado"
+}
