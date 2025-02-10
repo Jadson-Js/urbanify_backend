@@ -4,6 +4,7 @@ import { readFileSync, unlinkSync } from "fs";
 import path from "path";
 import ReportModel from "../models/ReportModel.js";
 import { generateGeohash } from "../utils/geohash.js";
+import { userExist } from "../utils/userExist.js";
 
 export default class ReportService {
   constructor(data) {
@@ -17,21 +18,40 @@ export default class ReportService {
   }
 
   async processReport() {
-    const { coordinates } = this.report;
+    const { user_id, coordinates } = this.report;
 
-    await this.uploadFile();
-
+    // Busca se existe um report na localização
     const report = await this.getByLocal(
       this.address,
       coordinates.latitude,
       coordinates.longitude
     );
 
+    // Se não existir
     if (!report) {
-      await this.create();
-    }
+      await this.create(); // Criar um report
+      await this.uploadFile(); // Manda a imagem pro S3
+      await this.addChildren(); // Cria um filho e anexa no report
 
-    return await this.addChildren();
+      // Se ja houver um report na localização
+    } else {
+      // Verifica quantos filhos ja possui
+      const childrensLength = report.childrens.L.length;
+
+      // Verifica se o usuario está tentando reportar o mesmo local uma 2° vez
+      if (userExist(user_id, report)) {
+        return "Usuário já reportou anteriormente";
+      }
+
+      // Verifica se ja existe mais de 3 reports
+      if (childrensLength < 3) {
+        // Se ainda não houver, ele continuar a subir imagens como registros para o report
+        await this.uploadFile();
+      }
+
+      // Criar um filho, e anexa ao report ja existente
+      await this.addChildren();
+    }
 
     // Ja tenho o children formatado, agora falta saber se esse vai se criar um novo report ou inseri-lo em um ja existente
   }
