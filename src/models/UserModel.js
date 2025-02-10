@@ -11,6 +11,7 @@ class UserModel {
     const params = {
       TableName: tableName,
       Item: user,
+      ConditionExpression: "attribute_not_exists(email)",
     };
 
     try {
@@ -40,5 +41,4 @@ class UserModel {
   }
 }
 
-// Busca usuario pelo email
 export default new UserModel();

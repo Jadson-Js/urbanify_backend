@@ -1,4 +1,3 @@
-// Setup inicial
 import { generateJWT } from "../utils/jwt.js";
 import crypto from "crypto";
 import { encrypt, decrypt } from "../utils/crypto.js";
@@ -17,13 +16,10 @@ class UserService {
       created_at: new Date().toISOString(),
     };
 
-    // Invoca o model, onde este ira inserir um novo elemento na tabela user com os atributos igual ao do objeto
     return await UserModel.signup(user);
   }
 
   async login(email, password) {
-    // retorna o usuario encontrado pelo email
-
     const user = await UserModel.login(email);
 
     if (user) {

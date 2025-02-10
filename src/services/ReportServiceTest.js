@@ -3,12 +3,10 @@ import { readFileSync, unlinkSync } from "fs";
 import path from "path";
 import ReportModel from "../models/ReportModel.js";
 import { generateGeohash } from "../utils/geohash.js";
-import { userExist } from "../utils/userExist.js";
 
 export default class ReportService {
   constructor(data) {
     (this.report = data.report),
-      (this.address = `${data.report.subregion}_${data.report.district}`),
       (this.pathFile = data.pathFile),
       (this.reportFormated = this.formatDataToReport()),
       (this.childrenFormated = this.formatDataToChildren());
@@ -17,44 +15,31 @@ export default class ReportService {
   }
 
   async processReport() {
-    const { user_id, coordinates } = this.report;
+    const { district, coordinates } = this.report;
+
+    await this.uploadFile();
 
     const report = await this.getByLocal(
-      this.address,
+      district,
       coordinates.latitude,
       coordinates.longitude
     );
 
     if (!report) {
       await this.create();
-      await this.uploadFile();
-      await this.addChildren();
-    } else {
-      const childrensLength = report.childrens.L.length;
-
-      if (userExist(user_id, report)) {
-        return "Usuário já reportou anteriormente";
-      }
-
-      if (childrensLength < 3) {
-        await this.uploadFile();
-      }
-
-      await this.addChildren();
     }
+
+    return await this.addChildren();
   }
 
   formatDataToReport() {
-    const { subregion, district, street, coordinates } = this.report;
-
-    const report_id = crypto.randomBytes(32).toString("hex");
-    const address = `${subregion}_${district}`;
+    const { district, street, coordinates } = this.report;
 
     const putData = {
-      id: report_id,
+      id: crypto.randomBytes(32).toString("hex"),
       status: "REPORTADO",
       created_at: new Date().toISOString(),
-      address: address,
+      district: district,
       street: street,
       geohash: generateGeohash(coordinates.latitude, coordinates.longitude),
       coordinates: {
@@ -98,14 +83,14 @@ export default class ReportService {
   }
 
   async getByLocal() {
-    const { coordinates } = this.report;
+    const { district, coordinates } = this.report;
 
     const geohash = generateGeohash(
       coordinates.latitude,
       coordinates.longitude
     );
 
-    return ReportModel.getByLocal(this.address, geohash);
+    return ReportModel.getByLocal(district, geohash);
   }
 
   async create() {
@@ -117,6 +102,9 @@ export default class ReportService {
   async addChildren() {
     const report = this.reportFormated;
     const children = this.childrenFormated;
+
+    console.log(report);
+    console.log(children);
 
     ReportModel.addChildren(children, report);
   }

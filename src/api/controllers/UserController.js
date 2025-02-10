@@ -1,4 +1,3 @@
-// Importando os serviços
 import UserService from "../../services/UserService.js";
 
 class UserController {
@@ -24,5 +23,4 @@ class UserController {
   }
 }
 
-// Exportando a classe como uma instância
 export default new UserController();

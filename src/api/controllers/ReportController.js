@@ -1,8 +1,5 @@
-// Importando os serviços
 import ReportService from "../../services/ReportService.js";
 import { compress } from "../../utils/compress.js";
-
-// Informa ao service o req.body, com a finalidade de salvar o usuario ao banco de dados
 
 class ReportController {
   async create(req, res) {

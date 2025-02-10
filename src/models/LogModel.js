@@ -10,8 +10,6 @@ const tableName = "logs";
 const client = new DynamoDBClient(dynamoConfig);
 const dynamodb = DynamoDBDocumentClient.from(client);
 
-// Busca usuario pelo email
-
 class LogModel {
   async get() {
     const params = {
@@ -22,7 +20,7 @@ class LogModel {
       const command = new ScanCommand(params);
       const data = await dynamodb.send(command);
 
-      return data.Items; // Retorna o primeiro usuário encontrado
+      return data.Items;
     } catch (error) {
       throw new Error("Erro ao buscar logs " + error);
     }
@@ -44,5 +42,4 @@ class LogModel {
   }
 }
 
-// Inseri um novo usuario a tabela
 export default new LogModel();

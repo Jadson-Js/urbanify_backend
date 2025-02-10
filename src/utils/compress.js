@@ -6,9 +6,9 @@ export const compress = async () => {
   const directory = "uploads/";
   const outputDir = "compress/";
 
-  const [file] = await fs.readdir(directory); // Obtém apenas o primeiro arquivo
+  const [file] = await fs.readdir(directory);
 
-  if (!file || !/\.(jpe?g|png|gif)$/i.test(file)) return; // Verifica se é uma imagem válida
+  if (!file || !/\.(jpe?g|png|gif)$/i.test(file)) return;
 
   const inputPath = path.join(directory, file);
   const outputPath = path.join(outputDir, file);

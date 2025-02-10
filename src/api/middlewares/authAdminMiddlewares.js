@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export default function validateAdminRole(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1]; // Pega o token do header
+  const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     return res
@@ -20,7 +20,7 @@ export default function validateAdminRole(req, res, next) {
       return res.status(403).json({ auth: false, message: "Acesso negado." });
     }
 
-    req.user_id = decoded.id; // Adiciona o ID do usuário à requisição
-    next(); // Permite continuar para a rota
+    req.user_id = decoded.id;
+    next();
   });
 }

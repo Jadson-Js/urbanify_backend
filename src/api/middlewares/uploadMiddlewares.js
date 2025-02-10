@@ -1,15 +1,12 @@
-// habilita as rotas possibilidade de receber arquivos
 import multer from "multer";
 
-const maxFileSize = 3 * 1024 * 1024; // 5MB
+const maxFileSize = 3 * 1024 * 1024; // Defini MB maximo por arquivo
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Poem o arquivo na pasta download
     cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    // é definido o nome do arquivo
     cb(null, Date.now() + "-" + file.originalname);
   },
 });
