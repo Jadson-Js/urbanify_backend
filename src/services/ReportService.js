@@ -34,9 +34,9 @@ export default class ReportService {
     } else {
       const childrensLength = report.childrens.L.length;
 
-      if (userExist(this.user_id, report)) {
-        return "Usuário já reportou anteriormente";
-      }
+      // if (userExist(this.user_id, report)) {
+      //   return "Usuário já reportou anteriormente";
+      // }
 
       if (childrensLength < 3) {
         await this.uploadFile();
@@ -130,7 +130,16 @@ export default class ReportService {
 
     const index = getIndexChildren(user_id, report);
 
-    if (index >= 0) {
+    // Se o report tiver apenas um filho, e o index pego na function for maior que -1, delete o report inteiro
+
+    const childrensLength = report.childrens.L.length;
+
+    console.log(report);
+    console.log(user_id);
+
+    if (childrensLength == 1 && index != -1) {
+      return await ReportModel.delete(address, geohash);
+    } else if (index != -1) {
       return await ReportModel.removeChildren(index, address, geohash);
     } else {
       return "Children não encontrado";

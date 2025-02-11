@@ -5,6 +5,7 @@ import {
   DynamoDBDocumentClient,
   PutCommand,
   UpdateCommand,
+  DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 const tableName = "reports";
 const client = new DynamoDBClient(dynamoConfig);
@@ -79,6 +80,24 @@ class ReportModel {
       const putChildren = await dynamodb.send(new UpdateCommand(params));
 
       return putChildren;
+    } catch (error) {
+      throw new Error("Erro no update report" + error);
+    }
+  }
+
+  async delete(address, geohash) {
+    const params = {
+      TableName: tableName,
+      Key: {
+        address: address,
+        geohash: geohash,
+      },
+    };
+
+    try {
+      const deleteReport = await dynamodb.send(new DeleteCommand(params));
+
+      return deleteReport;
     } catch (error) {
       throw new Error("Erro no update report" + error);
     }
