@@ -6,18 +6,17 @@ class ReportController {
     const data = {
       user_id: req.user_id.S,
       report: JSON.parse(req.body.data),
-      pathFile: await compress(),
+      file: req.file,
     };
 
     try {
       const reportService = new ReportService(data);
 
-      //const putReport = reportService.processCreate();
-      reportService.processCreate();
+      const putReport = reportService.processCreate();
 
       res.status(201).json({
         message: "Report cadastrado com sucesso!",
-        report: { id: "123" },
+        report: putReport,
       });
     } catch (error) {
       console.log(error);
@@ -26,13 +25,15 @@ class ReportController {
   }
 
   async delete(req, res) {
-    const user_id = req.user_id;
-    const data = req.body;
+    const data = {
+      user_id: req.user_id.S,
+      body: req.body,
+    };
 
     try {
-      const reportService = new ReportService();
+      const reportService = new ReportService(data);
 
-      const deleteReport = reportService.processDelete(user_id, data);
+      const deleteReport = reportService.processDelete();
 
       res.status(201).json({
         message: "Report deletado com sucesso!",

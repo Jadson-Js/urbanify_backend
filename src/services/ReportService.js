@@ -1,62 +1,82 @@
 import crypto from "crypto";
-import { readFileSync, unlinkSync } from "fs";
-import path from "path";
+import sharp from "sharp";
+import stream from "stream";
+
 import ReportModel from "../models/ReportModel.js";
+
 import { generateGeohash } from "../utils/geohash.js";
 import { userExist } from "../utils/userExist.js";
 import { getIndexChildren } from "../utils/getIndexChildren.js";
 
 export default class ReportService {
   constructor(data = undefined) {
-    if (data) {
-      (this.user_id = data.user_id),
-        (this.report = data.report),
-        (this.address = `${data.report.subregion}_${data.report.district}`),
-        (this.pathFile = data.pathFile),
-        (this.reportFormated = this.formatDataToReport()),
-        (this.childrenFormated = this.formatDataToChildren());
+    if (data.user_id) {
+      this.user_id = data.user_id;
+    }
+
+    if (data.body) {
+      this.body = data.body;
+    }
+
+    if (data.file) {
+      this.file = data.file;
+      this.key = `${new Date().toISOString()}-${data.file.originalname}`;
+    }
+
+    if (data.report) {
+      this.report = data.report;
+      this.address = `${data.report.subregion}_${data.report.district}`;
+      this.reportFormated = this.formatDataToReport();
+      this.childrenFormated = this.formatDataToChildren();
     }
   }
 
   async processCreate() {
+    // // Pega as coordenadas do report
     const { coordinates } = this.report;
 
+    // Faz uma busca para saber se existe algum report existente no local requisitado
     const report = await this.getByLocal(
       this.address,
       coordinates.latitude,
       coordinates.longitude
     );
 
+    // Se não existir nenhum report anterior
     if (!report) {
       await this.create();
       await this.uploadFile();
       await this.addChildren();
-    } else {
-      const childrensLength = report.childrens.L.length;
 
+      // Se existir um report na região
+    } else {
       // if (userExist(this.user_id, report)) {
       //   return "Usuário já reportou anteriormente";
       // }
 
-      if (childrensLength < 3) {
-        await this.uploadFile();
-      }
+      // // const childrensLength = report.childrens.L.length;
 
+      // Verifica se este tem mais de 3 filhos
+      // //if (childrensLength < 3) {
+      // Se tiver, ele faz o upload da fotografia para o report
+      await this.uploadFile();
+      // //}
+
+      // Adiciona-se o report como filho
       await this.addChildren();
     }
   }
 
   formatDataToReport() {
-    const { subregion, district, street, coordinates } = this.report;
+    const { street, coordinates } = this.report;
 
     const report_id = crypto.randomBytes(32).toString("hex");
-    const address = `${subregion}_${district}`;
 
     const putData = {
       id: report_id,
       status: "REPORTADO",
       created_at: new Date().toISOString(),
-      address: address,
+      address: this.address,
       street: street,
       geohash: generateGeohash(coordinates.latitude, coordinates.longitude),
       coordinates: {
@@ -74,7 +94,7 @@ export default class ReportService {
 
     const putData = {
       user_id: this.user_id,
-      s3_photo_key: path.basename(this.pathFile),
+      s3_photo_key: this.key,
       severity: severity,
       created_at: new Date().toISOString(),
       coordinates: {
@@ -98,16 +118,21 @@ export default class ReportService {
   }
 
   async uploadFile() {
+    // Processa a imagem com Sharp (redimensiona e comprime)
+    const buffer = sharp(this.file.buffer)
+      .resize(800) // Redimensiona para 800px
+      .jpeg({ quality: 10 }) // Comprime para JPEG qualidade 80
+      .toBuffer() // Retorna um buffer processado
+      .toString("base64");
+
     const putData = {
       Bucket: process.env.S3_BUCKET,
-      Key: path.basename(this.pathFile),
+      Key: this.key,
       StorageClass: "STANDARD",
-      Body: readFileSync(this.pathFile),
+      Body: buffer,
     };
 
-    await ReportModel.uploadFile(putData);
-
-    unlinkSync(this.pathFile);
+    return await ReportModel.uploadFile(putData);
   }
 
   async create() {
@@ -123,8 +148,10 @@ export default class ReportService {
     ReportModel.addChildren(children, report);
   }
 
-  async processDelete(user_id, data) {
-    const { address, geohash } = data;
+  async processDelete() {
+    const user_id = this.user_id;
+
+    const { address, geohash } = this.body;
 
     const report = await ReportModel.getByLocal(address, geohash);
 
@@ -133,9 +160,6 @@ export default class ReportService {
     // Se o report tiver apenas um filho, e o index pego na function for maior que -1, delete o report inteiro
 
     const childrensLength = report.childrens.L.length;
-
-    console.log(report);
-    console.log(user_id);
 
     if (childrensLength == 1 && index != -1) {
       return await ReportModel.delete(address, geohash);
