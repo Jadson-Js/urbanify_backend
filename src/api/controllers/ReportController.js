@@ -12,7 +12,7 @@ class ReportController {
     try {
       const reportService = new ReportService(data);
 
-      const putReport = reportService.processCreate();
+      const putReport = await reportService.processCreate();
 
       res.status(201).json({
         message: "Report cadastrado com sucesso!",
@@ -33,7 +33,8 @@ class ReportController {
     try {
       const reportService = new ReportService(data);
 
-      const deleteReport = reportService.processDelete();
+      const deleteReport = await reportService.processDelete();
+      console.log(deleteReport);
 
       res.status(201).json({
         message: "Report deletado com sucesso!",

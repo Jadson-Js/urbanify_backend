@@ -47,7 +47,7 @@ export default class ReportService {
       const newReport = await this.create();
 
       await this.uploadFile(newReport.id);
-      await this.addChildren();
+      return await this.addChildren();
 
       // Se existir um report na região
     } else {
@@ -65,7 +65,7 @@ export default class ReportService {
       }
 
       // Adiciona-se o report como filho
-      await this.addChildren();
+      return await this.addChildren();
     }
   }
 
@@ -158,6 +158,11 @@ export default class ReportService {
     const { address, geohash } = this.body;
 
     const report = await ReportModel.getByLocal(address, geohash);
+
+    if (!report) {
+      return "Report não encontrado";
+    }
+
     const index = getIndexChildren(user_id, report);
 
     const childrensLength = report.childrens.L.length;
