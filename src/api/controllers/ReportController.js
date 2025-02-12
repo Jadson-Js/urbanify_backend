@@ -1,7 +1,18 @@
 import ReportService from "../../services/ReportService.js";
-import { compress } from "../../utils/compress.js";
 
 class ReportController {
+  async get(req, res) {
+    try {
+      const reportService = new ReportService();
+
+      const reports = await reportService.get();
+
+      res.status(201).json({ message: "Busca concluida!", reports });
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar reports.", error });
+    }
+  }
+
   async create(req, res) {
     const data = {
       user_id: req.user_id.S,

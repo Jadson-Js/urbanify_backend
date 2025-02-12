@@ -9,14 +9,10 @@ import usersRoutes from "./routes/userRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import logRoutes from "./routes/logRoutes.js";
 
-// Middlewares
-import authMiddlewares from "./middlewares/authMiddlewares.js";
-import authAdminMiddlewares from "./middlewares/authAdminMiddlewares.js";
-
 // Integrando rotas
 app.use("/user", usersRoutes);
-app.use("/report", authMiddlewares, reportRoutes);
-app.use("/log", authMiddlewares, authAdminMiddlewares, logRoutes);
+app.use("/report", reportRoutes);
+app.use("/log", logRoutes);
 
 // Exporta o APPe
 export default app;

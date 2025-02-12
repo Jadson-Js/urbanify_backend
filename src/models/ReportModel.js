@@ -8,6 +8,7 @@ import {
 } from "@aws-sdk/client-s3";
 import {
   DynamoDBDocumentClient,
+  ScanCommand,
   PutCommand,
   UpdateCommand,
   DeleteCommand,
@@ -18,6 +19,22 @@ const dynamodb = DynamoDBDocumentClient.from(client);
 const s3Client = new S3Client(s3Config);
 
 class ReportModel {
+  async get() {
+    const params = {
+      TableName: tableName,
+    };
+
+    try {
+      const command = new ScanCommand(params);
+      const data = await dynamodb.send(command);
+
+      return data.Items;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Erro ao buscar reports " + error);
+    }
+  }
+
   async getByLocal(address, geohash) {
     const params = {
       TableName: tableName,
@@ -33,6 +50,7 @@ class ReportModel {
 
       return data.Item;
     } catch (error) {
+      console.log(error);
       throw new Error("Erro ao buscar report " + error);
     }
   }
@@ -86,6 +104,7 @@ class ReportModel {
 
       return putChildren;
     } catch (error) {
+      console.log(error);
       throw new Error("Erro no update report" + error);
     }
   }
@@ -104,6 +123,7 @@ class ReportModel {
 
       return deleteReport;
     } catch (error) {
+      console.log(error);
       throw new Error("Erro no update report" + error);
     }
   }
@@ -124,6 +144,7 @@ class ReportModel {
 
       return removeChildren;
     } catch (error) {
+      console.log(error);
       throw new Error("Erro no update report" + error);
     }
   }
@@ -134,6 +155,7 @@ class ReportModel {
 
       return listResponse;
     } catch (error) {
+      console.log(error);
       throw new Error("Erro no delete dos arquivos" + error);
     }
   }
@@ -146,6 +168,7 @@ class ReportModel {
 
       return deleteResponse;
     } catch (error) {
+      console.log(error);
       throw new Error("Erro no delete dos arquivos" + error);
     }
   }

@@ -10,25 +10,31 @@ import { getIndexChildren } from "../utils/getIndexChildren.js";
 
 export default class ReportService {
   constructor(data = undefined) {
-    if (data.user_id) {
+    if (data && data.user_id) {
       this.user_id = data.user_id;
     }
 
-    if (data.body) {
+    if (data && data.body) {
       this.body = data.body;
     }
 
-    if (data.file) {
+    if (data && data.file) {
       this.file = data.file;
       this.key = `${new Date().toISOString()}-${data.file.originalname}`;
     }
 
-    if (data.report) {
+    if (data && data.report) {
       this.report = data.report;
       this.address = `${data.report.subregion}_${data.report.district}`;
       this.reportFormated = this.formatDataToReport();
       this.childrenFormated = this.formatDataToChildren();
     }
+  }
+
+  async get() {
+    const reports = await ReportModel.get();
+
+    return reports;
   }
 
   async processCreate() {
@@ -51,9 +57,9 @@ export default class ReportService {
 
       // Se existir um report na região
     } else {
-      if (userExist(this.user_id, report)) {
-        return "Usuário já reportou anteriormente";
-      }
+      // if (userExist(this.user_id, report)) {
+      //   return "Usuário já reportou anteriormente";
+      // }
 
       const childrensLength = report.childrens.L.length;
 
@@ -150,7 +156,11 @@ export default class ReportService {
     const report = this.reportFormated;
     const children = this.childrenFormated;
 
-    return ReportModel.addChildren(children, report);
+    const newChildren = await ReportModel.addChildren(children, report);
+
+    const report_id = { id: newChildren.Attributes.id };
+
+    return report_id;
   }
 
   async processDelete() {
