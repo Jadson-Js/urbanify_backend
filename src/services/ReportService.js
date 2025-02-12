@@ -32,7 +32,7 @@ export default class ReportService {
   }
 
   async processCreate() {
-    // // Pega as coordenadas do report
+    // Pega as coordenadas do report
     const { coordinates } = this.report;
 
     // Faz uma busca para saber se existe algum report existente no local requisitado
@@ -44,23 +44,25 @@ export default class ReportService {
 
     // Se não existir nenhum report anterior
     if (!report) {
-      await this.create();
-      await this.uploadFile();
+      const newReport = await this.create();
+
+      await this.uploadFile(newReport.id);
       await this.addChildren();
 
       // Se existir um report na região
     } else {
-      // if (userExist(this.user_id, report)) {
-      //   return "Usuário já reportou anteriormente";
-      // }
+      if (userExist(this.user_id, report)) {
+        return "Usuário já reportou anteriormente";
+      }
 
-      // // const childrensLength = report.childrens.L.length;
+      const childrensLength = report.childrens.L.length;
 
       // Verifica se este tem mais de 3 filhos
-      // //if (childrensLength < 3) {
-      // Se tiver, ele faz o upload da fotografia para o report
-      await this.uploadFile();
-      // //}
+      if (childrensLength < 3) {
+        // Se tiver, ele faz o upload da fotografia para o report
+
+        await this.uploadFile(report.id.S);
+      }
 
       // Adiciona-se o report como filho
       await this.addChildren();
@@ -70,7 +72,10 @@ export default class ReportService {
   formatDataToReport() {
     const { street, coordinates } = this.report;
 
-    const report_id = crypto.randomBytes(32).toString("hex");
+    const report_id = crypto
+      .randomBytes(12)
+      .toString("base64")
+      .replace(/\W/g, "");
 
     const putData = {
       id: report_id,
@@ -94,6 +99,7 @@ export default class ReportService {
 
     const putData = {
       user_id: this.user_id,
+      // Talvez no futuro, vc precise adicionar o prefixo (id do report)
       s3_photo_key: this.key,
       severity: severity,
       created_at: new Date().toISOString(),
@@ -117,19 +123,18 @@ export default class ReportService {
     return ReportModel.getByLocal(this.address, geohash);
   }
 
-  async uploadFile() {
+  async uploadFile(report_id) {
     // Processa a imagem com Sharp (redimensiona e comprime)
-    const buffer = sharp(this.file.buffer)
+    const image = sharp(this.file.buffer)
       .resize(800) // Redimensiona para 800px
       .jpeg({ quality: 10 }) // Comprime para JPEG qualidade 80
-      .toBuffer() // Retorna um buffer processado
       .toString("base64");
 
     const putData = {
       Bucket: process.env.S3_BUCKET,
-      Key: this.key,
+      Key: `${report_id}/${this.key}`,
       StorageClass: "STANDARD",
-      Body: buffer,
+      Body: image,
     };
 
     return await ReportModel.uploadFile(putData);
@@ -138,35 +143,50 @@ export default class ReportService {
   async create() {
     const report = this.reportFormated;
 
-    await ReportModel.create(report);
+    return await ReportModel.create(report);
   }
 
   async addChildren() {
     const report = this.reportFormated;
     const children = this.childrenFormated;
 
-    ReportModel.addChildren(children, report);
+    return ReportModel.addChildren(children, report);
   }
 
   async processDelete() {
     const user_id = this.user_id;
-
     const { address, geohash } = this.body;
 
     const report = await ReportModel.getByLocal(address, geohash);
-
     const index = getIndexChildren(user_id, report);
-
-    // Se o report tiver apenas um filho, e o index pego na function for maior que -1, delete o report inteiro
 
     const childrensLength = report.childrens.L.length;
 
     if (childrensLength == 1 && index != -1) {
+      await this.deleteFilesByPrefix(report.id.S);
       return await ReportModel.delete(address, geohash);
     } else if (index != -1) {
       return await ReportModel.removeChildren(index, address, geohash);
     } else {
       return "Children não encontrado";
     }
+  }
+
+  async deleteFilesByPrefix(prefix) {
+    const paramsToGet = {
+      Bucket: process.env.S3_BUCKET,
+      Prefix: prefix,
+    };
+
+    const listFiles = await ReportModel.getFilesByPrefix(paramsToGet);
+
+    const paramsToDelete = {
+      Bucket: process.env.S3_BUCKET,
+      Delete: {
+        Objects: listFiles.Contents.map((obj) => ({ Key: obj.Key })),
+      },
+    };
+
+    return await ReportModel.deleteFiles(paramsToDelete);
   }
 }

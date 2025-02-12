@@ -1,6 +1,11 @@
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { dynamoConfig, s3Config } from "../config/environment.js";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  ListObjectsV2Command,
+  DeleteObjectsCommand,
+} from "@aws-sdk/client-s3";
 import {
   DynamoDBDocumentClient,
   PutCommand,
@@ -120,6 +125,28 @@ class ReportModel {
       return removeChildren;
     } catch (error) {
       throw new Error("Erro no update report" + error);
+    }
+  }
+
+  async getFilesByPrefix(data) {
+    try {
+      const listResponse = await s3Client.send(new ListObjectsV2Command(data));
+
+      return listResponse;
+    } catch (error) {
+      throw new Error("Erro no delete dos arquivos" + error);
+    }
+  }
+
+  async deleteFiles(list) {
+    try {
+      const deleteResponse = await s3Client.send(
+        new DeleteObjectsCommand(list)
+      );
+
+      return deleteResponse;
+    } catch (error) {
+      throw new Error("Erro no delete dos arquivos" + error);
     }
   }
 }
