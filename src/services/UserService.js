@@ -13,6 +13,7 @@ class UserService {
       password: passwordEncrypt,
       role: "USER",
       active: true,
+      reports_id: [],
       created_at: new Date().toISOString(),
     };
 

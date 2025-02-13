@@ -1,8 +1,9 @@
-function userExist(user_email, report) {
-  const array = report.childrens.L;
-  const findUser = array.some((item) => item.M.user_email.S === user_email);
+function userExist(user, report_id) {
+  const userReports = user.reports_id.L;
 
-  return findUser;
+  const exist = userReports.some((item) => item.S === report_id);
+
+  return exist;
 }
 
 export { userExist };

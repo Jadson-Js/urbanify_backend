@@ -1,6 +1,10 @@
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { dynamoConfig } from "../config/environment.js";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 const tableName = "users";
 const client = new DynamoDBClient(dynamoConfig);
@@ -37,6 +41,29 @@ class UserModel {
       return data.Item;
     } catch (error) {
       throw new Error("Erro ao buscar usuário " + error);
+    }
+  }
+
+  async addReportToUser(user_email, report_id) {
+    const params = {
+      TableName: tableName,
+      Key: {
+        email: user_email,
+      },
+      UpdateExpression: "SET reports_id = list_append(reports_id, :report_id)",
+      ExpressionAttributeValues: {
+        ":report_id": [report_id],
+      },
+      ReturnValues: "ALL_NEW",
+    };
+
+    try {
+      const putReportId = await dynamodb.send(new UpdateCommand(params));
+
+      return putReportId;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Erro no update user" + error);
     }
   }
 }

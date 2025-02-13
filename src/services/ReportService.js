@@ -1,8 +1,8 @@
 import crypto from "crypto";
 import sharp from "sharp";
-import stream from "stream";
 
 import ReportModel from "../models/ReportModel.js";
+import UserModel from "../models/UserModel.js";
 
 import { generateGeohash } from "../utils/geohash.js";
 import { userExist } from "../utils/userExist.js";
@@ -39,7 +39,6 @@ export default class ReportService {
   }
 
   async processCreate() {
-    // Pega as coordenadas do report
     const { coordinates } = this.report;
 
     // Faz uma busca para saber se existe algum report existente no local requisitado
@@ -53,24 +52,33 @@ export default class ReportService {
     if (!report) {
       const newReport = await this.create();
 
+      // Enviar o arquivo para o S3
       await this.uploadFile(newReport.id);
+
+      // Vai chamar um model onde vai informar os parametros email & report_id
+      await UserModel.addReportToUser(this.user_email, newReport.id);
+
+      // adiciona o children ao report e retornar os dados
       return await this.addChildren();
 
       // Se existir um report na região
     } else {
-      // if (userExist(this.user_id, report)) {
-      //   return "Usuário já reportou anteriormente";
-      // }
+      // Verifica esse usuario ja fez report no mesmo local
+      const userExist = await this.verifyUserExist(report.id.S);
+
+      if (userExist) {
+        return "Usuario ja reportou anteriormente";
+      }
 
       const childrensLength = report.childrens.L.length;
 
-      // Verifica se este tem mais de 3 filhos
+      // Verifica se este report tem mais de 3 filhos
       if (childrensLength < 3) {
         // Se tiver, ele faz o upload da fotografia para o report
-
         await this.uploadFile(report.id.S);
       }
 
+      await UserModel.addReportToUser(this.user_email, report.id.S);
       // Adiciona-se o report como filho
       return await this.addChildren();
     }
@@ -128,6 +136,12 @@ export default class ReportService {
     );
 
     return ReportModel.getByLocal(this.address, geohash);
+  }
+
+  async verifyUserExist(report_id) {
+    const user = await UserModel.login(this.user_email);
+
+    return userExist(user, report_id);
   }
 
   async uploadFile(report_id) {
