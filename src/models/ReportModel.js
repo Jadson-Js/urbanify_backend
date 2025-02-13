@@ -1,4 +1,4 @@
-import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { dynamoConfig, s3Config } from "../config/environment.js";
 import {
   S3Client,
@@ -9,6 +9,7 @@ import {
 import {
   DynamoDBDocumentClient,
   ScanCommand,
+  GetCommand,
   PutCommand,
   UpdateCommand,
   DeleteCommand,
@@ -59,13 +60,13 @@ class ReportModel {
     const params = {
       TableName: tableName,
       Key: {
-        address: { S: address },
-        geohash: { S: geohash },
+        address: address,
+        geohash: geohash,
       },
     };
 
     try {
-      const command = new GetItemCommand(params);
+      const command = new GetCommand(params);
       const data = await dynamodb.send(command);
 
       return data.Item;

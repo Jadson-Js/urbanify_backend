@@ -23,8 +23,10 @@ class UserService {
   async login(email, password) {
     const user = await UserModel.getByEmail(email);
 
+    console.log(user);
+
     if (user) {
-      const passwordDecrypt = decrypt(user.password.S);
+      const passwordDecrypt = decrypt(user.password);
 
       if (password === passwordDecrypt) {
         user.token = generateJWT(user.email, user.role);

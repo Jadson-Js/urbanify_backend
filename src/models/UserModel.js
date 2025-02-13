@@ -1,7 +1,8 @@
-import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { dynamoConfig } from "../config/environment.js";
 import {
   DynamoDBDocumentClient,
+  GetCommand,
   PutCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
@@ -30,12 +31,12 @@ class UserModel {
     const params = {
       TableName: tableName,
       Key: {
-        email: { S: email },
+        email: email,
       },
     };
 
     try {
-      const command = new GetItemCommand(params);
+      const command = new GetCommand(params);
       const data = await dynamodb.send(command);
 
       return data.Item;

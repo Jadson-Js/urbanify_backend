@@ -21,7 +21,7 @@ export default function validateAdminRole(req, res, next) {
     }
 
     req.user_email = decoded.email;
-    req.role = decoded.role.S;
+    req.role = decoded.role;
     next();
   });
 }

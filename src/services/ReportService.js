@@ -41,7 +41,7 @@ export default class ReportService {
 
   async getMyReports() {
     const user = await UserModel.getByEmail(this.user_email);
-    const reportList = user.reports_id.L.map((item) => item.S);
+    const reportList = user.reports_id.map((item) => item);
     const reports = await ReportModel.getByListId(reportList);
 
     const childrens = getChildrenInReport(this.user_email, reports);
@@ -75,21 +75,21 @@ export default class ReportService {
       // Se existir um report na região
     } else {
       // Verifica esse usuario ja fez report no mesmo local
-      const userExist = await this.verifyUserExist(report.id.S);
+      const userExist = await this.verifyUserExist(report.id);
 
       if (userExist) {
         return "Usuario ja reportou anteriormente";
       }
 
-      const childrensLength = report.childrens.L.length;
+      const childrensLength = report.childrens.length;
 
       // Verifica se este report tem mais de 3 filhos
       if (childrensLength < 3) {
         // Se tiver, ele faz o upload da fotografia para o report
-        await this.uploadFile(report.id.S);
+        await this.uploadFile(report.id);
       }
 
-      await UserModel.addReport(this.user_email, report.id.S);
+      await UserModel.addReport(this.user_email, report.id);
       // Adiciona-se o report como filho
       return await this.addChildren();
     }
@@ -201,10 +201,10 @@ export default class ReportService {
 
     const index = getIndexChildren(user_email, report);
 
-    const childrensLength = report.childrens.L.length;
+    const childrensLength = report.childrens.length;
 
     if (childrensLength == 1 && index != -1) {
-      await this.deleteFilesByPrefix(report.id.S);
+      await this.deleteFilesByPrefix(report.id);
       return await ReportModel.delete(address, geohash);
     } else if (index != -1) {
       return await ReportModel.removeChildren(index, address, geohash);

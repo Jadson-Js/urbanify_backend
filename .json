@@ -1,20 +1,19 @@
 // Minha casa
 {
-  "user_email": "admin@admin.com",
-  "coordinates": {
-    "latitude": "-2.532442625724486",
-    "longitude": "-44.284024198277365"
-  },
   "subregion": "São Luís",
   "district": "Liberdade",
   "street": "Rua",
-  "severity": "Moderado"
+  "severity": "Moderado",
+  "coordinates": {
+    "latitude": "-2.532442625724486",
+    "longitude": "-44.284024198277365"
+  }
 }
 
 
 // Fundação //
 {
-  "user_id": "admin@admin.com",
+  
   "coordinates": {
     "latitude": "-2.5330916929147436",
     "longitude": "-44.284253091638234"
@@ -27,7 +26,7 @@
 
 // Odilon -2.532436370794621, -44.284062939880194
 {
-  "user_id": "admin@admin.com",
+ 
   "coordinates": {
     "latitude": "-2.532436370794621",
     "longitude": "-44.284062939880194"
@@ -40,7 +39,7 @@
 
 //Lucy -2.532678166352831, -44.28402581812798
 {
-  "user_id": "admin@admin.com",
+
   "coordinates": {
     "latitude": "-2.5322940312451405",
     "longitude": "-44.28402581812798"
@@ -53,7 +52,7 @@
 
 // Salão -2.5327896917934343, -44.28402869361632
 {
-  "user_id": "admin@admin.com",
+
   "coordinates": {
     "latitude": "-2.5327896917934343",
     "longitude": "-44.28402869361632"
@@ -66,7 +65,7 @@
 
 // Clinica
 {
-  "user_id": "admin@admin.com",
+
   "coordinates": {
     "latitude": "-2.5331292378961026",
     "longitude": "-44.28426098548843"
@@ -79,7 +78,7 @@
 
 // Casa dos primos
 {
-  "user_id": "admin@admin.com",
+
   "coordinates": {
     "latitude": "-2.539188866766546",
     "longitude": "-44.283904471248995"
@@ -92,7 +91,7 @@
 
 // Casa antiga
 {
-  "user_id": "admin@admin.com",
+
   "coordinates": {
     "latitude": "-2.5442874601696097",
     "longitude": "-44.287086618349534"
@@ -105,7 +104,7 @@
 
 // Liberdade - SP -23.559979338836754, -46.63130663946477
 {
-  "user_id": "admin@admin.com",
+
   "coordinates": {
     "latitude": "-23.559979338836754",
     "longitude": "-46.63130663946477"
