@@ -13,6 +13,26 @@ class ReportController {
     }
   }
 
+  async getStatus(req, res) {
+    const data = {
+      body: req.body,
+    };
+
+    try {
+      const reportService = new ReportService(data);
+
+      const status = await reportService.getStatusByLocal();
+
+      res.status(201).json({
+        message: "Busca feita com sucesso!",
+        status: status,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Erro ao buscar reports.", error });
+    }
+  }
+
   async getMyReports(req, res) {
     const data = {
       user_email: req.user_email,

@@ -149,6 +149,20 @@ export default class ReportService {
     return ReportModel.getByLocal(this.address, geohash);
   }
 
+  async getStatusByLocal() {
+    const { address, geohash } = this.body;
+
+    const report = await ReportModel.getByLocal(address, geohash);
+
+    if (report) {
+      return report.status;
+    } else {
+      return "Report não encontrado";
+    }
+
+    // ReportModel.getByLocal(this.address, geohash);
+  }
+
   async verifyUserExist(report_id) {
     const user = await UserModel.getByEmail(this.user_email);
 
