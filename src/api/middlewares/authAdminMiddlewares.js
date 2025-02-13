@@ -20,7 +20,7 @@ export default function validateAdminRole(req, res, next) {
       return res.status(403).json({ auth: false, message: "Acesso negado." });
     }
 
-    req.user_id = decoded.id;
+    req.user_email = decoded.email;
     req.role = decoded.role.S;
     next();
   });

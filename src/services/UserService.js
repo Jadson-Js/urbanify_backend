@@ -26,7 +26,7 @@ class UserService {
       const passwordDecrypt = decrypt(user.password.S);
 
       if (password === passwordDecrypt) {
-        user.token = generateJWT(user.id, user.role);
+        user.token = generateJWT(user.email, user.role);
         return user;
       }
     }

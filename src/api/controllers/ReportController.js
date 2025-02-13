@@ -15,7 +15,7 @@ class ReportController {
 
   async create(req, res) {
     const data = {
-      user_id: req.user_id.S,
+      user_email: req.user_email.S,
       report: JSON.parse(req.body.data),
       file: req.file,
     };
@@ -37,7 +37,7 @@ class ReportController {
 
   async delete(req, res) {
     const data = {
-      user_id: req.user_id.S,
+      user_email: req.user_email.S,
       body: req.body,
     };
 

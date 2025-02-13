@@ -10,10 +10,11 @@ import { getIndexChildren } from "../utils/getIndexChildren.js";
 
 export default class ReportService {
   constructor(data = undefined) {
-    if (data && data.user_id) {
-      this.user_id = data.user_id;
+    if (data && data.user_email) {
+      this.user_email = data.user_email;
     }
 
+    // muito generico
     if (data && data.body) {
       this.body = data.body;
     }
@@ -104,7 +105,7 @@ export default class ReportService {
     const { severity, coordinates } = this.report;
 
     const putData = {
-      user_id: this.user_id,
+      user_email: this.user_email,
       // Talvez no futuro, vc precise adicionar o prefixo (id do report)
       s3_photo_key: this.key,
       severity: severity,
@@ -164,7 +165,7 @@ export default class ReportService {
   }
 
   async processDelete() {
-    const user_id = this.user_id;
+    const user_email = this.user_email;
     const { address, geohash } = this.body;
 
     const report = await ReportModel.getByLocal(address, geohash);
@@ -173,7 +174,7 @@ export default class ReportService {
       return "Report não encontrado";
     }
 
-    const index = getIndexChildren(user_id, report);
+    const index = getIndexChildren(user_email, report);
 
     const childrensLength = report.childrens.L.length;
 
