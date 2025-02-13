@@ -21,6 +21,22 @@ class UserController {
       res.status(500).json({ message: "Erro ao logar usuário.", error });
     }
   }
+
+  async getReports(req, res) {
+    try {
+      const reports = await UserService.login(
+        req.body.email,
+        req.body.password
+      );
+
+      res
+        .status(200)
+        .json({ message: "Usuário logado com sucesso!", token: user.token });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Erro ao logar usuário.", error });
+    }
+  }
 }
 
 export default new UserController();

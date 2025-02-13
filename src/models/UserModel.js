@@ -26,7 +26,7 @@ class UserModel {
     }
   }
 
-  async login(email) {
+  async getByEmail(email) {
     const params = {
       TableName: tableName,
       Key: {
@@ -44,7 +44,7 @@ class UserModel {
     }
   }
 
-  async addReportToUser(user_email, report_id) {
+  async addReport(user_email, report_id) {
     const params = {
       TableName: tableName,
       Key: {

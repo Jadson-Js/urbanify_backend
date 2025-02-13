@@ -8,10 +8,8 @@ import ReportController from "../controllers/ReportController.js";
 
 const router = express.Router();
 
-// router.get("/", authAdminMiddlewares, ReportController.get);
-
 router.get("/", authAdminMiddlewares, ReportController.get);
-
+router.get("/my", authMiddlewares, ReportController.getMyReports);
 router.post(
   "/",
   authMiddlewares,

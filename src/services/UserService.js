@@ -21,7 +21,7 @@ class UserService {
   }
 
   async login(email, password) {
-    const user = await UserModel.login(email);
+    const user = await UserModel.getByEmail(email);
 
     if (user) {
       const passwordDecrypt = decrypt(user.password.S);

@@ -35,6 +35,26 @@ class ReportModel {
     }
   }
 
+  async getByListId(reports_id) {
+    const params = {
+      TableName: tableName,
+      FilterExpression:
+        "id IN (" + reports_id.map((_, item) => `:id${item}`).join(", ") + ")",
+      ExpressionAttributeValues: Object.fromEntries(
+        reports_id.map((id, item) => [`:id${item}`, id])
+      ),
+    };
+
+    try {
+      const command = new ScanCommand(params);
+      const response = await client.send(command);
+      return response.Items;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Erro ao buscar reports " + error);
+    }
+  }
+
   async getByLocal(address, geohash) {
     const params = {
       TableName: tableName,

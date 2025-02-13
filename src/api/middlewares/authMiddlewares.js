@@ -17,7 +17,7 @@ export default function validateJWT(req, res, next) {
         .status(500)
         .json({ auth: false, message: "Falha na autenticação do Token" });
     } else {
-      req.user_email = decoded.email;
+      req.user_email = decoded.email.S;
       req.role = decoded.role.S;
       next();
     }

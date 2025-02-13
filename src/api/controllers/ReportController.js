@@ -13,9 +13,29 @@ class ReportController {
     }
   }
 
+  async getMyReports(req, res) {
+    const data = {
+      user_email: req.user_email,
+    };
+
+    try {
+      const reportService = new ReportService(data);
+
+      const reports = await reportService.getMyReports();
+
+      res.status(201).json({
+        message: "Busca feita com sucesso!",
+        report: reports,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Erro ao buscar reports.", error });
+    }
+  }
+
   async create(req, res) {
     const data = {
-      user_email: req.user_email.S,
+      user_email: req.user_email,
       report: JSON.parse(req.body.data),
       file: req.file,
     };
@@ -37,7 +57,7 @@ class ReportController {
 
   async delete(req, res) {
     const data = {
-      user_email: req.user_email.S,
+      user_email: req.user_email,
       body: req.body,
     };
 

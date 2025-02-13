@@ -7,6 +7,7 @@ import UserModel from "../models/UserModel.js";
 import { generateGeohash } from "../utils/geohash.js";
 import { userExist } from "../utils/userExist.js";
 import { getIndexChildren } from "../utils/getIndexChildren.js";
+import { getChildrenInReport } from "../utils/getChildrenInReport.js";
 
 export default class ReportService {
   constructor(data = undefined) {
@@ -38,6 +39,16 @@ export default class ReportService {
     return reports;
   }
 
+  async getMyReports() {
+    const user = await UserModel.getByEmail(this.user_email);
+    const reportList = user.reports_id.L.map((item) => item.S);
+    const reports = await ReportModel.getByListId(reportList);
+
+    const childrens = getChildrenInReport(this.user_email, reports);
+
+    return childrens;
+  }
+
   async processCreate() {
     const { coordinates } = this.report;
 
@@ -56,7 +67,7 @@ export default class ReportService {
       await this.uploadFile(newReport.id);
 
       // Vai chamar um model onde vai informar os parametros email & report_id
-      await UserModel.addReportToUser(this.user_email, newReport.id);
+      await UserModel.addReport(this.user_email, newReport.id);
 
       // adiciona o children ao report e retornar os dados
       return await this.addChildren();
@@ -78,7 +89,7 @@ export default class ReportService {
         await this.uploadFile(report.id.S);
       }
 
-      await UserModel.addReportToUser(this.user_email, report.id.S);
+      await UserModel.addReport(this.user_email, report.id.S);
       // Adiciona-se o report como filho
       return await this.addChildren();
     }
@@ -139,7 +150,7 @@ export default class ReportService {
   }
 
   async verifyUserExist(report_id) {
-    const user = await UserModel.login(this.user_email);
+    const user = await UserModel.getByEmail(this.user_email);
 
     return userExist(user, report_id);
   }
