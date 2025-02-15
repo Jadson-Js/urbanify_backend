@@ -30,6 +30,7 @@ class LogModel {
     const params = {
       TableName: tableName,
       Item: log,
+      ConditionExpression: "attribute_not_exists(id)",
     };
 
     try {

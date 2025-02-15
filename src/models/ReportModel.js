@@ -92,7 +92,7 @@ class ReportModel {
       TableName: tableName,
       Item: report,
       ConditionExpression:
-        "attribute_not_exists(address) AND attribute_not_exists(geohash)",
+        "attribute_not_exists(address) AND attribute_not_exists(geohash) AND attribute_not_exists(id)",
     };
 
     try {

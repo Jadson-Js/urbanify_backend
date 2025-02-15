@@ -8,7 +8,7 @@ class UserService {
     const passwordEncrypt = encrypt(data.password);
 
     const user = {
-      id: crypto.randomBytes(32).toString("hex"),
+      id: crypto.randomUUID(),
       email: data.email,
       password: passwordEncrypt,
       role: "USER",
