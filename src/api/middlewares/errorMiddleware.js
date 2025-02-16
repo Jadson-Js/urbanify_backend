@@ -1,4 +1,9 @@
-export default function validateAdminRole(error, req, res, next) {
-  console.log("error middleware");
-  res.sendStatus(500);
-}
+// Middleware que captura erros não tratados
+const errorMiddleware = (err, req, res, next) => {
+  res.status(err.statusCode || 500).json({
+    error: err.name || "InternalServerError",
+    message: err.message || "Ocorreu um erro no servidor",
+  });
+};
+
+export default errorMiddleware;

@@ -1,12 +1,26 @@
 import express from "express";
-import { body, validationResult } from "express-validator";
-import errorMiddleware from "../middlewares/errorMiddleware.js";
 
 import UserController from "../controllers/UserController.js";
 
+// Middleware que carrega os parametros do express-validator,
+import expressMiddleware from "../middlewares/expressMiddleware.js";
+
 const router = express.Router();
 
-router.post("/signup", UserController.signup, errorMiddleware);
-router.post("/login", UserController.login);
+router.post(
+  "/signup",
+  // Aqui eu chamo os parametros definidos no middleware,
+  expressMiddleware.userSchema(), // o metodo defini quais condições o email e senha devem possui para ser validos
+  expressMiddleware.validate, // metodo para validar se o o metodo anterior foram validados. ou seja
+  // Se o expressMidleware.userSchema detectou que a senha está vazia, ele vai lançar um erro e o "".validate" vai tratar
+  UserController.signup
+);
+
+router.post(
+  "/login",
+  expressMiddleware.userSchema(),
+  expressMiddleware.validate,
+  UserController.login
+);
 
 export default router;

@@ -1,5 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { dynamoConfig } from "../config/environment.js";
+import AppError from "../utils/AppError.js";
 import {
   DynamoDBDocumentClient,
   GetCommand,
@@ -23,7 +24,9 @@ class UserModel {
       await dynamodb.send(new PutCommand(params));
       return user;
     } catch (error) {
-      throw new Error("Erro ao cadastrar usuário " + error);
+      // Classe para tratar erros dentro do event loop
+      throw new AppError(400, "Usuario ja existente", "Digite outro email");
+      // Informa status code, error e uma mensagem
     }
   }
 
