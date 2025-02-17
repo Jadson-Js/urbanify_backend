@@ -165,7 +165,7 @@ export default class ReportService {
   }
 
   async getStatusByLocal() {
-    const { address, geohash } = this.form;
+    const { address, geohash } = this.local;
 
     const report = await ReportModel.getByLocal(address, geohash);
 
