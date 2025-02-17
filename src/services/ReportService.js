@@ -8,6 +8,7 @@ import { generateGeohash } from "../utils/geohash.js";
 import { userExist } from "../utils/userExist.js";
 import { getIndexChildren } from "../utils/getIndexChildren.js";
 import { getChildrenInReport } from "../utils/getChildrenInReport.js";
+import AppError from "../utils/AppError.js";
 
 export default class ReportService {
   constructor(data = undefined) {
@@ -78,7 +79,11 @@ export default class ReportService {
       const userExist = await this.verifyUserExist(report.id);
 
       if (userExist) {
-        return "Usuario ja reportou anteriormente";
+        throw new AppError(
+          401,
+          "Usuario ja reportou anteriormente",
+          "O usuario não pode reportar o mesmo local mais de 1 vez"
+        );
       }
 
       const childrensLength = report.childrens.length;

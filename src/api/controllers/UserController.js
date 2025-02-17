@@ -8,13 +8,6 @@ class UserController {
 
   async login(req, res) {
     const user = await UserService.login(req.body.email, req.body.password);
-    res
-      .status(200)
-      .json({ message: "Usuário logado com sucesso!", token: user.token });
-  }
-
-  async getReports(req, res) {
-    const reports = await UserService.login(req.body.email, req.body.password);
 
     res
       .status(200)

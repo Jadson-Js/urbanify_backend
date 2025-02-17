@@ -22,7 +22,7 @@ class LogModel {
 
       return data.Items;
     } catch (error) {
-      throw new Error("Erro ao buscar logs " + error);
+      throw new AppError(404, "Erro inespedado", "Tente novamente mais tarde");
     }
   }
 
@@ -38,7 +38,11 @@ class LogModel {
 
       return log;
     } catch (error) {
-      throw new Error("Erro ao cadastrar log " + error);
+      throw new AppError(
+        400,
+        "Log mal definido",
+        "Log mal definido ou id ja existente"
+      );
     }
   }
 }

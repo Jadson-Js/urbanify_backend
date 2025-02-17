@@ -44,7 +44,11 @@ class UserModel {
 
       return data.Item;
     } catch (error) {
-      throw new Error("Erro ao buscar usuário " + error);
+      throw new AppError(
+        404,
+        "Usuario não encontrado",
+        "Email incorreto ou inexistente"
+      );
     }
   }
 
@@ -66,8 +70,7 @@ class UserModel {
 
       return putReportId;
     } catch (error) {
-      console.log(error);
-      throw new Error("Erro no update user" + error);
+      throw new AppError(404, "Usuario não encontrado", "Digite outro email");
     }
   }
 }

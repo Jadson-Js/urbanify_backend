@@ -1,5 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { dynamoConfig, s3Config } from "../config/environment.js";
+import AppError from "../utils/AppError.js";
 import {
   S3Client,
   PutObjectCommand,
@@ -31,8 +32,11 @@ class ReportModel {
 
       return data.Items;
     } catch (error) {
-      console.log(error);
-      throw new Error("Erro ao buscar reports " + error);
+      throw new AppError(
+        404,
+        "Usuario não encontrado",
+        "Email incorreto ou inexistente"
+      );
     }
   }
 
@@ -51,8 +55,11 @@ class ReportModel {
       const response = await client.send(command);
       return response.Items;
     } catch (error) {
-      console.log(error);
-      throw new Error("Erro ao buscar reports " + error);
+      throw new AppError(
+        404,
+        "Report não encontrado",
+        "Report id mal definido ou inexistente"
+      );
     }
   }
 
@@ -71,8 +78,11 @@ class ReportModel {
 
       return data.Item;
     } catch (error) {
-      console.log(error);
-      throw new Error("Erro ao buscar report " + error);
+      throw new AppError(
+        404,
+        "Report não encontrado",
+        "Address e Geohash foram mal definidos ou não encontrado"
+      );
     }
   }
 
@@ -82,8 +92,11 @@ class ReportModel {
 
       return response;
     } catch (error) {
-      console.error("Error uploading file:", error);
-      throw error;
+      throw new AppError(
+        400,
+        "Arquivo não enviado",
+        "Arquivo pode está corrompido"
+      );
     }
   }
 
@@ -100,9 +113,11 @@ class ReportModel {
 
       return report;
     } catch (error) {
-      console.log(error);
-
-      throw new Error("Erro ao cadastrar report" + error);
+      throw new AppError(
+        400,
+        "Report mal definido ou ja existente",
+        "Address, Geohash ou Id podem ja existir no Banco De Dados"
+      );
     }
   }
 
@@ -125,8 +140,11 @@ class ReportModel {
 
       return putChildren;
     } catch (error) {
-      console.log(error);
-      throw new Error("Erro no update report" + error);
+      throw new AppError(
+        400,
+        "Children mal definido",
+        "Report ou children podem está mal definido"
+      );
     }
   }
 
@@ -144,8 +162,11 @@ class ReportModel {
 
       return deleteReport;
     } catch (error) {
-      console.log(error);
-      throw new Error("Erro no update report" + error);
+      throw new AppError(
+        404,
+        "Report não encontrado",
+        "Address ou Geohash podem está mal definido"
+      );
     }
   }
 
@@ -165,8 +186,11 @@ class ReportModel {
 
       return removeChildren;
     } catch (error) {
-      console.log(error);
-      throw new Error("Erro no update report" + error);
+      throw new AppError(
+        400,
+        "Index ou Local mal definidos",
+        "Address, Geohash ou children podem está mal definido"
+      );
     }
   }
 
@@ -176,8 +200,11 @@ class ReportModel {
 
       return listResponse;
     } catch (error) {
-      console.log(error);
-      throw new Error("Erro no delete dos arquivos" + error);
+      throw new AppError(
+        404,
+        "Prefixos não encontrado",
+        "Tente outro prefixo mais tarde"
+      );
     }
   }
 
@@ -189,8 +216,11 @@ class ReportModel {
 
       return deleteResponse;
     } catch (error) {
-      console.log(error);
-      throw new Error("Erro no delete dos arquivos" + error);
+      throw new AppError(
+        400,
+        "Lista mal definida",
+        "A lista de arquivos não encontrada ou mal definida"
+      );
     }
   }
 }

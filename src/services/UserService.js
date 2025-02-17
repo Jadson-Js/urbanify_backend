@@ -2,6 +2,7 @@ import { generateJWT } from "../utils/jwt.js";
 import crypto from "crypto";
 import { encrypt, decrypt } from "../utils/crypto.js";
 import UserModel from "../models/UserModel.js";
+import AppError from "../utils/AppError.js";
 
 class UserService {
   async signup(data) {
@@ -23,9 +24,13 @@ class UserService {
   async login(email, password) {
     const user = await UserModel.getByEmail(email);
 
-    console.log(user);
-
-    if (user) {
+    if (!user) {
+      throw new AppError(
+        404,
+        "Usuario não encontrado",
+        "Email incorreto ou inexistente"
+      );
+    } else {
       const passwordDecrypt = decrypt(user.password);
 
       if (password === passwordDecrypt) {
@@ -33,8 +38,6 @@ class UserService {
         return user;
       }
     }
-
-    return null;
   }
 }
 

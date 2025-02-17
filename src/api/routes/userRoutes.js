@@ -10,7 +10,7 @@ const router = express.Router();
 router.post(
   "/signup",
   // Aqui eu chamo os parametros definidos no middleware,
-  expressMiddleware.userSchema(), // o metodo defini quais condições o email e senha devem possui para ser validos
+  expressMiddleware.user(), // o metodo defini quais condições o email e senha devem possui para ser validos
   expressMiddleware.validate, // metodo para validar se o o metodo anterior foram validados. ou seja
   // Se o expressMidleware.userSchema detectou que a senha está vazia, ele vai lançar um erro e o "".validate" vai tratar
   UserController.signup
@@ -18,7 +18,7 @@ router.post(
 
 router.post(
   "/login",
-  expressMiddleware.userSchema(),
+  expressMiddleware.user(),
   expressMiddleware.validate,
   UserController.login
 );
