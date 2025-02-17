@@ -16,7 +16,7 @@ export default function validateAdminRole(req, res, next) {
       return res.status(401).json({ auth: false, message: "Token inválido." });
     }
 
-    if (decoded.role.S !== "ADMIN") {
+    if (decoded.role !== "ADMIN") {
       return res.status(403).json({ auth: false, message: "Acesso negado." });
     }
 

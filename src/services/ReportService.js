@@ -11,7 +11,7 @@ import { getChildrenInReport } from "../utils/getChildrenInReport.js";
 import AppError from "../utils/AppError.js";
 
 export default class ReportService {
-  constructor(data) {
+  constructor(data = {}) {
     this.user_email = data.user_email;
     this.local = data.local;
     this.file = this.setFile(data);
@@ -165,14 +165,18 @@ export default class ReportService {
   }
 
   async getStatusByLocal() {
-    const { address, geohash } = this.body;
+    const { address, geohash } = this.form;
 
     const report = await ReportModel.getByLocal(address, geohash);
 
     if (report) {
       return report.status;
     } else {
-      return "Report não encontrado";
+      throw new AppError(
+        404,
+        "Report não encontrado",
+        "Address e geohash não foram encontrado no banco de dados"
+      );
     }
 
     // ReportModel.getByLocal(this.address, geohash);
@@ -224,9 +228,12 @@ export default class ReportService {
 
     const report = await ReportModel.getByLocal(address, geohash);
 
-    /*
     if (!report) {
-      return "Report não encontrado";
+      throw new AppError(
+        404,
+        "Report não encontrado",
+        "Address e geohash não foram encontrado no banco de dados"
+      );
     }
 
     const index = getIndexChildren(user_email, report);
@@ -239,9 +246,12 @@ export default class ReportService {
     } else if (index != -1) {
       return await ReportModel.removeChildren(index, address, geohash);
     } else {
-      return "Children não encontrado";
+      throw new AppError(
+        404,
+        "Children não encontrado",
+        "Children não foi encontrado dentro do report"
+      );
     }
-      */
   }
 
   async deleteFilesByPrefix(prefix) {

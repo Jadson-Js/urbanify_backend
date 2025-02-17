@@ -14,9 +14,9 @@ router.get("/", authAdminMiddlewares, ReportController.get);
 router.get("/my", authMiddlewares, ReportController.getMyReports);
 router.get(
   "/status",
+  authMiddlewares,
   expressMiddleware.getStatus(),
   expressMiddleware.validate,
-  authMiddlewares,
   ReportController.getStatus
 );
 router.post(
