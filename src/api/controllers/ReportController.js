@@ -11,7 +11,7 @@ class ReportController {
 
   async getStatus(req, res) {
     const data = {
-      body: req.body,
+      local: req.body,
     };
 
     const reportService = new ReportService(data);
@@ -42,7 +42,7 @@ class ReportController {
   async create(req, res) {
     const data = {
       user_email: req.user_email,
-      report: JSON.parse(req.body.data),
+      form: JSON.parse(req.body.data),
       file: req.file,
     };
 
@@ -59,13 +59,12 @@ class ReportController {
   async delete(req, res) {
     const data = {
       user_email: req.user_email,
-      body: req.body,
+      local: req.body,
     };
 
     const reportService = new ReportService(data);
 
     const deleteReport = await reportService.processDelete();
-    console.log(deleteReport);
 
     res.status(201).json({
       message: "Report deletado com sucesso!",

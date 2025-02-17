@@ -11,26 +11,35 @@ import { getChildrenInReport } from "../utils/getChildrenInReport.js";
 import AppError from "../utils/AppError.js";
 
 export default class ReportService {
-  constructor(data = undefined) {
-    if (data && data.user_email) {
-      this.user_email = data.user_email;
-    }
+  constructor(data) {
+    this.user_email = data.user_email;
+    this.local = data.local;
+    this.file = this.setFile(data);
+    this.form = this.setForm(data);
+    (this.reportFormated = {}), (this.childrenFormated = {});
+  }
 
-    // muito generico
-    if (data && data.body) {
-      this.body = data.body;
-    }
+  setFile(data) {
+    if (data.file) {
+      const file = {
+        image: data.file,
+        key: `${new Date().toISOString()}-${data.file.originalname}`,
+      };
 
-    if (data && data.file) {
-      this.file = data.file;
-      this.key = `${new Date().toISOString()}-${data.file.originalname}`;
+      return file;
+    } else {
+      return undefined;
     }
+  }
 
-    if (data && data.report) {
-      this.report = data.report;
-      this.address = `${data.report.subregion}_${data.report.district}`;
-      this.reportFormated = this.formatDataToReport();
-      this.childrenFormated = this.formatDataToChildren();
+  setForm(data) {
+    if (data.form) {
+      let form = data.form;
+      form.address = `${data.form.subregion}_${data.form.district}`;
+
+      return form;
+    } else {
+      return undefined;
     }
   }
 
@@ -51,14 +60,15 @@ export default class ReportService {
   }
 
   async processCreate() {
-    const { coordinates } = this.report;
+    this.reportFormated = this.formDataToReport();
+    this.childrenFormated = this.formDataToChildren();
+
+    console.log(this.reportFormated);
+
+    const { address, coordinates } = this.form;
 
     // Faz uma busca para saber se existe algum report existente no local requisitado
-    const report = await this.getByLocal(
-      this.address,
-      coordinates.latitude,
-      coordinates.longitude
-    );
+    const report = await this.getByLocal();
 
     // Se não existir nenhum report anterior
     if (!report) {
@@ -100,8 +110,8 @@ export default class ReportService {
     }
   }
 
-  formatDataToReport() {
-    const { street, coordinates } = this.report;
+  formDataToReport() {
+    const { address, street, coordinates } = this.form;
 
     const report_id = crypto
       .randomBytes(12)
@@ -112,7 +122,7 @@ export default class ReportService {
       id: report_id,
       status: "REPORTADO",
       created_at: new Date().toISOString(),
-      address: this.address,
+      address: address,
       street: street,
       geohash: generateGeohash(coordinates.latitude, coordinates.longitude),
       coordinates: {
@@ -125,13 +135,13 @@ export default class ReportService {
     return putData;
   }
 
-  formatDataToChildren() {
-    const { severity, coordinates } = this.report;
+  formDataToChildren() {
+    const { severity, coordinates } = this.form;
 
     const putData = {
       user_email: this.user_email,
       // Talvez no futuro, vc precise adicionar o prefixo (id do report)
-      s3_photo_key: this.key,
+      s3_photo_key: this.file.key,
       severity: severity,
       created_at: new Date().toISOString(),
       coordinates: {
@@ -144,14 +154,14 @@ export default class ReportService {
   }
 
   async getByLocal() {
-    const { coordinates } = this.report;
+    const { address, coordinates } = this.form;
 
     const geohash = generateGeohash(
       coordinates.latitude,
       coordinates.longitude
     );
 
-    return ReportModel.getByLocal(this.address, geohash);
+    return ReportModel.getByLocal(address, geohash);
   }
 
   async getStatusByLocal() {
@@ -176,14 +186,14 @@ export default class ReportService {
 
   async uploadFile(report_id) {
     // Processa a imagem com Sharp (redimensiona e comprime)
-    const image = sharp(this.file.buffer)
+    const image = sharp(this.file.image.buffer)
       .resize(800) // Redimensiona para 800px
       .jpeg({ quality: 10 }) // Comprime para JPEG qualidade 80
       .toString("base64");
 
     const putData = {
       Bucket: process.env.S3_BUCKET,
-      Key: `${report_id}/${this.key}`,
+      Key: `${report_id}/${this.file.key}`,
       StorageClass: "STANDARD",
       Body: image,
     };
@@ -210,10 +220,11 @@ export default class ReportService {
 
   async processDelete() {
     const user_email = this.user_email;
-    const { address, geohash } = this.body;
+    const { address, geohash } = this.local;
 
     const report = await ReportModel.getByLocal(address, geohash);
 
+    /*
     if (!report) {
       return "Report não encontrado";
     }
@@ -230,6 +241,7 @@ export default class ReportService {
     } else {
       return "Children não encontrado";
     }
+      */
   }
 
   async deleteFilesByPrefix(prefix) {
