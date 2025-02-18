@@ -63,8 +63,6 @@ export default class ReportService {
     this.reportFormated = this.formDataToReport();
     this.childrenFormated = this.formDataToChildren();
 
-    console.log(this.reportFormated);
-
     const { address, coordinates } = this.form;
 
     // Faz uma busca para saber se existe algum report existente no local requisitado
