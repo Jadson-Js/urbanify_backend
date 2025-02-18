@@ -114,3 +114,12 @@
   "street": "Rua",
   "severity": "Moderado"
 }
+
+
+
+
+{  "subregion": "São Luís",  "district": "Monte Castelo",  "street": "Rua Paulo Frontin",  "severity": "moderado",  "coordinates": {    "latitude": "-2.5391686",    "longitude": "-44.2837538"  }}
+
+
+
+{\"coordinates\":{\"latitude\":-2.5391686,\"longitude\":-44.2837538},\"subregion\":\"São Luís\",\"district\":\"Monte Castelo\",\"street\":\"Rua Paulo Frontin\",\"severity\":\"moderado\"}

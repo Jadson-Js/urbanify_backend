@@ -5,12 +5,12 @@ import UserModel from "../models/UserModel.js";
 import AppError from "../utils/AppError.js";
 
 class UserService {
-  async signup(data) {
-    const passwordEncrypt = encrypt(data.password);
+  async signup(email, password) {
+    const passwordEncrypt = encrypt(password);
 
     const user = {
       id: crypto.randomUUID(),
-      email: data.email,
+      email: email,
       password: passwordEncrypt,
       role: "USER",
       active: true,

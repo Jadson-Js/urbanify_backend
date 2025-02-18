@@ -6,7 +6,7 @@ class ReportController {
 
     const reports = await reportService.get();
 
-    res.status(201).json({ message: "Busca concluida!", reports });
+    res.status(200).json({ message: "Busca concluida!", reports });
   }
 
   async getStatus(req, res) {
@@ -18,7 +18,7 @@ class ReportController {
 
     const status = await reportService.getStatusByLocal();
 
-    res.status(201).json({
+    res.status(200).json({
       message: "Busca feita com sucesso!",
       status: status,
     });
@@ -33,7 +33,7 @@ class ReportController {
 
     const reports = await reportService.getMyReports();
 
-    res.status(201).json({
+    res.status(200).json({
       message: "Busca feita com sucesso!",
       report: reports,
     });

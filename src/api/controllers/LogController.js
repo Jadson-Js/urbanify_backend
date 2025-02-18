@@ -4,7 +4,7 @@ class LogController {
   async get(req, res) {
     const logs = await LogService.get();
 
-    res.status(201).json({ message: "Busca concluida!", logs });
+    res.status(200).json({ message: "Busca concluida!", logs });
   }
 
   async create(req, res) {

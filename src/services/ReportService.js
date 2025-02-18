@@ -86,15 +86,15 @@ export default class ReportService {
       // Se existir um report na região
     } else {
       // Verifica esse usuario ja fez report no mesmo local
-      const userExist = await this.verifyUserExist(report.id);
+      // const userExist = await this.verifyUserExist(report.id);
 
-      if (userExist) {
-        throw new AppError(
-          401,
-          "Usuario ja reportou anteriormente",
-          "O usuario não pode reportar o mesmo local mais de 1 vez"
-        );
-      }
+      // if (userExist) {
+      //   throw new AppError(
+      //     401,
+      //     "Usuario ja reportou anteriormente",
+      //     "O usuario não pode reportar o mesmo local mais de 1 vez"
+      //   );
+      // }
 
       const childrensLength = report.childrens.length;
 
