@@ -63,8 +63,6 @@ export default class ReportService {
     this.reportFormated = this.formDataToReport();
     this.childrenFormated = this.formDataToChildren();
 
-    const { address, coordinates } = this.form;
-
     // Faz uma busca para saber se existe algum report existente no local requisitado
     const report = await this.getByLocal();
 
@@ -215,7 +213,11 @@ export default class ReportService {
 
     const newChildren = await ReportModel.addChildren(children, report);
 
-    const report_id = { id: newChildren.Attributes.id };
+    const report_id = {
+      id: newChildren.Attributes.id,
+      address: report.address,
+      geohash: report.geohash,
+    };
 
     return report_id;
   }
