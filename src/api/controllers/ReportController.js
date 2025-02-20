@@ -10,8 +10,10 @@ class ReportController {
   }
 
   async getStatus(req, res) {
+    const { address, geohash } = req.params;
+
     const data = {
-      local: req.body,
+      local: { address: address, geohash: geohash },
     };
 
     const reportService = new ReportService(data);

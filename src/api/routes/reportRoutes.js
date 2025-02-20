@@ -9,11 +9,10 @@ import ReportController from "../controllers/ReportController.js";
 import expressMiddleware from "../middlewares/expressMiddleware.js";
 
 const router = express.Router();
-
 router.get("/", authAdminMiddlewares, ReportController.get);
 router.get("/my", authMiddlewares, ReportController.getMyReports);
 router.get(
-  "/status",
+  "/status/address/:address/geohash/:geohash",
   authMiddlewares,
   expressMiddleware.getStatus(),
   expressMiddleware.validate,
