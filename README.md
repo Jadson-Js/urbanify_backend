@@ -153,14 +153,11 @@ npm start
   - `Authorization: Bearer SEU_TOKEN`
   - `Content-Type: application/json`
 
-**GET** `/report/status`
+**GET** `/report/status/address/:address/geohash/:geohash`
 
 - **Headers:**
   - `Authorization: Bearer SEU_TOKEN`
   - `Content-Type: application/json`
-- **Body:**
-  - `address` (string)
-  - `geohash` (string)
 
 ### 🔹 Verificar Status do Report
 

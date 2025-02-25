@@ -1,5 +1,5 @@
-import { generateJWT } from "../utils/jwt.js";
 import crypto from "crypto";
+import { generateJWT } from "../utils/jwt.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
 import UserModel from "../models/UserModel.js";
 import AppError from "../utils/AppError.js";

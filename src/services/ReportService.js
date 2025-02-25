@@ -1,9 +1,15 @@
+// Import dependences
 import crypto from "crypto";
 import sharp from "sharp";
 
+// Import Models
 import ReportModel from "../models/ReportModel.js";
 import UserModel from "../models/UserModel.js";
 
+// Import config
+import { ReportStatus, ReportSeverity } from "../config/environment.js";
+
+// Report Utils
 import { generateGeohash } from "../utils/geohash.js";
 import { userExist } from "../utils/userExist.js";
 import { getIndexChildren } from "../utils/getIndexChildren.js";
@@ -116,7 +122,7 @@ export default class ReportService {
 
     const putData = {
       id: report_id,
-      status: "REPORTADO",
+      status: ReportStatus.REPORTADO,
       created_at: new Date().toISOString(),
       address: address,
       street: street,
@@ -138,7 +144,7 @@ export default class ReportService {
       user_email: this.user_email,
       // Talvez no futuro, vc precise adicionar o prefixo (id do report)
       s3_photo_key: this.file.key,
-      severity: severity,
+      severity: ReportSeverity[severity],
       created_at: new Date().toISOString(),
       coordinates: {
         latitude: coordinates.latitude,

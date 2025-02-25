@@ -18,4 +18,15 @@ const s3Config = {
   },
 };
 
-export { dynamoConfig, s3Config };
+const ReportStatus = Object.freeze({
+  REPORTADO: 0,
+  AVALIADO: 1,
+  CONCLUIDO: 2,
+});
+
+const ReportSeverity = Object.freeze({
+  GRAVE: 0,
+  MODERADO: 1,
+});
+
+export { dynamoConfig, s3Config, ReportStatus, ReportSeverity };
