@@ -19,7 +19,7 @@ const req = {
 };
 
 describe("Report Routes", () => {
-  test("Should create my report with ADMIN successfuly", async () => {
+  test("Criar um report meu como ADMIN com sucesso", async () => {
     const response = await supertest(app)
       .post("/report")
       .set("Authorization", req.adminToken)
@@ -36,7 +36,7 @@ describe("Report Routes", () => {
     expect(response.body.report).toHaveProperty("id");
   });
 
-  test("Should create grandma report with ADMIN successfuly", async () => {
+  test("Criar um report para avó como ADMIN com sucesso", async () => {
     const response = await supertest(app)
       .post("/report")
       .set("Authorization", req.adminToken)
@@ -53,7 +53,7 @@ describe("Report Routes", () => {
     expect(response.body.report).toHaveProperty("id");
   });
 
-  test("Should create my report with USER successfuly", async () => {
+  test("Criar um report meu como USER com sucesso ", async () => {
     const response = await supertest(app)
       .post("/report")
       .set("Authorization", req.userToken)
@@ -70,7 +70,7 @@ describe("Report Routes", () => {
     expect(response.body.report).toHaveProperty("id");
   });
 
-  test("Should get all reports with successfuly", async () => {
+  test("Pega todos reports com sucesso", async () => {
     const response = await supertest(app)
       .get("/report")
       .set("Authorization", req.adminToken);
@@ -82,7 +82,18 @@ describe("Report Routes", () => {
     expect(response.body.reports.length).toBe(2);
   });
 
-  test("Should get reports of ADMIN successfuly", async () => {
+  test("Pega um report com sucesso", async () => {
+    const response = await supertest(app)
+      .get("/report/address/São Luís_Liberdade/geohash/7p8986c")
+      .set("Authorization", req.adminToken);
+
+    console.log(response.body);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.report).toBeInstanceOf(Object);
+  });
+
+  test("Pega todos reports do ADMIN com sucesso", async () => {
     const response = await supertest(app)
       .get("/report/my")
       .set("Authorization", req.adminToken);
@@ -94,7 +105,7 @@ describe("Report Routes", () => {
     expect(response.body.report.length).toBe(2);
   });
 
-  test("Should get reports of USER successfuly", async () => {
+  test("Pega todos reports do USER com sucesso", async () => {
     const response = await supertest(app)
       .get("/report/my")
       .set("Authorization", req.userToken);
@@ -106,7 +117,7 @@ describe("Report Routes", () => {
     expect(response.body.report.length).toBe(1);
   });
 
-  test("Should get status of my report successfuly", async () => {
+  test("Pega status do meu report com sucesso", async () => {
     const response = await supertest(app)
       .get("/report/status/address/São Luís_Liberdade/geohash/7p8986c")
       .set("Authorization", req.adminToken);
@@ -118,7 +129,7 @@ describe("Report Routes", () => {
     expect(response.body.status).toBe(0);
   });
 
-  test("Should delete my report of ADMIN successfuly", async () => {
+  test("Deleta meu report como ADMIN com sucesso", async () => {
     const response = await supertest(app)
       .delete("/report")
       .send({
@@ -136,7 +147,7 @@ describe("Report Routes", () => {
     );
   });
 
-  test("Should delete grandma report of ADMIN successfuly", async () => {
+  test("Deleta report da minha vó como ADMIN com sucesso", async () => {
     const response = await supertest(app)
       .delete("/report")
       .send({
@@ -154,7 +165,7 @@ describe("Report Routes", () => {
     );
   });
 
-  test("Should delete my report of USER successfuly", async () => {
+  test("Deleta meu report como USER com sucesso", async () => {
     const response = await supertest(app)
       .delete("/report")
       .send({

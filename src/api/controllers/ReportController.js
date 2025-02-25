@@ -22,7 +22,7 @@ class ReportController {
 
     res.status(200).json({
       message: "Busca feita com sucesso!",
-      status: report,
+      report: report,
     });
   }
 
