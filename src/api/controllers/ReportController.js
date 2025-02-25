@@ -13,6 +13,7 @@ class ReportController {
     const { address, geohash } = req.params;
 
     const data = {
+      user_email: req.user_email,
       local: { address: address, geohash: geohash },
     };
 

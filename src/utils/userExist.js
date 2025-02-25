@@ -1,7 +1,7 @@
-function userExist(user, report_id) {
-  const userReports = user.reports_id;
+function userExist(user_email, report) {
+  const childrens = report.childrens;
 
-  const exist = userReports.some((item) => item === report_id);
+  const exist = childrens.some((item) => item.user_email === user_email);
 
   return exist;
 }

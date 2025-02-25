@@ -171,7 +171,18 @@ export default class ReportService {
 
     const report = await ReportModel.getByLocal(address, geohash);
 
+    const alreadyExist = userExist(this.user_email, report);
+    console.log(alreadyExist);
+
     if (report) {
+      if (!alreadyExist) {
+        throw new AppError(
+          401,
+          "Usuario não autorizado",
+          "O usuario não tem autorização para acessar os dados de um report que não faça parte"
+        );
+      }
+
       return report.status;
     } else {
       throw new AppError(
