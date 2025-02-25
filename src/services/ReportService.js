@@ -73,6 +73,22 @@ export default class ReportService {
     return reportsFormated;
   }
 
+  async getReport() {
+    const { address, geohash } = this.local;
+
+    const report = await ReportModel.getByLocal(address, geohash);
+
+    if (!report) {
+      throw new AppError(
+        404,
+        "Report não encontrado",
+        "Address e geohash não foram encontrado no banco de dados"
+      );
+    }
+
+    return report;
+  }
+
   async getMyReports() {
     const user = await UserModel.getByEmail(this.user_email);
     const reportList = user.reports_id.map((item) => item);
@@ -192,7 +208,6 @@ export default class ReportService {
     const report = await ReportModel.getByLocal(address, geohash);
 
     const alreadyExist = userExist(this.user_email, report);
-    console.log(alreadyExist);
 
     if (report) {
       if (!alreadyExist) {
@@ -211,8 +226,6 @@ export default class ReportService {
         "Address e geohash não foram encontrado no banco de dados"
       );
     }
-
-    // ReportModel.getByLocal(this.address, geohash);
   }
 
   async verifyUserExist(report_id) {

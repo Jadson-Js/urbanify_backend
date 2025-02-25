@@ -9,6 +9,23 @@ class ReportController {
     res.status(200).json({ message: "Busca concluida!", reports });
   }
 
+  async getReport(req, res) {
+    const { address, geohash } = req.params;
+
+    const data = {
+      local: { address: address, geohash: geohash },
+    };
+
+    const reportService = new ReportService(data);
+
+    const report = await reportService.getReport();
+
+    res.status(200).json({
+      message: "Busca feita com sucesso!",
+      status: report,
+    });
+  }
+
   async getStatus(req, res) {
     const { address, geohash } = req.params;
 
