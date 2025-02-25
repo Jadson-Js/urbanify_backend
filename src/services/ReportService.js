@@ -131,7 +131,7 @@ export default class ReportService {
   }
 
   formDataToReport() {
-    const { address, street, coordinates } = this.form;
+    const { subregion, district, address, street, coordinates } = this.form;
 
     const report_id = crypto
       .randomBytes(12)
@@ -142,8 +142,10 @@ export default class ReportService {
       id: report_id,
       status: ReportStatus.REPORTADO,
       created_at: new Date().toISOString(),
-      address: address,
-      street: street,
+      subregion,
+      district,
+      address,
+      street,
       geohash: generateGeohash(coordinates.latitude, coordinates.longitude),
       coordinates: {
         latitude: coordinates.latitude,
