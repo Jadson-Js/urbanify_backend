@@ -52,7 +52,25 @@ export default class ReportService {
   async get() {
     const reports = await ReportModel.get();
 
-    return reports;
+    const reportsFormated = reports.map((report) => {
+      const childrens = report.childrens;
+
+      const childrenFormated = childrens.map((children) => {
+        const { severity, created_at } = children;
+
+        return {
+          severity,
+          created_at,
+        };
+      });
+
+      return {
+        ...report,
+        childrens: childrenFormated,
+      };
+    });
+
+    return reportsFormated;
   }
 
   async getMyReports() {
