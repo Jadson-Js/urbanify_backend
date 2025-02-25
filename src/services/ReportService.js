@@ -75,7 +75,6 @@ export default class ReportService {
 
   async getReport() {
     const { address, geohash } = this.local;
-
     const report = await ReportModel.getByLocal(address, geohash);
 
     if (!report) {
@@ -86,7 +85,25 @@ export default class ReportService {
       );
     }
 
-    return report;
+    const urls = await this.generatePresignedUrl(report.id);
+
+    return {
+      report,
+      urls,
+    };
+  }
+
+  async generatePresignedUrl(prefix) {
+    const paramsToGet = {
+      Bucket: process.env.S3_BUCKET,
+      Prefix: prefix,
+    };
+
+    const { Contents } = await ReportModel.getFilesByPrefix(paramsToGet);
+
+    const urls = await ReportModel.generatePresignedUrl(Contents);
+
+    return urls;
   }
 
   async getMyReports() {
@@ -237,15 +254,17 @@ export default class ReportService {
   async uploadFile(report_id) {
     // Processa a imagem com Sharp (redimensiona e comprime)
     const image = sharp(this.file.image.buffer)
-      .resize(800) // Redimensiona para 800px
-      .jpeg({ quality: 10 }) // Comprime para JPEG qualidade 80
-      .toString("base64");
+      .resize(200) // Redimensiona para 800px
+      .jpeg({ quality: 1 }); // Comprime para JPEG qualidade 80
+
+    const imageBuffer = await image.toBuffer();
 
     const putData = {
       Bucket: process.env.S3_BUCKET,
       Key: `${report_id}/${this.file.key}`,
       StorageClass: "STANDARD",
-      Body: image,
+      Body: imageBuffer,
+      ContentType: "image/jpeg",
     };
 
     return await ReportModel.uploadFile(putData);

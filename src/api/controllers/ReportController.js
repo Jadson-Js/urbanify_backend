@@ -18,11 +18,11 @@ class ReportController {
 
     const reportService = new ReportService(data);
 
-    const report = await reportService.getReport();
+    const response = await reportService.getReport();
 
     res.status(200).json({
       message: "Busca feita com sucesso!",
-      report: report,
+      data: response,
     });
   }
 

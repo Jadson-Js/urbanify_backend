@@ -90,7 +90,8 @@ describe("Report Routes", () => {
     console.log(response.body);
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.report).toBeInstanceOf(Object);
+    expect(response.body.data.report).toBeInstanceOf(Object);
+    expect(response.body.data.urls).toBeInstanceOf(Array);
   });
 
   test("Pega todos reports do ADMIN com sucesso", async () => {

@@ -4,9 +4,11 @@ import AppError from "../utils/AppError.js";
 import {
   S3Client,
   PutObjectCommand,
+  GetObjectCommand,
   ListObjectsV2Command,
   DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import {
   DynamoDBDocumentClient,
   ScanCommand,
@@ -96,6 +98,31 @@ class ReportModel {
         400,
         "Arquivo não enviado",
         "Arquivo pode está corrompido"
+      );
+    }
+  }
+
+  async generatePresignedUrl(Contents) {
+    try {
+      const urls = await Promise.all(
+        Contents.map(async (item) => {
+          const paramsToGet = {
+            Bucket: process.env.S3_BUCKET,
+            Key: item.Key,
+          };
+
+          const command = new GetObjectCommand(paramsToGet);
+          const url = await getSignedUrl(s3Client, command, { expiresIn: 300 });
+          return url;
+        })
+      );
+
+      return urls;
+    } catch (error) {
+      throw new AppError(
+        400,
+        "Prefixo mal definido",
+        "Prefixo não foi enviado ou está mal definido"
       );
     }
   }
