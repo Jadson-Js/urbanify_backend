@@ -17,60 +17,99 @@ import { getChildrenInReport } from "../utils/getChildrenInReport.js";
 import AppError from "../utils/AppError.js";
 
 export default class ReportService {
+  // Setup Inicial
   constructor(data = {}) {
     this.user_email = data.user_email;
     this.local = data.local;
     this.file = this.setFile(data);
     this.form = this.setForm(data);
+    this.date = new Date().toISOString();
     (this.reportFormated = {}), (this.childrenFormated = {});
   }
 
-  setFile(data) {
-    if (data.file) {
-      const file = {
-        image: data.file,
-        key: `${new Date().toISOString()}-${data.file.originalname}`,
-      };
-
-      return file;
-    } else {
-      return undefined;
-    }
-  }
-
   setForm(data) {
-    if (data.form) {
-      let form = data.form;
-      form.address = `${data.form.subregion}_${data.form.district}`;
-
-      return form;
-    } else {
+    if (!data.form) {
       return undefined;
     }
+
+    const { form } = data;
+    form.address = `${form.subregion}_${form.district}`;
+
+    return form;
   }
 
+  setFile(data) {
+    if (!data.file) {
+      return undefined;
+    }
+
+    const file = {
+      image: data.file,
+      key: `${this.date}-${data.file.originalname}`,
+    };
+
+    return file;
+  }
+
+  formDataToReport() {
+    const { subregion, district, address, street, coordinates } = this.form;
+
+    const report_id = crypto
+      .randomBytes(12)
+      .toString("base64")
+      .replace(/\W/g, "");
+
+    const putData = {
+      id: report_id,
+      status: ReportStatus.REPORTADO,
+      created_at: this.date,
+      subregion,
+      district,
+      address,
+      street,
+      geohash: generateGeohash(coordinates.latitude, coordinates.longitude),
+      coordinates: {
+        ...coordinates,
+      },
+      childrens: [],
+    };
+
+    return putData;
+  }
+
+  formDataToChildren() {
+    const { severity, coordinates } = this.form;
+
+    const putData = {
+      user_email: this.user_email,
+      s3_photo_key: this.file.key,
+      severity: ReportSeverity[severity],
+      created_at: this.date,
+      coordinates: { ...coordinates },
+    };
+
+    return putData;
+  }
+
+  // Rotas para Buscas
   async get() {
     const reports = await ReportModel.get();
 
-    const reportsFormated = reports.map((report) => {
-      const childrens = report.childrens;
-
-      const childrenFormated = childrens.map((children) => {
-        const { severity, created_at } = children;
-
-        return {
+    const reportsFormatted = reports.map((report) => {
+      const childrenFormatted = report.childrens.map(
+        ({ severity, created_at }) => ({
           severity,
           created_at,
-        };
-      });
+        })
+      );
 
       return {
         ...report,
-        childrens: childrenFormated,
+        childrens: childrenFormatted,
       };
     });
 
-    return reportsFormated;
+    return reportsFormatted;
   }
 
   async getReport() {
@@ -81,18 +120,76 @@ export default class ReportService {
       throw new AppError(
         404,
         "Report não encontrado",
-        "Address e geohash não foram encontrado no banco de dados"
+        "Address e geohash não foram encontrados no banco de dados"
       );
     }
 
     const urls = await this.generatePresignedUrl(report.id);
 
-    return {
-      report,
-      urls,
-    };
+    return { report, urls };
   }
 
+  async getMyReports() {
+    const user = await UserModel.getByEmail(this.user_email);
+    const reportList = user.reports_id;
+
+    const reports = await ReportModel.getByListId(reportList);
+    const childrens = getChildrenInReport(this.user_email, reports);
+
+    return childrens;
+  }
+
+  async getStatus() {
+    const { address, geohash } = this.local;
+    const report = await ReportModel.getByLocal(address, geohash);
+
+    if (!report) {
+      throw new AppError(
+        404,
+        "Report não encontrado",
+        "Address e geohash não foram encontrados no banco de dados"
+      );
+    }
+
+    const alreadyExist = userExist(this.user_email, report);
+
+    if (!alreadyExist) {
+      throw new AppError(
+        401,
+        "Usuário não autorizado",
+        "O usuário não tem autorização para acessar os dados de um report que não faça parte"
+      );
+    }
+
+    return report.status;
+  }
+
+  // Rotas para criação
+  async create() {
+    const report = this.reportFormated;
+
+    return await ReportModel.create(report);
+  }
+
+  async uploadFile(report_id) {
+    // Processa a imagem com Sharp (redimensiona e comprime)
+    const imageBuffer = await sharp(this.file.image.buffer)
+      .resize(200) // Redimensiona para 200px
+      .jpeg({ quality: 1 }) // Comprime para JPEG qualidade 1
+      .toBuffer();
+
+    const putData = {
+      Bucket: process.env.S3_BUCKET,
+      Key: `${report_id}/${this.file.key}`,
+      StorageClass: "STANDARD",
+      Body: imageBuffer,
+      ContentType: "image/jpeg",
+    };
+
+    return ReportModel.uploadFile(putData);
+  }
+
+  // Utilitarios da classes
   async generatePresignedUrl(prefix) {
     const paramsToGet = {
       Bucket: process.env.S3_BUCKET,
@@ -100,21 +197,55 @@ export default class ReportService {
     };
 
     const { Contents } = await ReportModel.getFilesByPrefix(paramsToGet);
-
     const urls = await ReportModel.generatePresignedUrl(Contents);
 
     return urls;
   }
 
-  async getMyReports() {
-    const user = await UserModel.getByEmail(this.user_email);
-    const reportList = user.reports_id.map((item) => item);
-    const reports = await ReportModel.getByListId(reportList);
+  async getByLocal() {
+    const { address, coordinates } = this.form;
 
-    const childrens = getChildrenInReport(this.user_email, reports);
+    const geohash = generateGeohash(
+      coordinates.latitude,
+      coordinates.longitude
+    );
 
-    return childrens;
+    return ReportModel.getByLocal(address, geohash);
   }
+
+  async addChildren() {
+    const { reportFormated: report, childrenFormated: children } = this;
+
+    const newChildren = await ReportModel.addChildren(children, report);
+
+    const report_id = {
+      id: newChildren.Attributes.id,
+      address: report.address,
+      geohash: report.geohash,
+    };
+
+    return report_id;
+  }
+
+  async deleteFilesByPrefix(prefix) {
+    const paramsToGet = {
+      Bucket: process.env.S3_BUCKET,
+      Prefix: prefix,
+    };
+
+    const { Contents } = await ReportModel.getFilesByPrefix(paramsToGet);
+
+    const paramsToDelete = {
+      Bucket: process.env.S3_BUCKET,
+      Delete: {
+        Objects: Contents.map(({ Key }) => ({ Key })),
+      },
+    };
+
+    return ReportModel.deleteFiles(paramsToDelete);
+  }
+
+  // Processos
 
   async processCreate() {
     this.reportFormated = this.formDataToReport();
@@ -134,210 +265,82 @@ export default class ReportService {
       await UserModel.addReport(this.user_email, newReport.id);
 
       // adiciona o children ao report e retornar os dados
-      return await this.addChildren();
-
-      // Se existir um report na região
-    } else {
-      // Verifica esse usuario ja fez report no mesmo local
-      // const userExist = await this.verifyUserExist(report.id);
-
-      // if (userExist) {
-      //   throw new AppError(
-      //     401,
-      //     "Usuario ja reportou anteriormente",
-      //     "O usuario não pode reportar o mesmo local mais de 1 vez"
-      //   );
-      // }
-
-      const childrensLength = report.childrens.length;
-
-      // Verifica se este report tem mais de 3 filhos
-      if (childrensLength < 3) {
-        // Se tiver, ele faz o upload da fotografia para o report
-        await this.uploadFile(report.id);
-      }
-
-      await UserModel.addReport(this.user_email, report.id);
-      // Adiciona-se o report como filho
-      return await this.addChildren();
+      return this.addChildren();
     }
-  }
 
-  formDataToReport() {
-    const { subregion, district, address, street, coordinates } = this.form;
+    // Se existir um report na região
+    // Verifica esse usuário já fez report no mesmo local
+    // const userExist = "Use o util userExist"
 
-    const report_id = crypto
-      .randomBytes(12)
-      .toString("base64")
-      .replace(/\W/g, "");
+    // if (userExist) {
+    //   throw new AppError(
+    //     401,
+    //     "Usuário já reportou anteriormente",
+    //     "O usuário não pode reportar o mesmo local mais de 1 vez"
+    //   );
+    // }
 
-    const putData = {
-      id: report_id,
-      status: ReportStatus.REPORTADO,
-      created_at: new Date().toISOString(),
-      subregion,
-      district,
-      address,
-      street,
-      geohash: generateGeohash(coordinates.latitude, coordinates.longitude),
-      coordinates: {
-        latitude: coordinates.latitude,
-        longitude: coordinates.longitude,
-      },
-      childrens: [],
-    };
+    const childrensLength = report.childrens.length;
 
-    return putData;
-  }
-
-  formDataToChildren() {
-    const { severity, coordinates } = this.form;
-
-    const putData = {
-      user_email: this.user_email,
-      // Talvez no futuro, vc precise adicionar o prefixo (id do report)
-      s3_photo_key: this.file.key,
-      severity: ReportSeverity[severity],
-      created_at: new Date().toISOString(),
-      coordinates: {
-        latitude: coordinates.latitude,
-        longitude: coordinates.longitude,
-      },
-    };
-
-    return putData;
-  }
-
-  async getByLocal() {
-    const { address, coordinates } = this.form;
-
-    const geohash = generateGeohash(
-      coordinates.latitude,
-      coordinates.longitude
-    );
-
-    return ReportModel.getByLocal(address, geohash);
-  }
-
-  async getStatusByLocal() {
-    const { address, geohash } = this.local;
-
-    const report = await ReportModel.getByLocal(address, geohash);
-
-    const alreadyExist = userExist(this.user_email, report);
-
-    if (report) {
-      if (!alreadyExist) {
-        throw new AppError(
-          401,
-          "Usuario não autorizado",
-          "O usuario não tem autorização para acessar os dados de um report que não faça parte"
-        );
-      }
-
-      return report.status;
-    } else {
-      throw new AppError(
-        404,
-        "Report não encontrado",
-        "Address e geohash não foram encontrado no banco de dados"
-      );
+    // Verifica se este report tem mais de 3 filhos
+    if (childrensLength < 3) {
+      // Se tiver, ele faz o upload da fotografia para o report
+      await this.uploadFile(report.id);
     }
+
+    await UserModel.addReport(this.user_email, report.id);
+    // Adiciona-se o report como filho
+    return this.addChildren();
   }
 
-  async verifyUserExist(report_id) {
-    const user = await UserModel.getByEmail(this.user_email);
+  async processCreate() {
+    this.reportFormated = this.formDataToReport();
+    this.childrenFormated = this.formDataToChildren();
 
-    return userExist(user, report_id);
-  }
+    const report = await this.getByLocal();
 
-  async uploadFile(report_id) {
-    // Processa a imagem com Sharp (redimensiona e comprime)
-    const image = sharp(this.file.image.buffer)
-      .resize(200) // Redimensiona para 800px
-      .jpeg({ quality: 1 }); // Comprime para JPEG qualidade 80
+    if (!report) {
+      const newReport = await this.create();
+      await this.uploadFile(newReport.id);
+      await UserModel.addReport(this.user_email, newReport.id);
+      return this.addChildren();
+    }
 
-    const imageBuffer = await image.toBuffer();
+    if (report.childrens.length < 3) {
+      await this.uploadFile(report.id);
+    }
 
-    const putData = {
-      Bucket: process.env.S3_BUCKET,
-      Key: `${report_id}/${this.file.key}`,
-      StorageClass: "STANDARD",
-      Body: imageBuffer,
-      ContentType: "image/jpeg",
-    };
-
-    return await ReportModel.uploadFile(putData);
-  }
-
-  async create() {
-    const report = this.reportFormated;
-
-    return await ReportModel.create(report);
-  }
-
-  async addChildren() {
-    const report = this.reportFormated;
-    const children = this.childrenFormated;
-
-    const newChildren = await ReportModel.addChildren(children, report);
-
-    const report_id = {
-      id: newChildren.Attributes.id,
-      address: report.address,
-      geohash: report.geohash,
-    };
-
-    return report_id;
+    await UserModel.addReport(this.user_email, report.id);
+    return this.addChildren();
   }
 
   async processDelete() {
-    const user_email = this.user_email;
     const { address, geohash } = this.local;
-
     const report = await ReportModel.getByLocal(address, geohash);
 
     if (!report) {
       throw new AppError(
         404,
         "Report não encontrado",
-        "Address e geohash não foram encontrado no banco de dados"
+        "Address e geohash não foram encontrados no banco de dados"
       );
     }
 
-    const index = getIndexChildren(user_email, report);
+    const index = getIndexChildren(this.user_email, report);
 
-    const childrensLength = report.childrens.length;
-
-    if (childrensLength == 1 && index != -1) {
-      await this.deleteFilesByPrefix(report.id);
-      return await ReportModel.delete(address, geohash);
-    } else if (index != -1) {
-      return await ReportModel.removeChildren(index, address, geohash);
-    } else {
+    if (index === -1) {
       throw new AppError(
         404,
         "Children não encontrado",
         "Children não foi encontrado dentro do report"
       );
     }
-  }
 
-  async deleteFilesByPrefix(prefix) {
-    const paramsToGet = {
-      Bucket: process.env.S3_BUCKET,
-      Prefix: prefix,
-    };
+    if (report.childrens.length === 1) {
+      await this.deleteFilesByPrefix(report.id);
+      return ReportModel.delete(address, geohash);
+    }
 
-    const listFiles = await ReportModel.getFilesByPrefix(paramsToGet);
-
-    const paramsToDelete = {
-      Bucket: process.env.S3_BUCKET,
-      Delete: {
-        Objects: listFiles.Contents.map((obj) => ({ Key: obj.Key })),
-      },
-    };
-
-    return await ReportModel.deleteFiles(paramsToDelete);
+    return ReportModel.removeChildren(index, address, geohash);
   }
 }

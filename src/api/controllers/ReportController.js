@@ -36,7 +36,7 @@ class ReportController {
 
     const reportService = new ReportService(data);
 
-    const status = await reportService.getStatusByLocal();
+    const status = await reportService.getStatus();
 
     res.status(200).json({
       message: "Busca feita com sucesso!",
