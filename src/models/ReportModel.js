@@ -42,29 +42,6 @@ class ReportModel {
     }
   }
 
-  async getByListId(reports_id) {
-    const params = {
-      TableName: tableName,
-      FilterExpression:
-        "id IN (" + reports_id.map((_, item) => `:id${item}`).join(", ") + ")",
-      ExpressionAttributeValues: Object.fromEntries(
-        reports_id.map((id, item) => [`:id${item}`, id])
-      ),
-    };
-
-    try {
-      const command = new ScanCommand(params);
-      const response = await client.send(command);
-      return response.Items;
-    } catch (error) {
-      throw new AppError(
-        404,
-        "Report não encontrado",
-        "Report id mal definido ou inexistente"
-      );
-    }
-  }
-
   async getByLocal(address, geohash) {
     const params = {
       TableName: tableName,
@@ -88,16 +65,39 @@ class ReportModel {
     }
   }
 
-  async uploadFile(file) {
-    try {
-      const response = await s3Client.send(new PutObjectCommand(file));
+  async getByListId(reports_id) {
+    const params = {
+      TableName: tableName,
+      FilterExpression:
+        "id IN (" + reports_id.map((_, item) => `:id${item}`).join(", ") + ")",
+      ExpressionAttributeValues: Object.fromEntries(
+        reports_id.map((id, item) => [`:id${item}`, id])
+      ),
+    };
 
-      return response;
+    try {
+      const command = new ScanCommand(params);
+      const response = await client.send(command);
+      return response.Items;
     } catch (error) {
       throw new AppError(
-        400,
-        "Arquivo não enviado",
-        "Arquivo pode está corrompido"
+        404,
+        "Report não encontrado",
+        "Report id mal definido ou inexistente"
+      );
+    }
+  }
+
+  async getFilesByPrefix(data) {
+    try {
+      const listResponse = await s3Client.send(new ListObjectsV2Command(data));
+
+      return listResponse;
+    } catch (error) {
+      throw new AppError(
+        404,
+        "Prefixos não encontrado",
+        "Tente outro prefixo mais tarde"
       );
     }
   }
@@ -148,6 +148,20 @@ class ReportModel {
     }
   }
 
+  async uploadFile(file) {
+    try {
+      const response = await s3Client.send(new PutObjectCommand(file));
+
+      return response;
+    } catch (error) {
+      throw new AppError(
+        400,
+        "Arquivo não enviado",
+        "Arquivo pode está corrompido"
+      );
+    }
+  }
+
   async addChildren(children, report) {
     const params = {
       TableName: tableName,
@@ -175,24 +189,39 @@ class ReportModel {
     }
   }
 
-  async delete(address, geohash) {
+  // updateStatus
+  // Faz o setup do parametros e faz o update no dynamoDB
+
+  async updateStatus(data) {
     const params = {
       TableName: tableName,
       Key: {
-        address: address,
-        geohash: geohash,
+        address: data.address,
+        geohash: data.geohash,
       },
+      UpdateExpression: "SET #status = :status",
+      ExpressionAttributeNames: {
+        "#status": "status", // Usando o alias #status para o atributo 'status'
+      },
+      ExpressionAttributeValues: {
+        ":status": data.status,
+      },
+      ReturnValues: "ALL_NEW",
     };
 
     try {
-      const deleteReport = await dynamodb.send(new DeleteCommand(params));
+      const response = await dynamodb.send(new UpdateCommand(params));
 
-      return deleteReport;
+      const { address, geohash, status } = response.Attributes;
+
+      return { address, geohash, status };
     } catch (error) {
+      console.log(error);
+
       throw new AppError(
-        404,
-        "Report não encontrado",
-        "Address ou Geohash podem está mal definido"
+        400,
+        "Parametros mal definido",
+        "Parametros foram mal definidos "
       );
     }
   }
@@ -221,16 +250,24 @@ class ReportModel {
     }
   }
 
-  async getFilesByPrefix(data) {
-    try {
-      const listResponse = await s3Client.send(new ListObjectsV2Command(data));
+  async delete(address, geohash) {
+    const params = {
+      TableName: tableName,
+      Key: {
+        address: address,
+        geohash: geohash,
+      },
+    };
 
-      return listResponse;
+    try {
+      const deleteReport = await dynamodb.send(new DeleteCommand(params));
+
+      return deleteReport;
     } catch (error) {
       throw new AppError(
         404,
-        "Prefixos não encontrado",
-        "Tente outro prefixo mais tarde"
+        "Report não encontrado",
+        "Address ou Geohash podem está mal definido"
       );
     }
   }

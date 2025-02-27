@@ -17,7 +17,7 @@ router.get("/my", authMiddlewares, ReportController.getMyReports);
 router.get(
   "/address/:address/geohash/:geohash",
   authAdminMiddlewares,
-  expressMiddleware.getStatus(),
+  expressMiddleware.getReport(),
   expressMiddleware.validate,
   ReportController.getReport
 );
@@ -36,6 +36,15 @@ router.post(
   uploadMiddlewares.single("file"),
   expressMiddleware.postReport,
   ReportController.create
+);
+
+// Rota PATCH recebe de params address + geohash, faz a validação usando o getStatus e chama o metodo updateStatus
+router.patch(
+  "/address/:address/geohash/:geohash",
+  authAdminMiddlewares,
+  expressMiddleware.patchStatusReport(),
+  expressMiddleware.validate,
+  ReportController.updateStatus
 );
 
 router.delete(

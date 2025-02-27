@@ -1,8 +1,10 @@
 import express from "express";
 import bodyParser from "body-parser";
+import cors from "cors";
 const app = express();
 import "express-async-errors"; // Biblioteca que captura erros assincrono
 
+app.use(cors());
 app.use(bodyParser.json());
 
 // Rotas

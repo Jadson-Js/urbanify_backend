@@ -23,6 +23,7 @@ export default class ReportService {
     this.local = data.local;
     this.file = this.setFile(data);
     this.form = this.setForm(data);
+    this.update = data.update;
     this.date = new Date().toISOString();
     (this.reportFormated = {}), (this.childrenFormated = {});
   }
@@ -164,7 +165,7 @@ export default class ReportService {
     return report.status;
   }
 
-  // Rotas para criação
+  // Rotas para CREATE
   async create() {
     const report = this.reportFormated;
 
@@ -187,6 +188,48 @@ export default class ReportService {
     };
 
     return ReportModel.uploadFile(putData);
+  }
+
+  // ROTAS para UPDATE
+  // updateStatus
+  // Organiza os parametros e chamar um model para edição do status e retorna o valor
+  async updateStatus() {
+    const data = this.update;
+
+    const response = ReportModel.updateStatus(data);
+
+    return response;
+  }
+
+  // Rotas para DELETE
+  async processDelete() {
+    const { address, geohash } = this.local;
+    const report = await ReportModel.getByLocal(address, geohash);
+
+    if (!report) {
+      throw new AppError(
+        404,
+        "Report não encontrado",
+        "Address e geohash não foram encontrados no banco de dados"
+      );
+    }
+
+    const index = getIndexChildren(this.user_email, report);
+
+    if (index === -1) {
+      throw new AppError(
+        404,
+        "Children não encontrado",
+        "Children não foi encontrado dentro do report"
+      );
+    }
+
+    if (report.childrens.length === 1) {
+      await this.deleteFilesByPrefix(report.id);
+      return ReportModel.delete(address, geohash);
+    }
+
+    return ReportModel.removeChildren(index, address, geohash);
   }
 
   // Utilitarios da classes
@@ -251,52 +294,6 @@ export default class ReportService {
     this.reportFormated = this.formDataToReport();
     this.childrenFormated = this.formDataToChildren();
 
-    // Faz uma busca para saber se existe algum report existente no local requisitado
-    const report = await this.getByLocal();
-
-    // Se não existir nenhum report anterior
-    if (!report) {
-      const newReport = await this.create();
-
-      // Enviar o arquivo para o S3
-      await this.uploadFile(newReport.id);
-
-      // Vai chamar um model onde vai informar os parametros email & report_id
-      await UserModel.addReport(this.user_email, newReport.id);
-
-      // adiciona o children ao report e retornar os dados
-      return this.addChildren();
-    }
-
-    // Se existir um report na região
-    // Verifica esse usuário já fez report no mesmo local
-    // const userExist = "Use o util userExist"
-
-    // if (userExist) {
-    //   throw new AppError(
-    //     401,
-    //     "Usuário já reportou anteriormente",
-    //     "O usuário não pode reportar o mesmo local mais de 1 vez"
-    //   );
-    // }
-
-    const childrensLength = report.childrens.length;
-
-    // Verifica se este report tem mais de 3 filhos
-    if (childrensLength < 3) {
-      // Se tiver, ele faz o upload da fotografia para o report
-      await this.uploadFile(report.id);
-    }
-
-    await UserModel.addReport(this.user_email, report.id);
-    // Adiciona-se o report como filho
-    return this.addChildren();
-  }
-
-  async processCreate() {
-    this.reportFormated = this.formDataToReport();
-    this.childrenFormated = this.formDataToChildren();
-
     const report = await this.getByLocal();
 
     if (!report) {
@@ -314,33 +311,49 @@ export default class ReportService {
     return this.addChildren();
   }
 
-  async processDelete() {
-    const { address, geohash } = this.local;
-    const report = await ReportModel.getByLocal(address, geohash);
+  // async processCreate() {
+  //   this.reportFormated = this.formDataToReport();
+  //   this.childrenFormated = this.formDataToChildren();
 
-    if (!report) {
-      throw new AppError(
-        404,
-        "Report não encontrado",
-        "Address e geohash não foram encontrados no banco de dados"
-      );
-    }
+  //   // Faz uma busca para saber se existe algum report existente no local requisitado
+  //   const report = await this.getByLocal();
 
-    const index = getIndexChildren(this.user_email, report);
+  //   // Se não existir nenhum report anterior
+  //   if (!report) {
+  //     const newReport = await this.create();
 
-    if (index === -1) {
-      throw new AppError(
-        404,
-        "Children não encontrado",
-        "Children não foi encontrado dentro do report"
-      );
-    }
+  //     // Enviar o arquivo para o S3
+  //     await this.uploadFile(newReport.id);
 
-    if (report.childrens.length === 1) {
-      await this.deleteFilesByPrefix(report.id);
-      return ReportModel.delete(address, geohash);
-    }
+  //     // Vai chamar um model onde vai informar os parametros email & report_id
+  //     await UserModel.addReport(this.user_email, newReport.id);
 
-    return ReportModel.removeChildren(index, address, geohash);
-  }
+  //     // adiciona o children ao report e retornar os dados
+  //     return this.addChildren();
+  //   }
+
+  //   // Se existir um report na região
+  //   // Verifica esse usuário já fez report no mesmo local
+  //   // const userExist = "Use o util userExist"
+
+  //   // if (userExist) {
+  //   //   throw new AppError(
+  //   //     401,
+  //   //     "Usuário já reportou anteriormente",
+  //   //     "O usuário não pode reportar o mesmo local mais de 1 vez"
+  //   //   );
+  //   // }
+
+  //   const childrensLength = report.childrens.length;
+
+  //   // Verifica se este report tem mais de 3 filhos
+  //   if (childrensLength < 3) {
+  //     // Se tiver, ele faz o upload da fotografia para o report
+  //     await this.uploadFile(report.id);
+  //   }
+
+  //   await UserModel.addReport(this.user_email, report.id);
+  //   // Adiciona-se o report como filho
+  //   return this.addChildren();
+  // }
 }

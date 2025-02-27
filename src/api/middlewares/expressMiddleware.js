@@ -75,6 +75,37 @@ class Validator {
     });
   }
 
+  getReport() {
+    return checkSchema({
+      address: {
+        isString: {
+          errorMessage: "address deve ser uma string",
+        },
+        notEmpty: {
+          errorMessage: "Preencha o address",
+        },
+        isLength: {
+          options: { min: 4, max: 125 },
+          errorMessage:
+            "address não pode conter menos de 4 ou mais de 125 caracteres",
+        },
+      },
+      geohash: {
+        isString: {
+          errorMessage: "geohash deve ser uma string",
+        },
+        notEmpty: {
+          errorMessage: "Preencha o geohash",
+        },
+        isLength: {
+          options: { min: 6, max: 8 },
+          errorMessage:
+            "geohash não pode conter menos de 3 ou mais de 62 caracteres",
+        },
+      },
+    });
+  }
+
   getStatus() {
     return checkSchema({
       address: {
@@ -151,6 +182,46 @@ class Validator {
         "Verifique se os campos informados possuem a quantidade de caracteres adequados"
       );
     }
+  }
+
+  patchStatusReport() {
+    return checkSchema({
+      address: {
+        isString: {
+          errorMessage: "Address deve ser uma string",
+        },
+        notEmpty: {
+          errorMessage: "Preencha o address",
+        },
+        isLength: {
+          options: { min: 4, max: 125 },
+          errorMessage:
+            "address não pode conter menos de 4 ou mais de 125 caracteres",
+        },
+      },
+      geohash: {
+        isString: {
+          errorMessage: "geohash deve ser uma string",
+        },
+        notEmpty: {
+          errorMessage: "Preencha o geohash",
+        },
+        isLength: {
+          options: { min: 6, max: 8 },
+          errorMessage:
+            "geohash não pode conter menos de 3 ou mais de 62 caracteres",
+        },
+      },
+      status: {
+        isInt: {
+          options: { min: 0, max: 3 },
+          errorMessage: "Status deve ser um número entre 0 e 3",
+        },
+        notEmpty: {
+          errorMessage: "Preencha o status",
+        },
+      },
+    });
   }
 
   // Metodo responsavel por tratar os erros

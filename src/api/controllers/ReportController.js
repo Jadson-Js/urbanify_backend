@@ -9,6 +9,21 @@ class ReportController {
     res.status(200).json({ message: "Busca concluida!", reports });
   }
 
+  async getMyReports(req, res) {
+    const data = {
+      user_email: req.user_email,
+    };
+
+    const reportService = new ReportService(data);
+
+    const reports = await reportService.getMyReports();
+
+    res.status(200).json({
+      message: "Busca feita com sucesso!",
+      report: reports,
+    });
+  }
+
   async getReport(req, res) {
     const { address, geohash } = req.params;
 
@@ -44,21 +59,6 @@ class ReportController {
     });
   }
 
-  async getMyReports(req, res) {
-    const data = {
-      user_email: req.user_email,
-    };
-
-    const reportService = new ReportService(data);
-
-    const reports = await reportService.getMyReports();
-
-    res.status(200).json({
-      message: "Busca feita com sucesso!",
-      report: reports,
-    });
-  }
-
   async create(req, res) {
     const data = {
       user_email: req.user_email,
@@ -73,6 +73,23 @@ class ReportController {
     res.status(201).json({
       message: "Report cadastrado com sucesso!",
       report: putReport,
+    });
+  }
+
+  async updateStatus(req, res) {
+    const { status } = req.body;
+    const { address, geohash } = req.params;
+
+    const data = {
+      update: { status: status, address, geohash },
+    };
+
+    const reportService = new ReportService(data);
+    const response = await reportService.updateStatus();
+
+    res.status(200).json({
+      message: "Edição feita com sucesso!",
+      report: response,
     });
   }
 
