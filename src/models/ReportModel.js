@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { dynamoConfig, s3Config } from "../config/environment.js";
+import { dynamoConfig, s3Config, snsConfig } from "../config/environment.js";
 import AppError from "../utils/AppError.js";
 import {
   S3Client,
@@ -17,12 +17,15 @@ import {
   UpdateCommand,
   DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 const tableName = "reports";
 const client = new DynamoDBClient(dynamoConfig);
 const dynamodb = DynamoDBDocumentClient.from(client);
 const s3Client = new S3Client(s3Config);
+const snsClient = new SNSClient(snsConfig);
 
 class ReportModel {
+  // Ações de GET
   async get() {
     const params = {
       TableName: tableName,
@@ -127,6 +130,7 @@ class ReportModel {
     }
   }
 
+  // Ações de POST
   async create(report) {
     const params = {
       TableName: tableName,
@@ -162,6 +166,16 @@ class ReportModel {
     }
   }
 
+  async sendEmail(params) {
+    try {
+      const data = await snsClient.send(new PublishCommand(params));
+      console.log("Email enviado com sucesso", data);
+    } catch (err) {
+      console.error("Erro ao enviar email", err);
+    }
+  }
+
+  // Ações de UPDATE
   async addChildren(children, report) {
     const params = {
       TableName: tableName,
@@ -188,9 +202,6 @@ class ReportModel {
       );
     }
   }
-
-  // updateStatus
-  // Faz o setup do parametros e faz o update no dynamoDB
 
   async updateStatus(data) {
     const params = {
@@ -226,6 +237,7 @@ class ReportModel {
     }
   }
 
+  // Ações de DELETE
   async removeChildren(index, address, geohash) {
     const params = {
       TableName: tableName,

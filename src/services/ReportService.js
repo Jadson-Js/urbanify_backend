@@ -61,6 +61,7 @@ export default class ReportService {
       .replace(/\W/g, "");
 
     const putData = {
+      falseId: this.date,
       id: report_id,
       status: ReportStatus.REPORTADO,
       created_at: this.date,
@@ -190,13 +191,17 @@ export default class ReportService {
     return ReportModel.uploadFile(putData);
   }
 
-  // ROTAS para UPDATE
-  // updateStatus
-  // Organiza os parametros e chamar um model para edição do status e retorna o valor
   async updateStatus() {
     const data = this.update;
 
-    const response = ReportModel.updateStatus(data);
+    const params = {
+      Message: "Este é o corpo da mensagem de teste!", // O corpo do email
+      Subject: "Assunto do Email", // O assunto
+      TopicArn: "arn:aws:sns:us-east-1:941377158973:urbanify", // ARN do tópico SNS que você configurou
+    };
+
+    const response = await ReportModel.updateStatus(data);
+    const email = await ReportModel.sendEmail(params);
 
     return response;
   }
@@ -262,6 +267,7 @@ export default class ReportService {
     const newChildren = await ReportModel.addChildren(children, report);
 
     const report_id = {
+      falseId: report.falseId,
       id: newChildren.Attributes.id,
       address: report.address,
       geohash: report.geohash,

@@ -38,7 +38,6 @@ router.post(
   ReportController.create
 );
 
-// Rota PATCH recebe de params address + geohash, faz a validação usando o getStatus e chama o metodo updateStatus
 router.patch(
   "/address/:address/geohash/:geohash",
   authAdminMiddlewares,

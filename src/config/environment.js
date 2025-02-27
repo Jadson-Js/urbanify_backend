@@ -18,6 +18,14 @@ const s3Config = {
   },
 };
 
+const snsConfig = {
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESSKEYID,
+    secretAccessKey: process.env.AWS_SECRETACCESSKEY,
+  },
+};
+
 const ReportStatus = Object.freeze({
   REPORTADO: 0,
   AVALIADO: 1,
@@ -29,4 +37,4 @@ const ReportSeverity = Object.freeze({
   MODERADO: 1,
 });
 
-export { dynamoConfig, s3Config, ReportStatus, ReportSeverity };
+export { dynamoConfig, s3Config, snsConfig, ReportStatus, ReportSeverity };
