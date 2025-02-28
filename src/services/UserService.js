@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { generateJWT } from "../utils/jwt.js";
+import { generateJWT, generateAccessToken } from "../utils/jwt.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
 import UserModel from "../models/UserModel.js";
 import AppError from "../utils/AppError.js";
@@ -38,6 +38,12 @@ class UserService {
         return user;
       }
     }
+  }
+
+  async access(refreshToken) {
+    const accessToken = await generateAccessToken(refreshToken);
+
+    return accessToken;
   }
 }
 

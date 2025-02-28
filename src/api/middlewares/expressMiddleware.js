@@ -31,6 +31,23 @@ class Validator {
     });
   }
 
+  token() {
+    return checkSchema({
+      refreshToken: {
+        notEmpty: {
+          errorMessage: "preencha o refresh token",
+        },
+        isString: {
+          errorMessage: "O refresh token deve ser uma string",
+        },
+        isLength: {
+          options: { max: 250 },
+          errorMessage: "O refresh token não pode ter mais de 250 caracteres",
+        },
+      },
+    });
+  }
+
   postLog() {
     return checkSchema({
       status: {
@@ -214,8 +231,8 @@ class Validator {
       },
       status: {
         isInt: {
-          options: { min: 0, max: 3 },
-          errorMessage: "Status deve ser um número entre 0 e 3",
+          options: { min: 0, max: 2 },
+          errorMessage: "Status deve ser um número entre 0 e 2",
         },
         notEmpty: {
           errorMessage: "Preencha o status",

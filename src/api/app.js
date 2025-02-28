@@ -10,12 +10,13 @@ app.use(bodyParser.json());
 // Rotas
 import usersRoutes from "./routes/userRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
-import logRoutes from "./routes/logRoutes.js";
+import resolvedReportRoutes from "./routes/resolvedReportRoutes.js";
+
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 
 app.use("/user", usersRoutes);
 app.use("/report", reportRoutes);
-app.use("/log", logRoutes);
+app.use("/report/resolved/", resolvedReportRoutes);
 
 app.use(errorMiddleware); // Middleware que captura erros que não foram tratados
 

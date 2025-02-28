@@ -11,7 +11,7 @@ export default function validateAdminRole(req, res, next) {
       .json({ auth: false, message: "Token não fornecido." });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (error, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET_ACCESS, (error, decoded) => {
     if (error) {
       return res.status(401).json({ auth: false, message: "Token inválido." });
     }

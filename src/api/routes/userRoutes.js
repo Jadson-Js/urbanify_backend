@@ -23,4 +23,11 @@ router.post(
   UserController.login
 );
 
+router.post(
+  "/access",
+  expressMiddleware.token(),
+  expressMiddleware.validate,
+  UserController.accesss
+);
+
 export default router;

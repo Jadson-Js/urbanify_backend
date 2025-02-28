@@ -16,6 +16,7 @@ const req = {
 
     grandma: `{  "subregion": "São Luís",  "district": "Monte Castelo",  "street": "Rua Paulo Fontin",  "severity": "MODERADO",  "coordinates": {    "latitude": "-2.539162334606275",    "longitude": "-44.28390231258721"  }}`,
   },
+  updateStatus: `{ "status": ${1} }`,
 };
 
 describe("Report Routes", () => {
@@ -25,8 +26,6 @@ describe("Report Routes", () => {
       .set("Authorization", req.adminToken)
       .field("data", req.report.my)
       .attach("file", req.filePath);
-
-    console.log(response.body);
 
     expect(response.statusCode).toBe(201);
     expect(response.body).toHaveProperty(
@@ -43,8 +42,6 @@ describe("Report Routes", () => {
       .field("data", req.report.grandma)
       .attach("file", req.filePath);
 
-    console.log(response.body);
-
     expect(response.statusCode).toBe(201);
     expect(response.body).toHaveProperty(
       "message",
@@ -60,8 +57,6 @@ describe("Report Routes", () => {
       .field("data", req.report.my)
       .attach("file", req.filePath);
 
-    console.log(response.body);
-
     expect(response.statusCode).toBe(201);
     expect(response.body).toHaveProperty(
       "message",
@@ -75,8 +70,6 @@ describe("Report Routes", () => {
       .get("/report")
       .set("Authorization", req.adminToken);
 
-    console.log(response.body);
-
     expect(response.statusCode).toBe(200);
     expect(Array.isArray(response.body.reports)).toBe(true);
     expect(response.body.reports.length).toBe(2);
@@ -86,8 +79,6 @@ describe("Report Routes", () => {
     const response = await supertest(app)
       .get("/report/address/São Luís_Liberdade/geohash/7p8986c")
       .set("Authorization", req.adminToken);
-
-    console.log(response.body);
 
     expect(response.statusCode).toBe(200);
     expect(response.body.data.report).toBeInstanceOf(Object);
@@ -99,8 +90,6 @@ describe("Report Routes", () => {
       .get("/report/my")
       .set("Authorization", req.adminToken);
 
-    console.log(response.body);
-
     expect(response.statusCode).toBe(200);
     expect(Array.isArray(response.body.report)).toBe(true);
     expect(response.body.report.length).toBe(2);
@@ -111,23 +100,29 @@ describe("Report Routes", () => {
       .get("/report/my")
       .set("Authorization", req.userToken);
 
-    console.log(response.body);
-
     expect(response.statusCode).toBe(200);
     expect(Array.isArray(response.body.report)).toBe(true);
     expect(response.body.report.length).toBe(1);
   });
 
-  test("Pega status do meu report com sucesso", async () => {
+  test("Edita status do meu report como ADMIN com sucesso", async () => {
+    const response = await supertest(app)
+      .patch("/report/address/São Luís_Liberdade/geohash/7p8986c")
+      .set("Authorization", req.adminToken)
+      .send({ status: 1 });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.report.status).toBe(1);
+  });
+
+  test("Pega status do meu report como ADMIN com sucesso", async () => {
     const response = await supertest(app)
       .get("/report/status/address/São Luís_Liberdade/geohash/7p8986c")
       .set("Authorization", req.adminToken);
 
-    console.log(response.body);
-
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("message", "Busca feita com sucesso!");
-    expect(response.body.status).toBe(0);
+    expect(response.body.status).toBe(1);
   });
 
   test("Deleta meu report como ADMIN com sucesso", async () => {
@@ -138,8 +133,6 @@ describe("Report Routes", () => {
         geohash: "7p8986c",
       })
       .set("Authorization", req.adminToken);
-
-    console.log(response.body);
 
     expect(response.statusCode).toBe(201);
     expect(response.body).toHaveProperty(
@@ -157,8 +150,6 @@ describe("Report Routes", () => {
       })
       .set("Authorization", req.adminToken);
 
-    console.log(response.body);
-
     expect(response.statusCode).toBe(201);
     expect(response.body).toHaveProperty(
       "message",
@@ -174,8 +165,6 @@ describe("Report Routes", () => {
         geohash: "7p8986c",
       })
       .set("Authorization", req.userToken);
-
-    console.log(response.body);
 
     expect(response.statusCode).toBe(201);
     expect(response.body).toHaveProperty(

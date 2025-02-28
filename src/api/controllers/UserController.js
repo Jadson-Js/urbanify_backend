@@ -13,9 +13,22 @@ class UserController {
 
     const user = await UserService.login(email, password);
 
-    res
-      .status(200)
-      .json({ message: "Usuário logado com sucesso!", token: user.token });
+    res.status(200).json({
+      message: "Usuário logado com sucesso!",
+      accessToken: user.token.access,
+      refreshToken: user.token.refresh,
+    });
+  }
+
+  async accesss(req, res) {
+    const { refreshToken } = req.body;
+
+    const accessToken = await UserService.access(refreshToken);
+
+    res.status(200).json({
+      message: "Novo token de acesso gerado",
+      accessToken,
+    });
   }
 }
 

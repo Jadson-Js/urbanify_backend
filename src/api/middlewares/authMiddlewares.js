@@ -11,7 +11,7 @@ export default function validateJWT(req, res, next) {
       .json({ auth: false, message: "O token não foi fornecido" });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (error, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET_ACCESS, (error, decoded) => {
     if (error) {
       return res
         .status(500)

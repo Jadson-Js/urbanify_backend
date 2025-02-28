@@ -71,10 +71,9 @@ class ReportModel {
   async getByListId(reports_id) {
     const params = {
       TableName: tableName,
-      FilterExpression:
-        "id IN (" + reports_id.map((_, item) => `:id${item}`).join(", ") + ")",
+      FilterExpression: reports_id.map((_, i) => `id = :id${i}`).join(" OR "),
       ExpressionAttributeValues: Object.fromEntries(
-        reports_id.map((id, item) => [`:id${item}`, id])
+        reports_id.map((id, i) => [`:id${i}`, id])
       ),
     };
 
@@ -83,6 +82,8 @@ class ReportModel {
       const response = await client.send(command);
       return response.Items;
     } catch (error) {
+      console.log(error);
+
       throw new AppError(
         404,
         "Report não encontrado",
@@ -146,8 +147,8 @@ class ReportModel {
     } catch (error) {
       throw new AppError(
         400,
-        "Report mal definido ou ja existente",
-        "Address, Geohash ou Id podem ja existir no Banco De Dados"
+        "Arquivo não enviado",
+        "Arquivo pode está corrompido"
       );
     }
   }
@@ -169,9 +170,10 @@ class ReportModel {
   async sendEmail(params) {
     try {
       const data = await snsClient.send(new PublishCommand(params));
-      console.log("Email enviado com sucesso", data);
+
+      return data;
     } catch (err) {
-      console.error("Erro ao enviar email", err);
+      throw new AppError(400, "Email não enviado", "Email não foi enviado");
     }
   }
 
@@ -223,9 +225,7 @@ class ReportModel {
     try {
       const response = await dynamodb.send(new UpdateCommand(params));
 
-      const { address, geohash, status } = response.Attributes;
-
-      return { address, geohash, status };
+      return response.Attributes;
     } catch (error) {
       console.log(error);
 

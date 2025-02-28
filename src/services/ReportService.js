@@ -4,6 +4,7 @@ import sharp from "sharp";
 
 // Import Models
 import ReportModel from "../models/ReportModel.js";
+import ResolvedReportModel from "../models/ResolvedReportModel.js";
 import UserModel from "../models/UserModel.js";
 
 // Import config
@@ -21,10 +22,10 @@ export default class ReportService {
   constructor(data = {}) {
     this.user_email = data.user_email;
     this.local = data.local;
+    this.date = new Date().toISOString();
     this.file = this.setFile(data);
     this.form = this.setForm(data);
     this.update = data.update;
-    this.date = new Date().toISOString();
     (this.reportFormated = {}), (this.childrenFormated = {});
   }
 
@@ -191,17 +192,43 @@ export default class ReportService {
     return ReportModel.uploadFile(putData);
   }
 
+  // Rotas para UPDATE
   async updateStatus() {
-    const data = this.update;
+    const { address, geohash, status } = await ReportModel.updateStatus(
+      this.update
+    );
 
-    const params = {
-      Message: "Este é o corpo da mensagem de teste!", // O corpo do email
-      Subject: "Assunto do Email", // O assunto
-      TopicArn: "arn:aws:sns:us-east-1:941377158973:urbanify", // ARN do tópico SNS que você configurou
+    let params = {};
+
+    if (status === 2) {
+      params = {
+        Message: "A obra foi concluida, obrigado pelo seu relato.", // O corpo do email
+        Subject: "A obra foi concluida, obrigado pelo seu relato.", // O assunto
+      };
+
+      const report = await ReportModel.getByLocal(address, geohash);
+      await ResolvedReportModel.create(report);
+      await ReportModel.delete(address, geohash);
+    } else {
+      params = {
+        Message: "A obra foi avaliada, em breve estaremos reparando o trecho.", // O corpo do email
+        Subject: "A obra foi avaliada, em breve estaremos reparando o trecho.", // O assunto
+      };
+    }
+
+    const content = {
+      ...params,
+      TopicArn: "arn:aws:sns:us-east-1:941377158973:urbanify",
     };
 
-    const response = await ReportModel.updateStatus(data);
-    const email = await ReportModel.sendEmail(params);
+    // Enviando o email
+    const email = await ReportModel.sendEmail(content);
+
+    // Resposta final
+    const response = {
+      report: { address, geohash, status },
+      email_id: email.MessageId,
+    };
 
     return response;
   }
@@ -309,7 +336,7 @@ export default class ReportService {
       return this.addChildren();
     }
 
-    if (report.childrens.length < 3) {
+    if (report.childrens.length < 10) {
       await this.uploadFile(report.id);
     }
 

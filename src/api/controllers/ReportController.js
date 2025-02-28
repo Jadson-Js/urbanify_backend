@@ -89,7 +89,7 @@ class ReportController {
 
     res.status(200).json({
       message: "Edição feita com sucesso!",
-      report: response,
+      data: response,
     });
   }
 
