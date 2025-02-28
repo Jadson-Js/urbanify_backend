@@ -26,6 +26,8 @@ const snsConfig = {
   },
 };
 
+const snsARN = process.env.SNS_ARN;
+
 const ReportStatus = Object.freeze({
   REPORTADO: 0,
   AVALIADO: 1,
@@ -37,4 +39,11 @@ const ReportSeverity = Object.freeze({
   MODERADO: 1,
 });
 
-export { dynamoConfig, s3Config, snsConfig, ReportStatus, ReportSeverity };
+export {
+  dynamoConfig,
+  s3Config,
+  snsConfig,
+  snsARN,
+  ReportStatus,
+  ReportSeverity,
+};

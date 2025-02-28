@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { snsARN } from "../config/environment.js";
 import { generateJWT, generateAccessToken } from "../utils/jwt.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
 import UserModel from "../models/UserModel.js";
@@ -7,13 +8,20 @@ import AppError from "../utils/AppError.js";
 class UserService {
   async signup(email, password) {
     const passwordEncrypt = encrypt(password);
+    const params = {
+      Protocol: "email",
+      Endpoint: email,
+      TopicArn: snsARN,
+    };
+
+    await UserModel.snsSubscribe(params);
 
     const user = {
       id: crypto.randomUUID(),
       email: email,
       password: passwordEncrypt,
       role: "USER",
-      active: true,
+      active: false,
       reports_id: [],
       created_at: new Date().toISOString(),
     };
@@ -30,13 +38,31 @@ class UserService {
         "Usuario não encontrado",
         "Email incorreto ou inexistente"
       );
-    } else {
-      const passwordDecrypt = decrypt(user.password);
+    }
 
-      if (password === passwordDecrypt) {
-        user.token = generateJWT(user.email, user.role);
-        return user;
-      }
+    const params = {
+      user_email: user.email,
+      topic_arn: snsARN,
+    };
+
+    const status = await UserModel.isSubscribe(params);
+
+    if (status.SubscriptionArn == "PendingConfirmation") {
+      throw new AppError(
+        401,
+        "Email do usuario está pendente",
+        "Email do usuario está pendente"
+      );
+    } else if (user.active == false) {
+      // Chama model que deixa o active do usuario igual a true
+      await UserModel.active(user.email);
+    }
+
+    const passwordDecrypt = decrypt(user.password);
+
+    if (password === passwordDecrypt) {
+      user.token = generateJWT(user);
+      return user;
     }
   }
 

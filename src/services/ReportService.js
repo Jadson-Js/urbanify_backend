@@ -8,7 +8,7 @@ import ResolvedReportModel from "../models/ResolvedReportModel.js";
 import UserModel from "../models/UserModel.js";
 
 // Import config
-import { ReportStatus, ReportSeverity } from "../config/environment.js";
+import { ReportStatus, ReportSeverity, snsARN } from "../config/environment.js";
 
 // Report Utils
 import { generateGeohash } from "../utils/geohash.js";
@@ -218,7 +218,7 @@ export default class ReportService {
 
     const content = {
       ...params,
-      TopicArn: "arn:aws:sns:us-east-1:941377158973:urbanify",
+      TopicArn: snsARN,
     };
 
     // Enviando o email

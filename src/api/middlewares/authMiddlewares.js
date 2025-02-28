@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import AppError from "../../utils/AppError.js";
 dotenv.config();
 
 export default function validateJWT(req, res, next) {
@@ -17,6 +18,14 @@ export default function validateJWT(req, res, next) {
         .status(500)
         .json({ auth: false, message: "Falha na autenticação do Token" });
     } else {
+      if (!decoded.active) {
+        throw new AppError(
+          403,
+          "Usuario com verificação de email pendente",
+          "Usuario com verificação de email pendente"
+        );
+      }
+
       req.user_email = decoded.email;
       req.role = decoded.role;
       next();

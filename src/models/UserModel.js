@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { dynamoConfig } from "../config/environment.js";
+import { dynamoConfig, snsConfig } from "../config/environment.js";
 import AppError from "../utils/AppError.js";
 import {
   DynamoDBDocumentClient,
@@ -7,6 +7,12 @@ import {
   PutCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
+import {
+  SNSClient,
+  SubscribeCommand,
+  ListSubscriptionsByTopicCommand,
+} from "@aws-sdk/client-sns";
+const snsClient = new SNSClient(snsConfig);
 
 const tableName = "users";
 const client = new DynamoDBClient(dynamoConfig);
@@ -52,6 +58,28 @@ class UserModel {
     }
   }
 
+  async active(email) {
+    const params = {
+      TableName: tableName,
+      Key: {
+        email: email,
+      },
+      UpdateExpression: "SET active = :active",
+      ExpressionAttributeValues: {
+        ":active": true,
+      },
+      ReturnValues: "ALL_NEW",
+    };
+
+    try {
+      const putReportId = await dynamodb.send(new UpdateCommand(params));
+
+      return putReportId;
+    } catch (error) {
+      throw new AppError(404, "Usuario não encontrado", "Digite outro email");
+    }
+  }
+
   async addReport(user_email, report_id) {
     const params = {
       TableName: tableName,
@@ -72,6 +100,31 @@ class UserModel {
     } catch (error) {
       throw new AppError(404, "Usuario não encontrado", "Digite outro email");
     }
+  }
+
+  async snsSubscribe(params) {
+    try {
+      const data = await snsClient.send(new SubscribeCommand(params));
+
+      return data;
+    } catch (err) {
+      console.log(err);
+      throw new AppError(400, "Email não enviado", "Email não foi enviado");
+    }
+  }
+
+  async isSubscribe(params) {
+    const { user_email, topic_arn } = params;
+
+    const data = await snsClient.send(
+      new ListSubscriptionsByTopicCommand({ TopicArn: topic_arn })
+    );
+
+    const subscription = data.Subscriptions.find(
+      (sub) => sub.Endpoint === user_email
+    );
+
+    return subscription;
   }
 }
 
