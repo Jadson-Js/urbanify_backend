@@ -11,20 +11,20 @@ const router = express.Router();
 
 router.get("/", authAdminMiddlewares, ResolvedReportController.get);
 
-router.get("/my", authMiddlewares, ResolvedReportController.getMyReports);
+// router.get("/my", authMiddlewares, ResolvedReportController.getMyReports);
+
+// router.get(
+//   "/address/:address/geohash/:geohash",
+//   authAdminMiddlewares,
+//   expressMiddleware.getReport(),
+//   expressMiddleware.validate,
+//   ResolvedReportController.getReport
+// );
 
 router.get(
-  "/address/:address/geohash/:geohash",
-  authAdminMiddlewares,
-  expressMiddleware.getReport(),
-  expressMiddleware.validate,
-  ResolvedReportController.getReport
-);
-
-router.get(
-  "/status/address/:address/geohash/:geohash",
+  "/status/id/:id/created_at/:created_at",
   authMiddlewares,
-  expressMiddleware.getStatus(),
+  expressMiddleware.getStatusResolvedReport(),
   expressMiddleware.validate,
   ResolvedReportController.getStatus
 );

@@ -154,6 +154,35 @@ class Validator {
     });
   }
 
+  getStatusResolvedReport() {
+    return checkSchema({
+      id: {
+        isString: {
+          errorMessage: "id deve ser uma string",
+        },
+        notEmpty: {
+          errorMessage: "Preencha o id",
+        },
+        isLength: {
+          options: { max: 125 },
+          errorMessage: "Id não pode conter menos de 125 caracteres",
+        },
+      },
+      created_at: {
+        isString: {
+          errorMessage: "created_at deve ser uma string",
+        },
+        notEmpty: {
+          errorMessage: "Preencha o created_at",
+        },
+        isLength: {
+          options: { max: 125 },
+          errorMessage: "created_at não pode conter menos de 125 caracteres",
+        },
+      },
+    });
+  }
+
   postReport(req, res, next) {
     const { subregion, district, street, severity, coordinates } = JSON.parse(
       req.body.data
