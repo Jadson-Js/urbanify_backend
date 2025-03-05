@@ -4,7 +4,7 @@ import sharp from "sharp";
 
 // Import Models
 import ReportModel from "../models/ReportModel.js";
-import ResolvedReportModel from "../models/ResolvedReportModel.js";
+import ResolvedReportModel from "../models/ResolvedModel.js";
 import UserModel from "../models/UserModel.js";
 
 // Import config

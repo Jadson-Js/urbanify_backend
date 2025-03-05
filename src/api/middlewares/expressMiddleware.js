@@ -154,7 +154,7 @@ class Validator {
     });
   }
 
-  getStatusResolvedReport() {
+  getResolvedReport() {
     return checkSchema({
       id: {
         isString: {

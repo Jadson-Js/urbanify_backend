@@ -18,7 +18,7 @@ const client = new DynamoDBClient(dynamoConfig);
 const dynamodb = DynamoDBDocumentClient.from(client);
 const s3Client = new S3Client(s3Config);
 
-class ReportModel {
+class ResolvedModel {
   // Ações de GET
   async get() {
     const params = {
@@ -39,12 +39,12 @@ class ReportModel {
     }
   }
 
-  async getByLocal(address, geohash) {
+  async getByKeys(data) {
     const params = {
       TableName: tableName,
       Key: {
-        address: address,
-        geohash: geohash,
+        id: data.id,
+        created_at: data.created_at,
       },
     };
 
@@ -57,31 +57,7 @@ class ReportModel {
       throw new AppError(
         404,
         "Report não encontrado",
-        "Address e Geohash foram mal definidos ou não encontrado"
-      );
-    }
-  }
-
-  async getByListId(reports_id) {
-    const params = {
-      TableName: tableName,
-      FilterExpression: reports_id.map((_, i) => `id = :id${i}`).join(" OR "),
-      ExpressionAttributeValues: Object.fromEntries(
-        reports_id.map((id, i) => [`:id${i}`, id])
-      ),
-    };
-
-    try {
-      const command = new ScanCommand(params);
-      const response = await client.send(command);
-      return response.Items;
-    } catch (error) {
-      console.log(error);
-
-      throw new AppError(
-        404,
-        "Report não encontrado",
-        "Report id mal definido ou inexistente"
+        "Id ou created_at foram mal definidos ou não encontrado"
       );
     }
   }
@@ -124,28 +100,6 @@ class ReportModel {
       );
     }
   }
-
-  // Ações de POST
-  async create(report) {
-    const params = {
-      TableName: tableName,
-      Item: report,
-      ConditionExpression:
-        "attribute_not_exists(address) AND attribute_not_exists(geohash) AND attribute_not_exists(id)",
-    };
-
-    try {
-      await dynamodb.send(new PutCommand(params));
-
-      return report;
-    } catch (error) {
-      throw new AppError(
-        400,
-        "Arquivo não enviado",
-        "Arquivo pode está corrompido"
-      );
-    }
-  }
 }
 
-export default new ReportModel();
+export default new ResolvedModel();
