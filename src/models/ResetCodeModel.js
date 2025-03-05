@@ -6,6 +6,7 @@ import {
   GetCommand,
   PutCommand,
   UpdateCommand,
+  DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import {
   SNSClient,
@@ -37,28 +38,50 @@ class ResetCodeModel {
     }
   }
 
-  // async getByEmail(email) {
-  //   const params = {
-  //     TableName: tableName,
-  //     Key: {
-  //       email: email,
-  //       created,
-  //     },
-  //   };
+  async getByKeys(email, created_at) {
+    const params = {
+      TableName: tableName,
+      Key: {
+        email,
+        created_at,
+      },
+    };
 
-  //   try {
-  //     const command = new GetCommand(params);
-  //     const data = await dynamodb.send(command);
+    try {
+      const command = new GetCommand(params);
+      const data = await dynamodb.send(command);
 
-  //     return data.Item;
-  //   } catch (error) {
-  //     throw new AppError(
-  //       404,
-  //       "Usuario não encontrado",
-  //       "Email incorreto ou inexistente"
-  //     );
-  //   }
-  // }
+      return data.Item;
+    } catch (error) {
+      throw new AppError(
+        404,
+        "Reset code não encontrado",
+        "Email ou created_at incorreto ou inexistente"
+      );
+    }
+  }
+
+  async delete(email, created_at) {
+    const params = {
+      TableName: tableName,
+      Key: {
+        email,
+        created_at,
+      },
+    };
+
+    try {
+      const deleteReport = await dynamodb.send(new DeleteCommand(params));
+
+      return deleteReport;
+    } catch (error) {
+      throw new AppError(
+        404,
+        "Reset code não encontrado",
+        "Email ou created_at podem está mal definido"
+      );
+    }
+  }
 }
 
 export default new ResetCodeModel();

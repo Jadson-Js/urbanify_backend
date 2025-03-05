@@ -24,10 +24,19 @@ router.post(
 );
 
 router.post(
-  "/request-reset-password",
+  "/request/reset-password",
   expressMiddleware.email(),
   expressMiddleware.validate,
   UserController.requestResetPassword
+);
+
+router.post(
+  "/auth/reset-password",
+  expressMiddleware.user(),
+  expressMiddleware.created_at(),
+  expressMiddleware.code(),
+  expressMiddleware.validate,
+  UserController.authResetPassword
 );
 
 // rota post request-reset-password

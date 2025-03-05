@@ -7,29 +7,6 @@ import ResetCodeModel from "../models/ResetCodeModel.js";
 import AppError from "../utils/AppError.js";
 
 class UserService {
-  async signup(email, password) {
-    const passwordEncrypt = encrypt(password);
-    const params = {
-      Protocol: "email",
-      Endpoint: email,
-      TopicArn: snsARN,
-    };
-
-    await UserModel.snsSubscribe(params);
-
-    const user = {
-      id: crypto.randomUUID(),
-      email: email,
-      password: passwordEncrypt,
-      role: "USER",
-      active: false,
-      reports_id: [],
-      created_at: new Date().toISOString(),
-    };
-
-    return await UserModel.signup(user);
-  }
-
   async login(email, password) {
     const user = await UserModel.getByEmail(email);
 
@@ -67,15 +44,37 @@ class UserService {
     }
   }
 
+  async signup(email, password) {
+    const passwordEncrypt = encrypt(password);
+    const params = {
+      Protocol: "email",
+      Endpoint: email,
+      TopicArn: snsARN,
+    };
+
+    await UserModel.snsSubscribe(params);
+
+    const user = {
+      id: crypto.randomUUID(),
+      email: email,
+      password: passwordEncrypt,
+      role: "USER",
+      active: false,
+      reports_id: [],
+      created_at: new Date().toISOString(),
+    };
+
+    return await UserModel.signup(user);
+  }
+
   async access(refreshToken) {
     const accessToken = await generateAccessToken(refreshToken);
 
     return accessToken;
   }
 
-  async getCodeToResetPassword(email) {
+  async sendCodeToResetPassword(email) {
     const user = await UserModel.getByEmail(email);
-
     if (!user) {
       throw new AppError(
         404,
@@ -85,8 +84,8 @@ class UserService {
     }
 
     const data = {
-      email: email,
-      code: Math.floor(100000 + Math.random() * 900000),
+      email,
+      code: Math.floor(100000 + Math.random() * 900000).toString(),
       created_at: new Date().toISOString(),
     };
     await ResetCodeModel.create(data);
@@ -96,10 +95,42 @@ class UserService {
       Subject: "O codigo é " + data.code, // O assunto
       TopicArn: snsARN,
     };
+    await UserModel.sendEmail(content);
 
-    const sendEmail = await UserModel.sendEmail(content);
+    return { email: data.email, created_at: data.created_at };
+  }
 
-    return sendEmail;
+  async authCodeToResetPassword(params) {
+    const { email, password, code, created_at } = params;
+
+    const user = await UserModel.getByEmail(email);
+    if (!user) {
+      throw new AppError(
+        404,
+        "Usuario não encontrado",
+        "Email incorreto ou inexistente"
+      );
+    }
+
+    // Puxa o resetCode, chamando resetCodeModel informando email e created
+    const resetCode = await ResetCodeModel.getByKeys(email, created_at);
+
+    if (!resetCode) {
+      throw new AppError(
+        404,
+        "Reset code não encontrado",
+        "Email ou created_at incorreto ou inexistente"
+      );
+    } else if (resetCode.code !== code) {
+      throw new AppError(
+        400,
+        "Reset code não é valido",
+        "Reset code informado está incorreto"
+      );
+    } else {
+      await UserModel.updatePassword(email, encrypt(password));
+      await ResetCodeModel.delete(email, created_at);
+    }
   }
 }
 

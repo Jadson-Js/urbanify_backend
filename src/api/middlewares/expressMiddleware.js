@@ -48,6 +48,39 @@ class Validator {
     });
   }
 
+  code() {
+    return checkSchema({
+      code: {
+        isString: {
+          errorMessage: "Code deve ser uma string",
+        },
+        notEmpty: {
+          errorMessage: "preencha o email",
+        },
+        isLength: {
+          options: { min: 6, max: 6 },
+          errorMessage: "Code não pode conter mais de 6 caracteres",
+        },
+      },
+    });
+  }
+  created_at() {
+    return checkSchema({
+      created_at: {
+        isString: {
+          errorMessage: "created_at deve ser uma string",
+        },
+        notEmpty: {
+          errorMessage: "preencha o created_at",
+        },
+        isLength: {
+          options: { max: 250 },
+          errorMessage: "created_at não pode conter mais de 250 caracteres",
+        },
+      },
+    });
+  }
+
   token() {
     return checkSchema({
       refreshToken: {

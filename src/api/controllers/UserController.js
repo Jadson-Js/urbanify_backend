@@ -34,10 +34,21 @@ class UserController {
   async requestResetPassword(req, res) {
     const { email } = req.body;
 
-    await UserService.getCodeToResetPassword(email);
+    const data = await UserService.sendCodeToResetPassword(email);
 
     res.status(200).json({
       message: "Email enviado com sucesso!",
+      data,
+    });
+  }
+
+  async authResetPassword(req, res) {
+    const params = req.body;
+
+    await UserService.authCodeToResetPassword(params);
+
+    res.status(200).json({
+      message: "Senha redefinida!",
     });
   }
 }
