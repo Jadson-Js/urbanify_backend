@@ -167,16 +167,6 @@ class ReportModel {
     }
   }
 
-  async sendEmail(params) {
-    try {
-      const data = await snsClient.send(new PublishCommand(params));
-
-      return data;
-    } catch (err) {
-      throw new AppError(400, "Email não enviado", "Email não foi enviado");
-    }
-  }
-
   // Ações de UPDATE
   async addChildren(children, report) {
     const params = {

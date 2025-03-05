@@ -9,6 +9,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import {
   SNSClient,
+  PublishCommand,
   SubscribeCommand,
   ListSubscriptionsByTopicCommand,
 } from "@aws-sdk/client-sns";
@@ -125,6 +126,17 @@ class UserModel {
     );
 
     return subscription;
+  }
+
+  async sendEmail(params) {
+    try {
+      const data = await snsClient.send(new PublishCommand(params));
+
+      return data;
+    } catch (err) {
+      console.log(err);
+      throw new AppError(400, "Email não enviado", "Email não foi enviado");
+    }
   }
 }
 

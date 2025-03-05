@@ -3,6 +3,7 @@ import { snsARN } from "../config/environment.js";
 import { generateJWT, generateAccessToken } from "../utils/jwt.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
 import UserModel from "../models/UserModel.js";
+import ResetCodeModel from "../models/ResetCodeModel.js";
 import AppError from "../utils/AppError.js";
 
 class UserService {
@@ -70,6 +71,35 @@ class UserService {
     const accessToken = await generateAccessToken(refreshToken);
 
     return accessToken;
+  }
+
+  async getCodeToResetPassword(email) {
+    const user = await UserModel.getByEmail(email);
+
+    if (!user) {
+      throw new AppError(
+        404,
+        "Usuario não encontrado",
+        "Email incorreto ou inexistente"
+      );
+    }
+
+    const data = {
+      email: email,
+      code: Math.floor(100000 + Math.random() * 900000),
+      created_at: new Date().toISOString(),
+    };
+    await ResetCodeModel.create(data);
+
+    const content = {
+      Message: "Codigo de reset de senha", // O corpo do email
+      Subject: "O codigo é " + data.code, // O assunto
+      TopicArn: snsARN,
+    };
+
+    const sendEmail = await UserModel.sendEmail(content);
+
+    return sendEmail;
   }
 }
 

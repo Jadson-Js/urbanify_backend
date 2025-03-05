@@ -24,10 +24,19 @@ router.post(
 );
 
 router.post(
-  "/access",
-  expressMiddleware.token(),
+  "/request-reset-password",
+  expressMiddleware.email(),
   expressMiddleware.validate,
-  UserController.accesss
+  UserController.requestResetPassword
 );
+
+// rota post request-reset-password
+// valida o email e se existe um usuario com esse email
+// Retorna um codigo de 6 digitos
+
+// rota reset-password
+// informa o email, o codigo e a nova senha
+// Verifica se o codigo é o correto, encontra o usuario pelo email, e altera a nova senha
+// Retorna positivo para senha do usuario alterado
 
 export default router;

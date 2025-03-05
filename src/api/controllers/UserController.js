@@ -30,6 +30,16 @@ class UserController {
       accessToken,
     });
   }
+
+  async requestResetPassword(req, res) {
+    const { email } = req.body;
+
+    await UserService.getCodeToResetPassword(email);
+
+    res.status(200).json({
+      message: "Email enviado com sucesso!",
+    });
+  }
 }
 
 export default new UserController();

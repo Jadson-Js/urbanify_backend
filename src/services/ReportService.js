@@ -222,7 +222,7 @@ export default class ReportService {
     };
 
     // Enviando o email
-    const email = await ReportModel.sendEmail(content);
+    const email = await UserModel.sendEmail(content);
 
     // Resposta final
     const response = {

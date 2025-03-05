@@ -31,6 +31,23 @@ class Validator {
     });
   }
 
+  email() {
+    return checkSchema({
+      email: {
+        isEmail: {
+          errorMessage: "Email incorreto",
+        },
+        notEmpty: {
+          errorMessage: "preencha o email",
+        },
+        isLength: {
+          options: { max: 250 },
+          errorMessage: "Email não pode conter mais de 250 caracteres",
+        },
+      },
+    });
+  }
+
   token() {
     return checkSchema({
       refreshToken: {
