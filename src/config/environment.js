@@ -18,6 +18,15 @@ const s3Config = {
   },
 };
 
+const sesConfig = {
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESSKEYID,
+    secretAccessKey: process.env.AWS_SECRETACCESSKEY,
+  },
+};
+const sesSource = process.env.SES_EMAIL_SOURCE;
+
 const snsConfig = {
   region: process.env.AWS_REGION,
   credentials: {
@@ -25,7 +34,6 @@ const snsConfig = {
     secretAccessKey: process.env.AWS_SECRETACCESSKEY,
   },
 };
-
 const snsARN = process.env.SNS_ARN;
 
 const ReportStatus = Object.freeze({
@@ -42,6 +50,8 @@ const ReportSeverity = Object.freeze({
 export {
   dynamoConfig,
   s3Config,
+  sesConfig,
+  sesSource,
   snsConfig,
   snsARN,
   ReportStatus,

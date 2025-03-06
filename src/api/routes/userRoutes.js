@@ -7,12 +7,17 @@ import expressMiddleware from "../middlewares/expressMiddleware.js";
 
 const router = express.Router();
 
+router.get(
+  "/verify/email-token/:token",
+  expressMiddleware.emailToken(),
+  expressMiddleware.validate,
+  UserController.verifyEmailToken
+);
+
 router.post(
   "/signup",
-  // Aqui eu chamo os parametros definidos no middleware,
-  expressMiddleware.user(), // o metodo defini quais condições o email e senha devem possui para ser validos
-  expressMiddleware.validate, // metodo para validar se o o metodo anterior foram validados. ou seja
-  // Se o expressMidleware.userSchema detectou que a senha está vazia, ele vai lançar um erro e o "".validate" vai tratar
+  expressMiddleware.user(),
+  expressMiddleware.validate,
   UserController.signup
 );
 
@@ -23,21 +28,21 @@ router.post(
   UserController.login
 );
 
-router.post(
-  "/request/reset-password",
-  expressMiddleware.email(),
-  expressMiddleware.validate,
-  UserController.requestResetPassword
-);
+// router.post(
+//   "/request/reset-password",
+//   expressMiddleware.email(),
+//   expressMiddleware.validate,
+//   UserController.requestResetPassword
+// );
 
-router.post(
-  "/auth/reset-password",
-  expressMiddleware.user(),
-  expressMiddleware.created_at(),
-  expressMiddleware.code(),
-  expressMiddleware.validate,
-  UserController.authResetPassword
-);
+// router.post(
+//   "/auth/reset-password",
+//   expressMiddleware.user(),
+//   expressMiddleware.created_at(),
+//   expressMiddleware.code(),
+//   expressMiddleware.validate,
+//   UserController.authResetPassword
+// );
 
 // rota post request-reset-password
 // valida o email e se existe um usuario com esse email

@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { dynamoConfig, snsConfig } from "../config/environment.js";
+import { dynamoConfig, sesConfig, snsConfig } from "../config/environment.js";
 import AppError from "../utils/AppError.js";
 import {
   DynamoDBDocumentClient,
@@ -7,12 +7,14 @@ import {
   PutCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import {
   SNSClient,
   PublishCommand,
   SubscribeCommand,
   ListSubscriptionsByTopicCommand,
 } from "@aws-sdk/client-sns";
+const sesClient = new SESClient(sesConfig);
 const snsClient = new SNSClient(snsConfig);
 
 const tableName = "users";
@@ -125,9 +127,11 @@ class UserModel {
     }
   }
 
-  async snsSubscribe(params) {
+  async sendEmail(params) {
     try {
-      const data = await snsClient.send(new SubscribeCommand(params));
+      const data = await sesClient.send(new SendEmailCommand(params));
+      console.log(params);
+      console.log(data);
 
       return data;
     } catch (err) {
@@ -135,6 +139,17 @@ class UserModel {
       throw new AppError(400, "Email não enviado", "Email não foi enviado");
     }
   }
+
+  // async snsSubscribe(params) {
+  //   try {
+  //     const data = await snsClient.send(new SubscribeCommand(params));
+
+  //     return data;
+  //   } catch (err) {
+  //     console.log(err);
+  //     throw new AppError(400, "Email não enviado", "Email não foi enviado");
+  //   }
+  // }
 
   async isSubscribe(params) {
     const { user_email, topic_arn } = params;
@@ -148,17 +163,6 @@ class UserModel {
     );
 
     return subscription;
-  }
-
-  async sendEmail(params) {
-    try {
-      const data = await snsClient.send(new PublishCommand(params));
-
-      return data;
-    } catch (err) {
-      console.log(err);
-      throw new AppError(400, "Email não enviado", "Email não foi enviado");
-    }
   }
 }
 

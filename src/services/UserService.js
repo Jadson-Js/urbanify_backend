@@ -1,10 +1,14 @@
 import crypto from "crypto";
-import { snsARN } from "../config/environment.js";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import { sesSource, snsARN } from "../config/environment.js";
 import { generateJWT, generateAccessToken } from "../utils/jwt.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
 import UserModel from "../models/UserModel.js";
 import ResetCodeModel from "../models/ResetCodeModel.js";
 import AppError from "../utils/AppError.js";
+
+dotenv.config();
 
 class UserService {
   async login(email, password) {
@@ -17,6 +21,8 @@ class UserService {
         "Email incorreto ou inexistente"
       );
     }
+
+    // Fazer validação para saber se a conta deste user está ativo
 
     const params = {
       user_email: user.email,
@@ -46,14 +52,6 @@ class UserService {
 
   async signup(email, password) {
     const passwordEncrypt = encrypt(password);
-    const params = {
-      Protocol: "email",
-      Endpoint: email,
-      TopicArn: snsARN,
-    };
-
-    await UserModel.snsSubscribe(params);
-
     const user = {
       id: crypto.randomUUID(),
       email: email,
@@ -64,7 +62,53 @@ class UserService {
       created_at: new Date().toISOString(),
     };
 
+    await this.sendConfirmEmail(email, user);
+
     return await UserModel.signup(user);
+  }
+
+  async sendConfirmEmail(email, user) {
+    const token = generateJWT(user);
+
+    const params = {
+      Destination: {
+        ToAddresses: [email],
+      },
+      Message: {
+        Body: {
+          Html: {
+            Data: `
+              <html>
+                <body>
+                  <h1>Confirmação de email</h1>
+                  <p>Olá! Para concluir o seu email, clique no link abaixo:</p>
+                  <a href="http://localhost:3000/user/verify/email-token/${token.access}">Clique aqui para confirmar seu email</a>
+                </body>
+              </html>
+            `,
+          },
+        },
+        Subject: { Data: "Confirmar email" },
+      },
+      Source: sesSource,
+    };
+    console.log(params.Message.Body.Html.Data);
+
+    await UserModel.sendEmail(params);
+  }
+
+  async verifyToken(token) {
+    jwt.verify(token, process.env.JWT_SECRET_ACCESS, async (error, decoded) => {
+      if (error) {
+        throw new AppError(
+          400,
+          "Token invalido",
+          "O token enviado era invalido"
+        );
+      } else {
+        await UserModel.active(decoded.email);
+      }
+    });
   }
 
   async access(refreshToken) {

@@ -81,6 +81,23 @@ class Validator {
     });
   }
 
+  emailToken() {
+    return checkSchema({
+      token: {
+        notEmpty: {
+          errorMessage: "preencha o refresh token",
+        },
+        isString: {
+          errorMessage: "O refresh token deve ser uma string",
+        },
+        isLength: {
+          options: { max: 500 },
+          errorMessage: "O refresh token não pode ter mais de 500 caracteres",
+        },
+      },
+    });
+  }
+
   token() {
     return checkSchema({
       refreshToken: {
@@ -91,8 +108,8 @@ class Validator {
           errorMessage: "O refresh token deve ser uma string",
         },
         isLength: {
-          options: { max: 250 },
-          errorMessage: "O refresh token não pode ter mais de 250 caracteres",
+          options: { max: 500 },
+          errorMessage: "O refresh token não pode ter mais de 500 caracteres",
         },
       },
     });

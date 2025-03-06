@@ -31,26 +31,42 @@ class UserController {
     });
   }
 
-  async requestResetPassword(req, res) {
-    const { email } = req.body;
+  async verifyEmailToken(req, res) {
+    const { token } = req.params;
 
-    const data = await UserService.sendCodeToResetPassword(email);
-
-    res.status(200).json({
-      message: "Email enviado com sucesso!",
-      data,
-    });
+    await UserService.verifyToken(token);
+    res.send(`
+      <html>
+          <head><title>Email Verificado</title></head>
+          <body>
+              <h1>Sucesso!</h1>
+              <p>Seu email ja foi verificado.</p></br>
+              <p>Seja bem vindo a URBANIFY.</p>
+          </body>
+      </html>
+  `);
   }
 
-  async authResetPassword(req, res) {
-    const params = req.body;
+  // async requestResetPassword(req, res) {
+  //   const { email } = req.body;
 
-    await UserService.authCodeToResetPassword(params);
+  //   const data = await UserService.sendCodeToResetPassword(email);
 
-    res.status(200).json({
-      message: "Senha redefinida!",
-    });
-  }
+  //   res.status(200).json({
+  //     message: "Email enviado com sucesso!",
+  //     data,
+  //   });
+  // }
+
+  // async authResetPassword(req, res) {
+  //   const params = req.body;
+
+  //   await UserService.authCodeToResetPassword(params);
+
+  //   res.status(200).json({
+  //     message: "Senha redefinida!",
+  //   });
+  // }
 }
 
 export default new UserController();
