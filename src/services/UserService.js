@@ -22,24 +22,12 @@ class UserService {
       );
     }
 
-    // Fazer validação para saber se a conta deste user está ativo
-
-    const params = {
-      user_email: user.email,
-      topic_arn: snsARN,
-    };
-
-    const status = await UserModel.isSubscribe(params);
-
-    if (status.SubscriptionArn == "PendingConfirmation") {
+    if (user.active == false) {
       throw new AppError(
         401,
         "Email do usuario está pendente",
         "Email do usuario está pendente"
       );
-    } else if (user.active == false) {
-      // Chama model que deixa o active do usuario igual a true
-      await UserModel.active(user.email);
     }
 
     const passwordDecrypt = decrypt(user.password);
@@ -98,17 +86,23 @@ class UserService {
   }
 
   async verifyToken(token) {
-    jwt.verify(token, process.env.JWT_SECRET_ACCESS, async (error, decoded) => {
-      if (error) {
-        throw new AppError(
-          400,
-          "Token invalido",
-          "O token enviado era invalido"
-        );
-      } else {
-        await UserModel.active(decoded.email);
+    const response = jwt.verify(
+      token,
+      process.env.JWT_SECRET_ACCESS,
+      async (error, decoded) => {
+        if (error) {
+          throw new AppError(
+            400,
+            "Token invalido",
+            "O token enviado era invalido"
+          );
+        } else {
+          return await UserModel.active(decoded.email);
+        }
       }
-    });
+    );
+
+    return response;
   }
 
   async access(refreshToken) {

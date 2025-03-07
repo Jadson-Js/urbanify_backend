@@ -34,7 +34,8 @@ class UserController {
   async verifyEmailToken(req, res) {
     const { token } = req.params;
 
-    await UserService.verifyToken(token);
+    const response = await UserService.verifyToken(token);
+
     res.send(`
       <html>
           <head><title>Email Verificado</title></head>
