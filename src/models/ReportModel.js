@@ -1,6 +1,6 @@
+// IMPORTANDO DEPENDENCIAS
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { dynamoConfig, s3Config, snsConfig } from "../config/environment.js";
-import AppError from "../utils/AppError.js";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import {
   S3Client,
   PutObjectCommand,
@@ -8,7 +8,6 @@ import {
   ListObjectsV2Command,
   DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import {
   DynamoDBDocumentClient,
   ScanCommand,
@@ -17,15 +16,21 @@ import {
   UpdateCommand,
   DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
+
+// IMPORTANDO CONFIGS
+import { dynamoConfig, s3Config, snsConfig } from "../config/environment.js";
+
+// IMPORTANDO UTILS
+import AppError from "../utils/AppError.js";
+
+// SETUP
 const tableName = "reports";
 const client = new DynamoDBClient(dynamoConfig);
 const dynamodb = DynamoDBDocumentClient.from(client);
 const s3Client = new S3Client(s3Config);
-const snsClient = new SNSClient(snsConfig);
 
 class ReportModel {
-  // Ações de GET
+  // AÇÕES DE GET
   async get() {
     const params = {
       TableName: tableName,
@@ -41,29 +46,6 @@ class ReportModel {
         404,
         "Usuario não encontrado",
         "Email incorreto ou inexistente"
-      );
-    }
-  }
-
-  async getByLocal(address, geohash) {
-    const params = {
-      TableName: tableName,
-      Key: {
-        address: address,
-        geohash: geohash,
-      },
-    };
-
-    try {
-      const command = new GetCommand(params);
-      const data = await dynamodb.send(command);
-
-      return data.Item;
-    } catch (error) {
-      throw new AppError(
-        404,
-        "Report não encontrado",
-        "Address e Geohash foram mal definidos ou não encontrado"
       );
     }
   }
@@ -92,6 +74,29 @@ class ReportModel {
     }
   }
 
+  async getByLocal(address, geohash) {
+    const params = {
+      TableName: tableName,
+      Key: {
+        address: address,
+        geohash: geohash,
+      },
+    };
+
+    try {
+      const command = new GetCommand(params);
+      const data = await dynamodb.send(command);
+
+      return data.Item;
+    } catch (error) {
+      throw new AppError(
+        404,
+        "Report não encontrado",
+        "Address e Geohash foram mal definidos ou não encontrado"
+      );
+    }
+  }
+
   async getFilesByPrefix(data) {
     try {
       const listResponse = await s3Client.send(new ListObjectsV2Command(data));
@@ -106,7 +111,7 @@ class ReportModel {
     }
   }
 
-  async generatePresignedUrl(Contents) {
+  async getPresignedUrl(Contents) {
     try {
       const urls = await Promise.all(
         Contents.map(async (item) => {
@@ -131,7 +136,7 @@ class ReportModel {
     }
   }
 
-  // Ações de POST
+  // AÇÕES DE POST
   async create(report) {
     const params = {
       TableName: tableName,
@@ -167,7 +172,7 @@ class ReportModel {
     }
   }
 
-  // Ações de UPDATE
+  // AÇÕES DE UPDATE
   async addChildren(children, report) {
     const params = {
       TableName: tableName,
@@ -227,7 +232,7 @@ class ReportModel {
     }
   }
 
-  // Ações de DELETE
+  // AÇÕES DE DELETE
   async removeChildren(index, address, geohash) {
     const params = {
       TableName: tableName,

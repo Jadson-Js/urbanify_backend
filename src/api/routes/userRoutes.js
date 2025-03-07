@@ -1,32 +1,44 @@
+// IMPORTANDO DEPENCIAS
 import express from "express";
 
+// IMPORTANDO CONTROLLERS
 import UserController from "../controllers/UserController.js";
 
-// Middleware que carrega os parametros do express-validator,
-import authMiddlewares from "../middlewares/authMiddlewares.js";
+// IMPORTANDO MIDDLEWARES
 import expressMiddleware from "../middlewares/expressMiddleware.js";
 
+// INSTANCIANDO O ROUTER
 const router = express.Router();
 
+// INSTANCIANDO ROTAS
+router.post(
+  "/signup",
+  expressMiddleware.email(),
+  expressMiddleware.password(),
+  expressMiddleware.validate,
+  UserController.signup
+);
+
 router.get(
-  "/verify/email-token/:token",
-  expressMiddleware.emailToken(),
+  "/verify/email-token/:accessToken",
+  expressMiddleware.accessToken(),
   expressMiddleware.validate,
   UserController.verifyEmailToken
 );
 
 router.post(
-  "/signup",
-  expressMiddleware.user(),
+  "/login",
+  expressMiddleware.email(),
+  expressMiddleware.password(),
   expressMiddleware.validate,
-  UserController.signup
+  UserController.login
 );
 
 router.post(
-  "/login",
-  expressMiddleware.user(),
+  "/access",
+  expressMiddleware.refreshToken(),
   expressMiddleware.validate,
-  UserController.login
+  UserController.access
 );
 
 router.post(
@@ -37,28 +49,17 @@ router.post(
 );
 
 router.get(
-  "/reset-password/token/:token",
-  expressMiddleware.emailToken(),
+  "/reset-password/token/:accessToken",
+  expressMiddleware.accessToken(),
+  expressMiddleware.validate,
   UserController.formToResetPassword
 );
 
 router.post(
   "/reset-password",
-  // expressMiddleware.user(),
-  // expressMiddleware.created_at(),
-  // expressMiddleware.code(),
-  //expressMiddleware.validate,
-  authMiddlewares,
+  expressMiddleware.newPassword(),
+  expressMiddleware.validate,
   UserController.resetPassword
 );
 
 export default router;
-
-// rota post request-reset-password
-// valida o email e se existe um usuario com esse email
-// Retorna um codigo de 6 digitos
-
-// rota reset-password
-// informa o email, o codigo e a nova senha
-// Verifica se o codigo é o correto, encontra o usuario pelo email, e altera a nova senha
-// Retorna positivo para senha do usuario alterado

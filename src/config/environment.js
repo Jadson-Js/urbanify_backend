@@ -1,4 +1,7 @@
+// IMPORTANDO DEPENDENCIAS
 import dotenv from "dotenv";
+
+// SETUP
 dotenv.config();
 
 const dynamoConfig = {

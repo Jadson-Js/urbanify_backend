@@ -1,22 +1,17 @@
-// Import Models
-import ResolvedModel from "../models/ResolvedModel.js";
-import UserModel from "../models/UserModel.js";
-
-// Report Utils
-import { generateGeohash } from "../utils/geohash.js";
-import { userExist } from "../utils/userExist.js";
-import { getChildrenInReport } from "../utils/getChildrenInReport.js";
+// IMPORTANDO UTILS
 import AppError from "../utils/AppError.js";
-import { PassThrough } from "stream";
+
+// IMPORTANDO MODELS
+import ResolvedModel from "../models/ResolvedModel.js";
 
 export default class ResolvedService {
-  // Setup Inicial
+  // CONSTRUTOR DA CLASSES
   constructor(data = {}) {
     this.user_email = data.user_email;
     this.keys = data.keys;
   }
 
-  // Rotas para Buscas
+  // AÇÕES DE GET
   async get() {
     const reports = await ResolvedModel.get();
 
@@ -53,7 +48,6 @@ export default class ResolvedService {
     return { report, urls };
   }
 
-  // Utilitarios da classes
   async generatePresignedUrl(prefix) {
     const paramsToGet = {
       Bucket: process.env.S3_BUCKET,
@@ -61,7 +55,7 @@ export default class ResolvedService {
     };
 
     const { Contents } = await ResolvedModel.getFilesByPrefix(paramsToGet);
-    const urls = await ResolvedModel.generatePresignedUrl(Contents);
+    const urls = await ResolvedModel.getPresignedUrl(Contents);
 
     return urls;
   }

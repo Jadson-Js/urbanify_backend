@@ -1,5 +1,8 @@
+// IMPORTNADO DEPENDENCIAS
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+
+// SETUP
 dotenv.config();
 
 export default function validateAdminRole(req, res, next) {

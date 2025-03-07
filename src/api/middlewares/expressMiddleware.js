@@ -1,10 +1,11 @@
+// IMPORTANDO DEPENDENCIAS
 import { checkSchema, validationResult } from "express-validator";
+
+// IMPORTANDO UTILS
 import AppError from "../../utils/AppError.js";
 
-// Classe onde terá as validações do express-validator usando Schema
 class Validator {
-  // Metodo responsavel por lançar os erros dos usuarios
-  user() {
+  email() {
     return checkSchema({
       email: {
         isEmail: {
@@ -15,10 +16,18 @@ class Validator {
         },
         isLength: {
           options: { max: 250 },
-          errorMessage: "Senha não pode conter mais de 250 caracteres",
+          errorMessage: "Seu email não pode conter mais de 250 caracteres",
         },
       },
+    });
+  }
+
+  password() {
+    return checkSchema({
       password: {
+        isString: {
+          errorMessage: "Senha deve ser uma string",
+        },
         isLength: {
           options: { min: 6, max: 64 },
           errorMessage:
@@ -31,220 +40,55 @@ class Validator {
     });
   }
 
-  email() {
+  newPassword() {
     return checkSchema({
-      email: {
-        isEmail: {
-          errorMessage: "Email incorreto",
-        },
-        notEmpty: {
-          errorMessage: "preencha o email",
+      new_password: {
+        isString: {
+          errorMessage: "Senha deve ser uma string",
         },
         isLength: {
-          options: { max: 250 },
-          errorMessage: "Email não pode conter mais de 250 caracteres",
+          options: { min: 6, max: 64 },
+          errorMessage:
+            "Senha não pode conter menos de 6 ou mais de 64 caracteres",
+        },
+        notEmpty: {
+          errorMessage: "preencha a senha",
         },
       },
     });
   }
 
-  code() {
+  accessToken() {
     return checkSchema({
-      code: {
+      accessToken: {
         isString: {
-          errorMessage: "Code deve ser uma string",
-        },
-        notEmpty: {
-          errorMessage: "preencha o email",
+          errorMessage: "O token deve ser uma string",
         },
         isLength: {
-          options: { min: 6, max: 6 },
-          errorMessage: "Code não pode conter mais de 6 caracteres",
-        },
-      },
-    });
-  }
-  created_at() {
-    return checkSchema({
-      created_at: {
-        isString: {
-          errorMessage: "created_at deve ser uma string",
+          options: { min: 10, max: 600 },
+          errorMessage:
+            "Token não pode conter menos de 10 ou mais de 600 caracteres",
         },
         notEmpty: {
-          errorMessage: "preencha o created_at",
-        },
-        isLength: {
-          options: { max: 250 },
-          errorMessage: "created_at não pode conter mais de 250 caracteres",
+          errorMessage: "preencha o token",
         },
       },
     });
   }
 
-  emailToken() {
-    return checkSchema({
-      token: {
-        notEmpty: {
-          errorMessage: "preencha o refresh token",
-        },
-        isString: {
-          errorMessage: "O refresh token deve ser uma string",
-        },
-        isLength: {
-          options: { max: 500 },
-          errorMessage: "O refresh token não pode ter mais de 500 caracteres",
-        },
-      },
-    });
-  }
-
-  token() {
+  refreshToken() {
     return checkSchema({
       refreshToken: {
-        notEmpty: {
-          errorMessage: "preencha o refresh token",
-        },
         isString: {
-          errorMessage: "O refresh token deve ser uma string",
+          errorMessage: "O token deve ser uma string",
         },
         isLength: {
-          options: { max: 500 },
-          errorMessage: "O refresh token não pode ter mais de 500 caracteres",
-        },
-      },
-    });
-  }
-
-  postLog() {
-    return checkSchema({
-      status: {
-        isString: {
-          errorMessage: "Status deve ser uma string",
-        },
-        notEmpty: {
-          errorMessage: "Preencha o status",
-        },
-        isLength: {
-          options: { min: 3, max: 15 },
+          options: { min: 10, max: 600 },
           errorMessage:
-            "Status não pode conter menos de 3 ou mais de 15 caracteres",
-        },
-      },
-      district: {
-        isString: {
-          errorMessage: "Strict deve ser uma string",
+            "Token não pode conter menos de 10 ou mais de 600 caracteres",
         },
         notEmpty: {
-          errorMessage: "Preencha o district",
-        },
-        isLength: {
-          options: { min: 3, max: 62 },
-          errorMessage:
-            "District não pode conter menos de 3 ou mais de 62 caracteres",
-        },
-      },
-      street: {
-        isString: {
-          errorMessage: "Street deve ser uma string",
-        },
-        notEmpty: {
-          errorMessage: "Preencha a street",
-        },
-        isLength: {
-          options: { min: 3, max: 100 },
-          errorMessage:
-            "Street não pode conter menos de 3 ou mais de 100 caracteres",
-        },
-      },
-    });
-  }
-
-  getReport() {
-    return checkSchema({
-      address: {
-        isString: {
-          errorMessage: "address deve ser uma string",
-        },
-        notEmpty: {
-          errorMessage: "Preencha o address",
-        },
-        isLength: {
-          options: { min: 4, max: 125 },
-          errorMessage:
-            "address não pode conter menos de 4 ou mais de 125 caracteres",
-        },
-      },
-      geohash: {
-        isString: {
-          errorMessage: "geohash deve ser uma string",
-        },
-        notEmpty: {
-          errorMessage: "Preencha o geohash",
-        },
-        isLength: {
-          options: { min: 6, max: 8 },
-          errorMessage:
-            "geohash não pode conter menos de 3 ou mais de 62 caracteres",
-        },
-      },
-    });
-  }
-
-  getStatus() {
-    return checkSchema({
-      address: {
-        isString: {
-          errorMessage: "address deve ser uma string",
-        },
-        notEmpty: {
-          errorMessage: "Preencha o address",
-        },
-        isLength: {
-          options: { min: 4, max: 125 },
-          errorMessage:
-            "address não pode conter menos de 4 ou mais de 125 caracteres",
-        },
-      },
-      geohash: {
-        isString: {
-          errorMessage: "geohash deve ser uma string",
-        },
-        notEmpty: {
-          errorMessage: "Preencha o geohash",
-        },
-        isLength: {
-          options: { min: 6, max: 8 },
-          errorMessage:
-            "geohash não pode conter menos de 3 ou mais de 62 caracteres",
-        },
-      },
-    });
-  }
-
-  getResolvedReport() {
-    return checkSchema({
-      id: {
-        isString: {
-          errorMessage: "id deve ser uma string",
-        },
-        notEmpty: {
-          errorMessage: "Preencha o id",
-        },
-        isLength: {
-          options: { max: 125 },
-          errorMessage: "Id não pode conter menos de 125 caracteres",
-        },
-      },
-      created_at: {
-        isString: {
-          errorMessage: "created_at deve ser uma string",
-        },
-        notEmpty: {
-          errorMessage: "Preencha o created_at",
-        },
-        isLength: {
-          options: { max: 125 },
-          errorMessage: "created_at não pode conter menos de 125 caracteres",
+          errorMessage: "preencha o token",
         },
       },
     });
@@ -255,80 +99,97 @@ class Validator {
       req.body.data
     );
 
-    // Validando se campo estão vazios
-    if (
-      !subregion ||
-      !district ||
-      !street ||
-      !severity ||
-      !coordinates.latitude ||
-      !coordinates.longitude
-    ) {
+    if (!coordinates?.latitude || !coordinates?.longitude) {
       throw new AppError(
         400,
-        "Campos não informado",
-        "Verifique se todos os campos nescessarios para cadastro de report estão corretos"
+        "Campos não informados",
+        "Latitude e longitude são obrigatórias."
       );
     }
 
-    if (
-      subregion.length > 1 &&
-      subregion.length < 125 &&
-      district.length > 1 &&
-      district.length < 125 &&
-      street.length > 1 &&
-      street.length < 125 &&
-      severity.length > 1 &&
-      severity.length < 125 &&
-      severity.length > 1 &&
-      severity.length < 125 &&
-      coordinates.latitude.length > 1 &&
-      coordinates.latitude.length < 250 &&
-      coordinates.longitude.length > 1 &&
-      coordinates.longitude.length < 250
-    ) {
-      next();
-    } else {
+    // Lista de campos para validação
+    const fields = {
+      subregion,
+      district,
+      street,
+      severity,
+      latitude: coordinates.latitude,
+      longitude: coordinates.longitude,
+    };
+
+    // Verificando campos vazios
+    const emptyField = Object.entries(fields).find(
+      ([_, value]) => !value || value.trim() === ""
+    );
+    if (emptyField) {
       throw new AppError(
         400,
-        "Quantidade de caracteres inadequados",
-        "Verifique se os campos informados possuem a quantidade de caracteres adequados"
+        "Campos não informados",
+        `O campo '${emptyField[0]}' é obrigatório.`
       );
     }
+
+    // Verificando tamanho dos campos
+    const invalidField = Object.entries(fields).find(
+      ([_, value]) => value.length < 2 || value.length > 125
+    );
+    if (invalidField) {
+      throw new AppError(
+        400,
+        "Quantidade de caracteres inadequada",
+        `O campo '${invalidField[0]}' deve ter entre 2 e 125 caracteres.`
+      );
+    }
+
+    next();
   }
 
-  patchStatusReport() {
+  address() {
     return checkSchema({
       address: {
         isString: {
-          errorMessage: "Address deve ser uma string",
+          errorMessage: "O address deve ser uma string",
+        },
+        isLength: {
+          options: { min: 2, max: 125 },
+          errorMessage:
+            "Address não pode conter menos de 2 ou mais de 125 caracteres",
         },
         notEmpty: {
           errorMessage: "Preencha o address",
         },
-        isLength: {
-          options: { min: 4, max: 125 },
-          errorMessage:
-            "address não pode conter menos de 4 ou mais de 125 caracteres",
-        },
       },
+    });
+  }
+
+  geohash() {
+    return checkSchema({
       geohash: {
         isString: {
-          errorMessage: "geohash deve ser uma string",
-        },
-        notEmpty: {
-          errorMessage: "Preencha o geohash",
+          errorMessage: "O geohash deve ser uma string",
         },
         isLength: {
           options: { min: 6, max: 8 },
           errorMessage:
-            "geohash não pode conter menos de 3 ou mais de 62 caracteres",
+            "geohash não pode conter menos de 2 ou mais de 125 caracteres",
+        },
+        notEmpty: {
+          errorMessage: "Preencha o geohash",
         },
       },
+    });
+  }
+
+  status() {
+    return checkSchema({
       status: {
-        isInt: {
+        isNumeric: {
+          errorMessage: "O status deve ser um number",
+        },
+        isLength: {
           options: { min: 0, max: 2 },
-          errorMessage: "Status deve ser um número entre 0 e 2",
+          errorMessage:
+            "geohash não pode conter menos de 0 ou mais de 2 caracteres",
         },
         notEmpty: {
           errorMessage: "Preencha o status",
@@ -337,7 +198,42 @@ class Validator {
     });
   }
 
-  // Metodo responsavel por tratar os erros
+  id() {
+    return checkSchema({
+      id: {
+        isString: {
+          errorMessage: "O id deve ser uma string",
+        },
+        isLength: {
+          options: { min: 4, max: 64 },
+          errorMessage:
+            "Id não pode conter menos de 4 ou mais de 64 caracteres",
+        },
+        notEmpty: {
+          errorMessage: "Preencha o id",
+        },
+      },
+    });
+  }
+
+  created_at() {
+    return checkSchema({
+      created_at: {
+        isString: {
+          errorMessage: "O created_at deve ser uma string",
+        },
+        isLength: {
+          options: { min: 4, max: 64 },
+          errorMessage:
+            "created_at não pode conter menos de 4 ou mais de 64 caracteres",
+        },
+        notEmpty: {
+          errorMessage: "Preencha o created_at",
+        },
+      },
+    });
+  }
+
   validate(req, res, next) {
     const errors = validationResult(req);
 

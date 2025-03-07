@@ -1,17 +1,19 @@
+// IMPORTANDO DEPENDENCIAS
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { sesSource, snsARN } from "../config/environment.js";
+
+// IMPORTANDO UTILS
 import { generateJWT, generateAccessToken } from "../utils/jwt.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
 import verifyToken from "../utils/verifyJwt.js";
-import UserModel from "../models/UserModel.js";
-
 import Tamplate from "../utils/tamplatesEmail.js";
-
-import ResetCodeModel from "../models/ResetCodeModel.js";
 import AppError from "../utils/AppError.js";
 
+// IMPORTANDO MODELS
+import UserModel from "../models/UserModel.js";
+
+// SETUP
 dotenv.config();
 
 class UserService {
@@ -120,50 +122,6 @@ class UserService {
   async resetPassword(data) {
     await UserModel.updatePassword(data.user_email, encrypt(data.new_password));
   }
-
-  // async authCodeToResetPassword(params) {
-  //   const { email, password, code, created_at } = params;
-
-  //   const user = await UserModel.getByEmail(email);
-  //   if (!user) {
-  //     throw new AppError(
-  //       404,
-  //       "Usuario não encontrado",
-  //       "Email incorreto ou inexistente"
-  //     );
-  //   }
-
-  //   // Puxa o resetCode, chamando resetCodeModel informando email e created
-  //   const resetCode = await ResetCodeModel.getByKeys(email, created_at);
-
-  //   if (!resetCode) {
-  //     throw new AppError(
-  //       404,
-  //       "Reset code não encontrado",
-  //       "Email ou created_at incorreto ou inexistente"
-  //     );
-  //   } else if (resetCode.code !== code) {
-  //     throw new AppError(
-  //       400,
-  //       "Reset code não é valido",
-  //       "Reset code informado está incorreto"
-  //     );
-  //   } else {
-  //     await UserModel.updatePassword(email, encrypt(password));
-  //     await ResetCodeModel.delete(email, created_at);
-  //   }
-  // }
 }
 
 export default new UserService();
-
-// async subscribe(email) {
-//   const params = {
-//     TopicArn: snsARN,
-//     Protocol: "email",
-//     Endpoint: email,
-//     Attributes: { FilterPolicy: "{}" },
-//   };
-
-//   await UserModel.snsSubscribe(params);
-// }

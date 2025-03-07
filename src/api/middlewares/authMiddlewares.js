@@ -1,6 +1,11 @@
+// DEPENDENCIAS
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+
+// IMPORTANDO UTILS
 import AppError from "../../utils/AppError.js";
+
+// SETUP
 dotenv.config();
 
 export default function validateJWT(req, res, next) {

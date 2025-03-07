@@ -1,6 +1,5 @@
+// IMPORTANDO DEPENDENCIAS
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { dynamoConfig, sesConfig, snsConfig } from "../config/environment.js";
-import AppError from "../utils/AppError.js";
 import {
   DynamoDBDocumentClient,
   GetCommand,
@@ -8,20 +7,21 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
-import {
-  SNSClient,
-  PublishCommand,
-  SubscribeCommand,
-  ListSubscriptionsByTopicCommand,
-} from "@aws-sdk/client-sns";
-const sesClient = new SESClient(sesConfig);
-const snsClient = new SNSClient(snsConfig);
 
+// IMPORTANDO CONFIGS
+import { dynamoConfig, sesConfig } from "../config/environment.js";
+
+// IMPORTANDO UTILS
+import AppError from "../utils/AppError.js";
+
+// SETUP
 const tableName = "users";
 const client = new DynamoDBClient(dynamoConfig);
 const dynamodb = DynamoDBDocumentClient.from(client);
+const sesClient = new SESClient(sesConfig);
 
 class UserModel {
+  // AÇÕES DE GET
   async getByEmail(email) {
     const params = {
       TableName: tableName,
@@ -44,6 +44,7 @@ class UserModel {
     }
   }
 
+  // AÇÕES DE CREATE
   async signup(user) {
     const params = {
       TableName: tableName,
@@ -61,28 +62,20 @@ class UserModel {
     }
   }
 
-  async updatePassword(email, password) {
-    const params = {
-      TableName: tableName,
-      Key: {
-        email: email,
-      },
-      UpdateExpression: "SET password = :password",
-      ExpressionAttributeValues: {
-        ":password": password,
-      },
-      ReturnValues: "ALL_NEW",
-    };
-
+  async sendEmail(params) {
     try {
-      const putReportId = await dynamodb.send(new UpdateCommand(params));
+      const data = await sesClient.send(new SendEmailCommand(params));
+      console.log(params.Message.Body.Html.Data);
+      console.log(data);
 
-      return putReportId;
-    } catch (error) {
-      throw new AppError(404, "Usuario não encontrado", "Digite outro email");
+      return data;
+    } catch (err) {
+      console.log(err);
+      throw new AppError(400, "Email não enviado", "Email não foi enviado");
     }
   }
 
+  // AÇÕES DE UPDATE
   async active(email) {
     const params = {
       TableName: tableName,
@@ -127,43 +120,27 @@ class UserModel {
     }
   }
 
-  async sendEmail(params) {
-    try {
-      const data = await sesClient.send(new SendEmailCommand(params));
-      console.log(params.Message.Body.Html.Data);
-      console.log(data);
+  async updatePassword(email, password) {
+    const params = {
+      TableName: tableName,
+      Key: {
+        email: email,
+      },
+      UpdateExpression: "SET password = :password",
+      ExpressionAttributeValues: {
+        ":password": password,
+      },
+      ReturnValues: "ALL_NEW",
+    };
 
-      return data;
-    } catch (err) {
-      console.log(err);
-      throw new AppError(400, "Email não enviado", "Email não foi enviado");
+    try {
+      const putReportId = await dynamodb.send(new UpdateCommand(params));
+
+      return putReportId;
+    } catch (error) {
+      throw new AppError(404, "Usuario não encontrado", "Digite outro email");
     }
   }
 }
 
 export default new UserModel();
-
-// async snsSubscribe(params) {
-//   try {
-//     const data = await snsClient.send(new SubscribeCommand(params));
-
-//     return data;
-//   } catch (err) {
-//     console.log(err);
-//     throw new AppError(400, "Email não enviado", "Email não foi enviado");
-//   }
-// }
-
-// async isSubscribe(params) {
-//   const { user_email, topic_arn } = params;
-
-//   const data = await snsClient.send(
-//     new ListSubscriptionsByTopicCommand({ TopicArn: topic_arn })
-//   );
-
-//   const subscription = data.Subscriptions.find(
-//     (sub) => sub.Endpoint === user_email
-//   );
-
-//   return subscription;
-// }

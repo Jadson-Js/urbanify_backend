@@ -19,7 +19,7 @@ const dynamodb = DynamoDBDocumentClient.from(client);
 const s3Client = new S3Client(s3Config);
 
 class ResolvedModel {
-  // Ações de GET
+  // AÇÕES DE GET
   async get() {
     const params = {
       TableName: tableName,
@@ -76,7 +76,7 @@ class ResolvedModel {
     }
   }
 
-  async generatePresignedUrl(Contents) {
+  async getPresignedUrl(Contents) {
     try {
       const urls = await Promise.all(
         Contents.map(async (item) => {
