@@ -34,7 +34,7 @@ class UserController {
   async verifyEmailToken(req, res) {
     const { token } = req.params;
 
-    const response = await UserService.verifyToken(token);
+    await UserService.verifyEmailToken(token);
 
     res.send(`
       <html>
@@ -48,16 +48,37 @@ class UserController {
   `);
   }
 
-  // async requestResetPassword(req, res) {
-  //   const { email } = req.body;
+  async sendEmailToResetPassword(req, res) {
+    const { email } = req.body;
 
-  //   const data = await UserService.sendCodeToResetPassword(email);
+    const data = await UserService.sendEmailToResetPassword(email);
 
-  //   res.status(200).json({
-  //     message: "Email enviado com sucesso!",
-  //     data,
-  //   });
-  // }
+    res.status(200).json({
+      message: "Email enviado com sucesso!",
+      data,
+    });
+  }
+
+  async formToResetPassword(req, res) {
+    const { token } = req.params;
+
+    const data = await UserService.formToResetPassword(token);
+
+    res.send(data);
+  }
+
+  async resetPassword(req, res) {
+    const { user_email } = req;
+    const { new_password } = req.body;
+
+    const data = { user_email, new_password };
+
+    await UserService.resetPassword(data);
+
+    res.status(200).json({
+      message: "Senha redefinida!",
+    });
+  }
 
   // async authResetPassword(req, res) {
   //   const params = req.body;

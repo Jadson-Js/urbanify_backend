@@ -130,7 +130,7 @@ class UserModel {
   async sendEmail(params) {
     try {
       const data = await sesClient.send(new SendEmailCommand(params));
-      console.log(params);
+      console.log(params.Message.Body.Html.Data);
       console.log(data);
 
       return data;
@@ -139,31 +139,31 @@ class UserModel {
       throw new AppError(400, "Email não enviado", "Email não foi enviado");
     }
   }
-
-  // async snsSubscribe(params) {
-  //   try {
-  //     const data = await snsClient.send(new SubscribeCommand(params));
-
-  //     return data;
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw new AppError(400, "Email não enviado", "Email não foi enviado");
-  //   }
-  // }
-
-  async isSubscribe(params) {
-    const { user_email, topic_arn } = params;
-
-    const data = await snsClient.send(
-      new ListSubscriptionsByTopicCommand({ TopicArn: topic_arn })
-    );
-
-    const subscription = data.Subscriptions.find(
-      (sub) => sub.Endpoint === user_email
-    );
-
-    return subscription;
-  }
 }
 
 export default new UserModel();
+
+// async snsSubscribe(params) {
+//   try {
+//     const data = await snsClient.send(new SubscribeCommand(params));
+
+//     return data;
+//   } catch (err) {
+//     console.log(err);
+//     throw new AppError(400, "Email não enviado", "Email não foi enviado");
+//   }
+// }
+
+// async isSubscribe(params) {
+//   const { user_email, topic_arn } = params;
+
+//   const data = await snsClient.send(
+//     new ListSubscriptionsByTopicCommand({ TopicArn: topic_arn })
+//   );
+
+//   const subscription = data.Subscriptions.find(
+//     (sub) => sub.Endpoint === user_email
+//   );
+
+//   return subscription;
+// }
