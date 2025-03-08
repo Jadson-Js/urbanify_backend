@@ -7,33 +7,51 @@ import AppError from "../../utils/AppError.js";
 
 // SETUP
 dotenv.config();
-
-export default function validateJWT(req, res, next) {
-  const token = req.headers["authorization"]?.split(" ")[1];
-
-  if (!token) {
-    return res
-      .status(401)
-      .json({ auth: false, message: "O token não foi fornecido" });
+export default function authMiddlewares(typeUser) {
+  if (!typeUser) {
+    throw new AppError(
+      500,
+      "Tipo do usuario não fornecido",
+      "Forneça o tipo do usuario que deseja autenticar."
+    );
   }
 
-  jwt.verify(token, process.env.JWT_SECRET_ACCESS, (error, decoded) => {
-    if (error) {
-      return res
-        .status(500)
-        .json({ auth: false, message: "Falha na autenticação do Token" });
-    } else {
+  return (req, res, next) => {
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) {
+        throw new AppError(
+          401,
+          "Token não fornecido",
+          "O token de autenticação é obrigatório."
+        );
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_ACCESS);
       if (!decoded.active) {
         throw new AppError(
           403,
-          "Usuario com verificação de email pendente",
-          "Usuario com verificação de email pendente"
+          "Usuário com verificação de e-mail pendente",
+          "Verifique seu e-mail para ativar a conta."
+        );
+      }
+
+      if (typeUser === "ADMIN" && decoded.role !== "ADMIN") {
+        throw new AppError(
+          403,
+          "Acesso negado",
+          "Você não tem permissão para acessar este recurso."
         );
       }
 
       req.user_email = decoded.email;
       req.role = decoded.role;
       next();
+    } catch (error) {
+      const status = error instanceof jwt.JsonWebTokenError ? 403 : 500;
+      next(
+        new AppError(status, "Falha na autenticação do Token", error.message)
+      );
     }
-  });
+  };
 }

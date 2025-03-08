@@ -2,7 +2,7 @@
 import express from "express";
 
 // IMPORTANDO MIDDLEWARES
-import authAdminMiddlewares from "../middlewares/authAdminMiddlewares.js";
+import authMiddlewares from "../middlewares/authMiddlewares.js";
 import expressMiddleware from "../middlewares/expressMiddleware.js";
 
 // IMPORTANDO CONTROLLERS
@@ -12,11 +12,11 @@ import ResolvedController from "../controllers/ResolvedController.js";
 const router = express.Router();
 
 // INSTANCIANDO ROTAS
-router.get("/", authAdminMiddlewares, ResolvedController.get);
+router.get("/", authMiddlewares("ADMIN"), ResolvedController.get);
 
 router.get(
   "/id/:id/created_at/:created_at",
-  authAdminMiddlewares,
+  authMiddlewares("ADMIN"),
   expressMiddleware.id(),
   expressMiddleware.created_at(),
   expressMiddleware.validate,

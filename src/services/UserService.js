@@ -17,33 +17,6 @@ import UserModel from "../models/UserModel.js";
 dotenv.config();
 
 class UserService {
-  async login(email, password) {
-    const user = await UserModel.getByEmail(email);
-
-    if (!user) {
-      throw new AppError(
-        404,
-        "Usuario não encontrado",
-        "Email incorreto ou inexistente"
-      );
-    }
-
-    if (user.active == false) {
-      throw new AppError(
-        401,
-        "Email do usuario está pendente",
-        "Email do usuario está pendente"
-      );
-    }
-
-    const passwordDecrypt = decrypt(user.password);
-
-    if (password === passwordDecrypt) {
-      user.token = generateJWT(user);
-      return user;
-    }
-  }
-
   async signup(email, password) {
     const passwordEncrypt = encrypt(password);
     const user = {
@@ -64,15 +37,15 @@ class UserService {
   async sendConfirmEmail(email, user) {
     const token = generateJWT(user);
 
-    const params = Tamplate.confirmEmail(email, token);
+    const params = Tamplate.emailConfirm(email, token);
     console.log(params.Message.Body.Html.Data);
 
     await UserModel.sendEmail(params);
   }
 
-  async verifyEmailToken(token) {
-    const response = jwt.verify(
-      token,
+  async verifyEmailToken(accessToken) {
+    jwt.verify(
+      accessToken,
       process.env.JWT_SECRET_ACCESS,
       async (error, decoded) => {
         if (error) {
@@ -82,22 +55,64 @@ class UserService {
             "O token enviado era invalido"
           );
         } else {
-          return await UserModel.active(decoded.email);
+          await UserModel.active(decoded.email);
         }
       }
     );
 
+    const response = Tamplate.responseConfirmEmail();
+
     return response;
   }
 
-  async access(refreshToken) {
+  async login(email, password) {
+    const user = await this.verifyUserExist(email);
+
+    if (user.active == false) {
+      throw new AppError(
+        401,
+        "Email do usuario está pendente",
+        "Email do usuario está pendente"
+      );
+    }
+
+    const passwordDecrypt = decrypt(user.password);
+
+    if (password === passwordDecrypt) {
+      user.token = generateJWT(user);
+      return user;
+    }
+  }
+
+  async generateAccessToken(refreshToken) {
     const accessToken = await generateAccessToken(refreshToken);
 
     return accessToken;
   }
 
   async sendEmailToResetPassword(email) {
+    const user = await this.verifyUserExist(email);
+
+    const params = Tamplate.emailResetPassword(email, generateJWT(user));
+    console.log(params.Message.Body.Html.Data);
+
+    return await UserModel.sendEmail(params);
+  }
+
+  async formToResetPassword(token) {
+    await verifyToken(token);
+
+    return Tamplate.responseResetPasswordForm(token);
+  }
+
+  async resetPassword(data) {
+    await UserModel.updatePassword(data.user_email, encrypt(data.new_password));
+  }
+
+  // UTILS PARA A CLASSE
+  async verifyUserExist(email) {
     const user = await UserModel.getByEmail(email);
+
     if (!user) {
       throw new AppError(
         404,
@@ -106,21 +121,7 @@ class UserService {
       );
     }
 
-    const params = Tamplate.resetPasswordEmail(email, generateJWT(user));
-
-    return await UserModel.sendEmail(params);
-  }
-
-  async formToResetPassword(token) {
-    // Valide o token com o util verifyToken
-    await verifyToken(token);
-
-    return Tamplate.resetPasswordEmailForm(token);
-    //retorna o tamplate com o formulario para resetar a senha
-  }
-
-  async resetPassword(data) {
-    await UserModel.updatePassword(data.user_email, encrypt(data.new_password));
+    return user;
   }
 }
 

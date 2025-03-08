@@ -53,8 +53,10 @@ class UserModel {
     };
 
     try {
-      await dynamodb.send(new PutCommand(params));
-      return user;
+      const command = new PutCommand(params);
+      const data = await dynamodb.send(command);
+
+      return data;
     } catch (error) {
       // Classe para tratar erros dentro do event loop
       throw new AppError(400, "Usuario ja existente", "Digite outro email");
@@ -64,9 +66,8 @@ class UserModel {
 
   async sendEmail(params) {
     try {
-      const data = await sesClient.send(new SendEmailCommand(params));
-      console.log(params.Message.Body.Html.Data);
-      console.log(data);
+      const command = new SendEmailCommand(params);
+      const data = await sesClient.send(command);
 
       return data;
     } catch (err) {
@@ -90,7 +91,8 @@ class UserModel {
     };
 
     try {
-      const putReportId = await dynamodb.send(new UpdateCommand(params));
+      const command = new UpdateCommand(params);
+      const putReportId = await dynamodb.send(command);
 
       return putReportId;
     } catch (error) {
@@ -112,7 +114,8 @@ class UserModel {
     };
 
     try {
-      const putReportId = await dynamodb.send(new UpdateCommand(params));
+      const command = new UpdateCommand(params);
+      const putReportId = await dynamodb.send(command);
 
       return putReportId;
     } catch (error) {
@@ -134,7 +137,8 @@ class UserModel {
     };
 
     try {
-      const putReportId = await dynamodb.send(new UpdateCommand(params));
+      const command = new UpdateCommand(params);
+      const putReportId = await dynamodb.send(command);
 
       return putReportId;
     } catch (error) {

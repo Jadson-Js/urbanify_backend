@@ -3,7 +3,6 @@ import express from "express";
 
 // IMPORTANDO MIDDLEWARES
 import authMiddlewares from "../middlewares/authMiddlewares.js";
-import authAdminMiddlewares from "../middlewares/authAdminMiddlewares.js";
 import uploadMiddlewares from "../middlewares/uploadMiddlewares.js";
 import expressMiddleware from "../middlewares/expressMiddleware.js";
 
@@ -14,13 +13,13 @@ import ReportController from "../controllers/ReportController.js";
 const router = express.Router();
 
 // INSTANCIANDO ROTAS
-router.get("/", authAdminMiddlewares, ReportController.get);
+router.get("/", authMiddlewares("ADMIN"), ReportController.get);
 
-router.get("/my", authMiddlewares, ReportController.getMyReports);
+router.get("/my", authMiddlewares("USER"), ReportController.getMyReports);
 
 router.get(
   "/address/:address/geohash/:geohash",
-  authAdminMiddlewares,
+  authMiddlewares("ADMIN"),
   expressMiddleware.address(),
   expressMiddleware.geohash(),
   expressMiddleware.validate,
@@ -29,7 +28,7 @@ router.get(
 
 router.get(
   "/status/address/:address/geohash/:geohash",
-  authMiddlewares,
+  authMiddlewares("USER"),
   expressMiddleware.address(),
   expressMiddleware.geohash(),
   expressMiddleware.validate,
@@ -38,7 +37,7 @@ router.get(
 
 router.post(
   "/",
-  authMiddlewares,
+  authMiddlewares("USER"),
   uploadMiddlewares.single("file"),
   expressMiddleware.postReport,
   ReportController.create
@@ -46,7 +45,7 @@ router.post(
 
 router.patch(
   "/address/:address/geohash/:geohash",
-  authAdminMiddlewares,
+  authMiddlewares("ADMIN"),
   expressMiddleware.address(),
   expressMiddleware.geohash(),
   expressMiddleware.status(),
@@ -56,7 +55,7 @@ router.patch(
 
 router.delete(
   "/",
-  authMiddlewares,
+  authMiddlewares("USER"),
   expressMiddleware.address(),
   expressMiddleware.geohash(),
   ReportController.delete

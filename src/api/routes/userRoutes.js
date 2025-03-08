@@ -20,7 +20,7 @@ router.post(
 );
 
 router.get(
-  "/verify/email-token/:accessToken",
+  "/verify/email/token/:accessToken",
   expressMiddleware.accessToken(),
   expressMiddleware.validate,
   UserController.verifyEmailToken
@@ -38,7 +38,7 @@ router.post(
   "/access",
   expressMiddleware.refreshToken(),
   expressMiddleware.validate,
-  UserController.access
+  UserController.generateAccessToken
 );
 
 router.post(

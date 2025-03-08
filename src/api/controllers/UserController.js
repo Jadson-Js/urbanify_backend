@@ -10,20 +10,11 @@ class UserController {
   }
 
   async verifyEmailToken(req, res) {
-    const { token } = req.params;
+    const { accessToken } = req.params;
 
-    await UserService.verifyEmailToken(token);
+    const response = await UserService.verifyEmailToken(accessToken);
 
-    res.send(`
-      <html>
-          <head><title>Email Verificado</title></head>
-          <body>
-              <h1>Sucesso!</h1>
-              <p>Seu email ja foi verificado.</p></br>
-              <p>Seja bem vindo a URBANIFY.</p>
-          </body>
-      </html>
-  `);
+    res.send(response);
   }
 
   async login(req, res) {
@@ -38,10 +29,10 @@ class UserController {
     });
   }
 
-  async access(req, res) {
+  async generateAccessToken(req, res) {
     const { refreshToken } = req.body;
 
-    const accessToken = await UserService.access(refreshToken);
+    const accessToken = await UserService.generateAccessToken(refreshToken);
 
     res.status(200).json({
       message: "Novo token de acesso gerado",

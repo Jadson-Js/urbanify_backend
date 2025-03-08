@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 // SETUP
 dotenv.config();
 
-const dynamoConfig = {
+export const dynamoConfig = {
   region: process.env.AWS_REGION,
   endpoint: process.env.DYNAMODB_ENDPOINT,
   credentials: {
@@ -13,7 +13,7 @@ const dynamoConfig = {
   },
 };
 
-const s3Config = {
+export const s3Config = {
   region: process.env.AWS_REGION, // Substitua pela sua região
   credentials: {
     accessKeyId: process.env.AWS_ACCESSKEYID,
@@ -21,42 +21,31 @@ const s3Config = {
   },
 };
 
-const sesConfig = {
+export const sesConfig = {
   region: process.env.AWS_REGION,
   credentials: {
     accessKeyId: process.env.AWS_ACCESSKEYID,
     secretAccessKey: process.env.AWS_SECRETACCESSKEY,
   },
 };
-const sesSource = process.env.SES_EMAIL_SOURCE;
+export const sesSource = process.env.SES_EMAIL_SOURCE;
 
-const snsConfig = {
+export const snsConfig = {
   region: process.env.AWS_REGION,
   credentials: {
     accessKeyId: process.env.AWS_ACCESSKEYID,
     secretAccessKey: process.env.AWS_SECRETACCESSKEY,
   },
 };
-const snsARN = process.env.SNS_ARN;
+export const snsARN = process.env.SNS_ARN;
 
-const ReportStatus = Object.freeze({
+export const ReportStatus = Object.freeze({
   REPORTADO: 0,
   AVALIADO: 1,
   CONCLUIDO: 2,
 });
 
-const ReportSeverity = Object.freeze({
+export const ReportSeverity = Object.freeze({
   GRAVE: 0,
   MODERADO: 1,
 });
-
-export {
-  dynamoConfig,
-  s3Config,
-  sesConfig,
-  sesSource,
-  snsConfig,
-  snsARN,
-  ReportStatus,
-  ReportSeverity,
-};
