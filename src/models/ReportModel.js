@@ -18,7 +18,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 
 // IMPORTANDO CONFIGS
-import { dynamoConfig, s3Config, snsConfig } from "../config/environment.js";
+import { dynamoConfig, s3Config } from "../config/environment.js";
 
 // IMPORTANDO UTILS
 import AppError from "../utils/AppError.js";

@@ -54,7 +54,7 @@ router.patch(
 );
 
 router.delete(
-  "/",
+  "/address/:address/geohash/:geohash",
   authMiddlewares("USER"),
   expressMiddleware.address(),
   expressMiddleware.geohash(),

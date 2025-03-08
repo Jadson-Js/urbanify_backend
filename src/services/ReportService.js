@@ -3,13 +3,11 @@ import crypto from "crypto";
 import sharp from "sharp";
 
 // IMPORTANDO CONFIGS
-import { ReportStatus, ReportSeverity, snsARN } from "../config/environment.js";
+import { ReportStatus, ReportSeverity } from "../config/environment.js";
 
 // IMPORTANDO UTILS
 import { generateGeohash } from "../utils/geohash.js";
-import { userExist } from "../utils/userExist.js";
-import { getIndexChildren } from "../utils/getIndexChildren.js";
-import { getChildrenInReport } from "../utils/getChildrenInReport.js";
+import ChildrenInReport from "../utils/ChildrenInReport.js";
 import AppError from "../utils/AppError.js";
 
 // IMPORTANDO MODELS
@@ -117,15 +115,7 @@ export default class ReportService {
 
   async getReport() {
     const { address, geohash } = this.local;
-    const report = await ReportModel.getByLocal(address, geohash);
-
-    if (!report) {
-      throw new AppError(
-        404,
-        "Report não encontrado",
-        "Address e geohash não foram encontrados no banco de dados"
-      );
-    }
+    const report = await this.verifyReportExist(address, geohash);
 
     const urls = await this.getPresignedUrl(report.id);
 
@@ -137,26 +127,18 @@ export default class ReportService {
     const reportList = user.reports_id;
 
     const reports = await ReportModel.getByListId(reportList);
-    const childrens = getChildrenInReport(this.user_email, reports);
+    const childrens = ChildrenInReport.get(this.user_email, reports);
 
     return childrens;
   }
 
   async getStatus() {
     const { address, geohash } = this.local;
-    const report = await ReportModel.getByLocal(address, geohash);
+    const report = await this.verifyReportExist(address, geohash);
 
-    if (!report) {
-      throw new AppError(
-        404,
-        "Report não encontrado",
-        "Address e geohash não foram encontrados no banco de dados"
-      );
-    }
+    const alreadyExist = ChildrenInReport.getIndex(this.user_email, report);
 
-    const alreadyExist = userExist(this.user_email, report);
-
-    if (!alreadyExist) {
+    if (alreadyExist === -1) {
       throw new AppError(
         401,
         "Usuário não autorizado",
@@ -218,14 +200,15 @@ export default class ReportService {
   // AÇÕES DE UPDATE
   async addChildren() {
     const { reportFormated: report, childrenFormated: children } = this;
+    const { falseId, address, geohash } = report;
 
     const newChildren = await ReportModel.addChildren(children, report);
 
     const report_id = {
-      falseId: report.falseId,
+      falseId,
       id: newChildren.Attributes.id,
-      address: report.address,
-      geohash: report.geohash,
+      address,
+      geohash,
     };
 
     return report_id;
@@ -236,36 +219,15 @@ export default class ReportService {
       this.update
     );
 
-    let params = {};
-
     if (status === 2) {
-      params = {
-        Message: "A obra foi concluida, obrigado pelo seu relato.", // O corpo do email
-        Subject: "A obra foi concluida, obrigado pelo seu relato.", // O assunto
-      };
-
       const report = await ReportModel.getByLocal(address, geohash);
       await ResolvedReportModel.create(report);
       await ReportModel.delete(address, geohash);
-    } else {
-      params = {
-        Message: "A obra foi avaliada, em breve estaremos reparando o trecho.", // O corpo do email
-        Subject: "A obra foi avaliada, em breve estaremos reparando o trecho.", // O assunto
-      };
     }
-
-    const content = {
-      ...params,
-      TopicArn: snsARN,
-    };
-
-    // Enviando o email
-    const email = await UserModel.sendEmail(content);
 
     // Resposta final
     const response = {
       report: { address, geohash, status },
-      email_id: email.MessageId,
     };
 
     return response;
@@ -274,25 +236,10 @@ export default class ReportService {
   // AÇÕES DE DELETE
   async processDelete() {
     const { address, geohash } = this.local;
-    const report = await ReportModel.getByLocal(address, geohash);
 
-    if (!report) {
-      throw new AppError(
-        404,
-        "Report não encontrado",
-        "Address e geohash não foram encontrados no banco de dados"
-      );
-    }
+    const report = await this.verifyReportExist(address, geohash);
 
-    const index = getIndexChildren(this.user_email, report);
-
-    if (index === -1) {
-      throw new AppError(
-        404,
-        "Children não encontrado",
-        "Children não foi encontrado dentro do report"
-      );
-    }
+    const index = await this.verifyChildrenExist(this.user_email, report);
 
     if (report.childrens.length === 1) {
       await this.deleteFilesByPrefix(report.id);
@@ -340,5 +287,34 @@ export default class ReportService {
 
     await UserModel.addReport(this.user_email, report.id);
     return this.addChildren();
+  }
+
+  // UTILS DA CLASSE
+  async verifyReportExist(address, geohash) {
+    const report = await ReportModel.getByLocal(address, geohash);
+
+    if (!report) {
+      throw new AppError(
+        404,
+        "Report não encontrado",
+        "Address e geohash não foram encontrados no banco de dados"
+      );
+    }
+
+    return report;
+  }
+
+  async verifyChildrenExist(user_email, report) {
+    const index = ChildrenInReport.getIndex(user_email, report);
+
+    if (index === -1) {
+      throw new AppError(
+        404,
+        "Children não encontrado",
+        "Children não foi encontrado dentro do report"
+      );
+    }
+
+    return index;
   }
 }

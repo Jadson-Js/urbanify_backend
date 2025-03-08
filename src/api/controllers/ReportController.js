@@ -29,7 +29,7 @@ class ReportController {
     const { address, geohash } = req.params;
 
     const data = {
-      local: { address: address, geohash: geohash },
+      local: { address, geohash },
     };
 
     const reportService = new ReportService(data);
@@ -47,7 +47,7 @@ class ReportController {
 
     const data = {
       user_email: req.user_email,
-      local: { address: address, geohash: geohash },
+      local: { address, geohash },
     };
 
     const reportService = new ReportService(data);
@@ -82,7 +82,7 @@ class ReportController {
     const { address, geohash } = req.params;
 
     const data = {
-      update: { status: status, address, geohash },
+      update: { status, address, geohash },
     };
 
     const reportService = new ReportService(data);
@@ -95,9 +95,11 @@ class ReportController {
   }
 
   async delete(req, res) {
+    const { address, geohash } = req.params;
+
     const data = {
       user_email: req.user_email,
-      local: req.body,
+      local: { address, geohash },
     };
 
     const reportService = new ReportService(data);

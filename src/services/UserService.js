@@ -3,10 +3,12 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
+// generateJWT
+// generateAccessToken
+
 // IMPORTANDO UTILS
-import { generateJWT, generateAccessToken } from "../utils/jwt.js";
+import JWT from "../utils/JWT.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
-import verifyToken from "../utils/verifyJwt.js";
 import Tamplate from "../utils/tamplatesEmail.js";
 import AppError from "../utils/AppError.js";
 
@@ -35,7 +37,7 @@ class UserService {
   }
 
   async sendConfirmEmail(email, user) {
-    const token = generateJWT(user);
+    const token = JWT.generateJWT(user);
 
     const params = Tamplate.emailConfirm(email, token);
     console.log(params.Message.Body.Html.Data);
@@ -79,13 +81,13 @@ class UserService {
     const passwordDecrypt = decrypt(user.password);
 
     if (password === passwordDecrypt) {
-      user.token = generateJWT(user);
+      user.token = JWT.generateJWT(user);
       return user;
     }
   }
 
   async generateAccessToken(refreshToken) {
-    const accessToken = await generateAccessToken(refreshToken);
+    const accessToken = JWT.generateAccessToken(refreshToken);
 
     return accessToken;
   }
@@ -93,14 +95,14 @@ class UserService {
   async sendEmailToResetPassword(email) {
     const user = await this.verifyUserExist(email);
 
-    const params = Tamplate.emailResetPassword(email, generateJWT(user));
+    const params = Tamplate.emailResetPassword(email, JWT.generateJWT(user));
     console.log(params.Message.Body.Html.Data);
 
     return await UserModel.sendEmail(params);
   }
 
   async formToResetPassword(token) {
-    await verifyToken(token);
+    await JWT.verifyToken(token);
 
     return Tamplate.responseResetPasswordForm(token);
   }
