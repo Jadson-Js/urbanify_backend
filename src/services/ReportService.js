@@ -215,40 +215,23 @@ export default class ReportService {
   }
 
   async updateStatus() {
-    const { address, geohash, status } = await ReportModel.updateStatus(
+    const { id, address, geohash, status } = await ReportModel.updateStatus(
       this.update
     );
 
     if (status === 2) {
-      const report = await ReportModel.getByLocal(address, geohash);
+      const report = await this.verifyReportExist(address, geohash);
       await ResolvedReportModel.create(report);
       await ReportModel.delete(address, geohash);
     }
 
     // Resposta final
-    const response = {
-      report: { address, geohash, status },
-    };
+    const report = { id, address, geohash, status };
 
-    return response;
+    return report;
   }
 
   // AÇÕES DE DELETE
-  async processDelete() {
-    const { address, geohash } = this.local;
-
-    const report = await this.verifyReportExist(address, geohash);
-
-    const index = await this.verifyChildrenExist(this.user_email, report);
-
-    if (report.childrens.length === 1) {
-      await this.deleteFilesByPrefix(report.id);
-      return ReportModel.delete(address, geohash);
-    }
-
-    return ReportModel.removeChildren(index, address, geohash);
-  }
-
   async deleteFilesByPrefix(prefix) {
     const paramsToGet = {
       Bucket: process.env.S3_BUCKET,
@@ -287,6 +270,27 @@ export default class ReportService {
 
     await UserModel.addReport(this.user_email, report.id);
     return this.addChildren();
+  }
+
+  async processDelete() {
+    const { address, geohash } = this.local;
+
+    const report = await this.verifyReportExist(address, geohash);
+
+    const index = await this.verifyChildrenExist(this.user_email, report);
+
+    const reponse = { id: report.id, address, geohash };
+
+    if (report.childrens.length === 1) {
+      await this.deleteFilesByPrefix(report.id);
+      ReportModel.delete(address, geohash);
+
+      return reponse;
+    }
+
+    ReportModel.removeChildren(index, address, geohash);
+
+    return reponse;
   }
 
   // UTILS DA CLASSE

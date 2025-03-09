@@ -21,7 +21,7 @@ class ReportController {
 
     res.status(200).json({
       message: "Busca feita com sucesso!",
-      report: reports,
+      reports,
     });
   }
 
@@ -86,11 +86,11 @@ class ReportController {
     };
 
     const reportService = new ReportService(data);
-    const response = await reportService.updateStatus();
+    const report = await reportService.updateStatus();
 
     res.status(200).json({
       message: "Edição feita com sucesso!",
-      data: response,
+      report,
     });
   }
 
@@ -106,7 +106,7 @@ class ReportController {
 
     const deleteReport = await reportService.processDelete();
 
-    res.status(201).json({
+    res.status(200).json({
       message: "Report deletado com sucesso!",
       report: deleteReport,
     });

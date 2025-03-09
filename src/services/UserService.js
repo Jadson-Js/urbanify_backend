@@ -40,7 +40,6 @@ class UserService {
     const token = JWT.generateJWT(user);
 
     const params = Tamplate.emailConfirm(email, token);
-    console.log(params.Message.Body.Html.Data);
 
     await UserModel.sendEmail(params);
   }
@@ -96,7 +95,6 @@ class UserService {
     const user = await this.verifyUserExist(email);
 
     const params = Tamplate.emailResetPassword(email, JWT.generateJWT(user));
-    console.log(params.Message.Body.Html.Data);
 
     return await UserModel.sendEmail(params);
   }

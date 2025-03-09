@@ -64,8 +64,6 @@ class ReportModel {
       const response = await client.send(command);
       return response.Items;
     } catch (error) {
-      console.log(error);
-
       throw new AppError(
         404,
         "Report não encontrado",
@@ -222,8 +220,6 @@ class ReportModel {
 
       return response.Attributes;
     } catch (error) {
-      console.log(error);
-
       throw new AppError(
         400,
         "Parametros mal definido",

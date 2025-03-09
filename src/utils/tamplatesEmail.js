@@ -2,7 +2,7 @@ import { sesSource } from "../config/environment.js";
 
 class Tamplate {
   emailConfirm(email, token) {
-    return {
+    const tamplate = {
       Destination: {
         ToAddresses: [email],
       },
@@ -24,6 +24,10 @@ class Tamplate {
       },
       Source: sesSource,
     };
+
+    console.log(tamplate.Message.Body.Html.Data);
+
+    return tamplate;
   }
 
   responseConfirmEmail() {
@@ -40,7 +44,7 @@ class Tamplate {
   }
 
   emailResetPassword(email, token) {
-    return {
+    const tamplate = {
       Destination: {
         ToAddresses: [email],
       },
@@ -62,6 +66,10 @@ class Tamplate {
       },
       Source: sesSource,
     };
+
+    console.log(tamplate.Message.Body.Html.Data);
+
+    return tamplate;
   }
 
   responseResetPasswordForm(token) {

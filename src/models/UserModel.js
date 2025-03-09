@@ -71,7 +71,6 @@ class UserModel {
 
       return data;
     } catch (err) {
-      console.log(err);
       throw new AppError(400, "Email não enviado", "Email não foi enviado");
     }
   }

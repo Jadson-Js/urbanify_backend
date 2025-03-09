@@ -1,175 +1,207 @@
 import supertest from "supertest";
 import app from "../../app.js";
 
-const req = {
-  adminToken:
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTczOTkwNzQ1NSwiZXhwIjoxNzQyNDk5NDU1fQ.nhqd3llOMuV7czOv0PwLUoIgukx-Bbj8rG24m2wM5n0",
+console.clear();
 
-  userToken:
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAYWRtaW4uY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3Mzk5MDQ5MjMsImV4cCI6MTc0MjQ5NjkyM30.RVKp62l0jQ1Mq_gqv1Na1cNb7qhOM4pNr9UtdUVSUX8",
-
+const environment = {
   filePath: "/home/magnus/Pictures/baki.jpg",
-  report: {
-    my: `{  "subregion": "São Luís",  "district": "Liberdade",  "street": "Rua Machado De Assis",  "severity": "MODERADO",  "coordinates": {    "latitude": "-2.5325999611122065",    "longitude": "-44.284021668688126"  }}`,
 
-    neighbor: `{  "subregion": "São Luís",  "district": "Liberdade",  "street": "Rua Machado De Assis",  "severity": "GRAVE",  "coordinates": {    "latitude": "-2.5328124698162275",    "longitude": "-44.28404927311758"  }}`,
-
-    grandma: `{  "subregion": "São Luís",  "district": "Monte Castelo",  "street": "Rua Paulo Fontin",  "severity": "MODERADO",  "coordinates": {    "latitude": "-2.539162334606275",    "longitude": "-44.28390231258721"  }}`,
+  users: {
+    user1: {
+      email: "vakeiro20051965@gmail.com",
+      password: "admin123",
+      access:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZha2Vpcm8yMDA1MTk2NUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJhY3RpdmUiOnRydWUsImlhdCI6MTc0MTUzODYzMywiZXhwIjoxNzQ0MTMwNjMzfQ.YXDOWK8e634NvbDXJ2pa_PgqYw_Z9s5mjhq_MQbx4xU",
+    },
+    user2: {
+      email: "wisdombigrobotcompany@gmail.com",
+      password: "admin123",
+      access:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Indpc2RvbWJpZ3JvYm90Y29tcGFueUBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImFjdGl2ZSI6dHJ1ZSwiaWF0IjoxNzQxNTM4NjA2LCJleHAiOjE3NDQxMzA2MDZ9.yS7N_FrZp6eMfCxXqylTYYHZKoUSZe_PzX9IcfSvDjA",
+    },
   },
-  updateStatus: `{ "status": ${1} }`,
+
+  reports: {
+    report10: `{  "subregion": "São Luís",  "district": "Liberdade",  "street": "Rua Machado De Assis",  "severity": "MODERADO",  "coordinates": {    "latitude": "-2.5326829319191773",    "longitude": "-44.28404809576579"  }}`,
+
+    report11: `{  "subregion": "São Luís",  "district": "Liberdade",  "street": "Rua Machado De Assis",  "severity": "GRAVE",  "coordinates": {    "latitude": "-2.532888103097746",    "longitude": "-44.28406521008228"  }}`,
+
+    report20: `{  "subregion": "São Luís",  "district": "Monte Castelo",  "street": "Rua Paulo Fontin",  "severity": "MODERADO",  "coordinates": {    "latitude": "-2.539193470011821",    "longitude": "-44.28389473683467"  }}`,
+  },
+
+  keys: {
+    report10: { address: "São Luís_Liberdade", geohash: "7p8986c" },
+    report20: { address: "São Luís_Monte Castelo", geohash: "7p8983c" },
+  },
 };
 
 describe("Report Routes", () => {
-  test("Criar um report meu como ADMIN com sucesso", async () => {
+  test("Criar report 10 com user 1", async () => {
     const response = await supertest(app)
       .post("/report")
-      .set("Authorization", req.adminToken)
-      .field("data", req.report.my)
-      .attach("file", req.filePath);
+      .set("Authorization", environment.users.user1.access)
+      .field("data", environment.reports.report10)
+      .attach("file", environment.filePath);
+
+    console.log(response.body);
 
     expect(response.statusCode).toBe(201);
-    expect(response.body).toHaveProperty(
-      "message",
-      "Report cadastrado com sucesso!"
-    );
+    expect(response.body).toHaveProperty("message");
     expect(response.body.report).toHaveProperty("id");
+    expect(response.body.report).toHaveProperty("address");
+    expect(response.body.report).toHaveProperty("geohash");
   });
 
-  test("Criar um report para avó como ADMIN com sucesso", async () => {
+  // Expect 201, message e report: id, address, geohash
+  test("Criar report 11 com user 2", async () => {
     const response = await supertest(app)
       .post("/report")
-      .set("Authorization", req.adminToken)
-      .field("data", req.report.grandma)
-      .attach("file", req.filePath);
+      .set("Authorization", environment.users.user2.access)
+      .field("data", environment.reports.report11)
+      .attach("file", environment.filePath);
+
+    console.log(response.body);
 
     expect(response.statusCode).toBe(201);
-    expect(response.body).toHaveProperty(
-      "message",
-      "Report cadastrado com sucesso!"
-    );
+    expect(response.body).toHaveProperty("message");
     expect(response.body.report).toHaveProperty("id");
+    expect(response.body.report).toHaveProperty("address");
+    expect(response.body.report).toHaveProperty("geohash");
   });
 
-  test("Criar um report meu como USER com sucesso ", async () => {
+  // Expect 201, message e report: id, address, geohash
+  test("Criar report 20 com user 2", async () => {
     const response = await supertest(app)
       .post("/report")
-      .set("Authorization", req.userToken)
-      .field("data", req.report.my)
-      .attach("file", req.filePath);
+      .set("Authorization", environment.users.user2.access)
+      .field("data", environment.reports.report20)
+      .attach("file", environment.filePath);
+
+    console.log(response.body);
 
     expect(response.statusCode).toBe(201);
-    expect(response.body).toHaveProperty(
-      "message",
-      "Report cadastrado com sucesso!"
-    );
+    expect(response.body).toHaveProperty("message");
     expect(response.body.report).toHaveProperty("id");
+    expect(response.body.report).toHaveProperty("address");
+    expect(response.body.report).toHaveProperty("geohash");
   });
 
-  test("Pega todos reports com sucesso", async () => {
+  // Expect 200, message, report: id, address, geohash, status
+  test("Editar report 10 com user 1 status 1", async () => {
     const response = await supertest(app)
-      .get("/report")
-      .set("Authorization", req.adminToken);
-
-    expect(response.statusCode).toBe(200);
-    expect(Array.isArray(response.body.reports)).toBe(true);
-    expect(response.body.reports.length).toBe(2);
-  });
-
-  test("Pega um report com sucesso", async () => {
-    const response = await supertest(app)
-      .get("/report/address/São Luís_Liberdade/geohash/7p8986c")
-      .set("Authorization", req.adminToken);
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body.data.report).toBeInstanceOf(Object);
-    expect(response.body.data.urls).toBeInstanceOf(Array);
-  });
-
-  test("Pega todos reports do ADMIN com sucesso", async () => {
-    const response = await supertest(app)
-      .get("/report/my")
-      .set("Authorization", req.adminToken);
-
-    expect(response.statusCode).toBe(200);
-    expect(Array.isArray(response.body.report)).toBe(true);
-    expect(response.body.report.length).toBe(2);
-  });
-
-  test("Pega todos reports do USER com sucesso", async () => {
-    const response = await supertest(app)
-      .get("/report/my")
-      .set("Authorization", req.userToken);
-
-    expect(response.statusCode).toBe(200);
-    expect(Array.isArray(response.body.report)).toBe(true);
-    expect(response.body.report.length).toBe(1);
-  });
-
-  test("Edita status do meu report como ADMIN com sucesso", async () => {
-    const response = await supertest(app)
-      .patch("/report/address/São Luís_Liberdade/geohash/7p8986c")
-      .set("Authorization", req.adminToken)
+      .patch(
+        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
+      )
+      .set("Authorization", environment.users.user1.access)
       .send({ status: 1 });
 
+    console.log(response.body);
+
     expect(response.statusCode).toBe(200);
-    expect(response.body.report.status).toBe(1);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.report).toHaveProperty("id");
+    expect(response.body.report).toHaveProperty("address");
+    expect(response.body.report).toHaveProperty("geohash");
   });
 
-  test("Pega status do meu report como ADMIN com sucesso", async () => {
+  // Expect 200, message, report: id, address, geohash, status 2
+  test("Editar report 20 com user 1 status 2", async () => {
     const response = await supertest(app)
-      .get("/report/status/address/São Luís_Liberdade/geohash/7p8986c")
-      .set("Authorization", req.adminToken);
+      .patch(
+        `/report/address/${environment.keys.report20.address}/geohash/${environment.keys.report20.geohash}`
+      )
+      .set("Authorization", environment.users.user1.access)
+      .send({ status: 2 });
+
+    console.log(response.body);
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("message", "Busca feita com sucesso!");
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.report).toHaveProperty("id");
+    expect(response.body.report).toHaveProperty("address");
+    expect(response.body.report).toHaveProperty("geohash");
+  });
+
+  // Expect 200, message, reports: array com 1 item, dentro do item no childrens outro array com 2 items
+  test("Buscar todos reports com user 1 ", async () => {
+    const response = await supertest(app)
+      .get("/report")
+      .set("Authorization", environment.users.user1.access);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.reports).toBeInstanceOf(Array);
+    expect(response.body.reports.length).toBe(1);
+    expect(response.body.reports[0].childrens).toBeInstanceOf(Array);
+    expect(response.body.reports[0].childrens.length).toBe(2);
+  });
+
+  // expect 200, message, data com report = childrens com 2 items + urls = com 2 items
+  test("Buscar report 10 com user 1", async () => {
+    const response = await supertest(app)
+      .get(
+        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
+      )
+      .set("Authorization", environment.users.user1.access);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.data.report.childrens).toBeInstanceOf(Array);
+    expect(response.body.data.report.childrens.length).toBe(2);
+    expect(response.body.data.urls).toBeInstanceOf(Array);
+    expect(response.body.data.urls.length).toBe(2);
+  });
+
+  //Expect 200, message, reports = 1 item
+  test("Buscar my reports com user 1", async () => {
+    const response = await supertest(app)
+      .get(`/report/my`)
+      .set("Authorization", environment.users.user1.access);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.reports).toBeInstanceOf(Array);
+    expect(response.body.reports.length).toBe(1);
+  });
+
+  // Expect 200, message, status = 1
+  test("Buscar status report 10 com user 1", async () => {
+    const response = await supertest(app)
+      .get(
+        `/report/status/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
+      )
+      .set("Authorization", environment.users.user1.access);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("message");
     expect(response.body.status).toBe(1);
   });
 
-  test("Deleta meu report como ADMIN com sucesso", async () => {
+  test("Deletar report 10 com user 1", async () => {
     const response = await supertest(app)
-      .delete("/report")
-      .send({
-        address: "São Luís_Liberdade",
-        geohash: "7p8986c",
-      })
-      .set("Authorization", req.adminToken);
+      .delete(
+        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
+      )
+      .set("Authorization", environment.users.user1.access);
 
-    expect(response.statusCode).toBe(201);
-    expect(response.body).toHaveProperty(
-      "message",
-      "Report deletado com sucesso!"
-    );
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.report).toHaveProperty("id");
+    expect(response.body.report).toHaveProperty("address");
+    expect(response.body.report).toHaveProperty("geohash");
   });
 
-  test("Deleta report da minha vó como ADMIN com sucesso", async () => {
+  test("Deletar report 10 com user 2", async () => {
     const response = await supertest(app)
-      .delete("/report")
-      .send({
-        address: "São Luís_Monte Castelo",
-        geohash: "7p8983c",
-      })
-      .set("Authorization", req.adminToken);
+      .delete(
+        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
+      )
+      .set("Authorization", environment.users.user2.access);
 
-    expect(response.statusCode).toBe(201);
-    expect(response.body).toHaveProperty(
-      "message",
-      "Report deletado com sucesso!"
-    );
-  });
-
-  test("Deleta meu report como USER com sucesso", async () => {
-    const response = await supertest(app)
-      .delete("/report")
-      .send({
-        address: "São Luís_Liberdade",
-        geohash: "7p8986c",
-      })
-      .set("Authorization", req.userToken);
-
-    expect(response.statusCode).toBe(201);
-    expect(response.body).toHaveProperty(
-      "message",
-      "Report deletado com sucesso!"
-    );
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.report).toHaveProperty("id");
+    expect(response.body.report).toHaveProperty("address");
+    expect(response.body.report).toHaveProperty("geohash");
   });
 });

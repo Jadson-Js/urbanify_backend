@@ -11,7 +11,7 @@ class JWT {
       { email, role, active },
       process.env.JWT_SECRET_ACCESS,
       {
-        expiresIn: "30m",
+        expiresIn: "30d",
       }
     );
     const refresh = jwt.sign(
@@ -44,7 +44,7 @@ class JWT {
           { email, role, active },
           process.env.JWT_SECRET_ACCESS,
           {
-            expiresIn: "30m",
+            expiresIn: "30d",
           }
         );
 

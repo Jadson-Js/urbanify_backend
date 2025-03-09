@@ -100,6 +100,26 @@ class ResolvedModel {
       );
     }
   }
+
+  async create(data) {
+    const params = {
+      TableName: tableName,
+      Item: data,
+    };
+
+    try {
+      const command = new PutCommand(params);
+      await dynamodb.send(command);
+
+      return data;
+    } catch (error) {
+      throw new AppError(
+        500,
+        "Erro ao criar o report",
+        "Não foi possível criar o report, tente novamente mais tarde"
+      );
+    }
+  }
 }
 
 export default new ResolvedModel();
