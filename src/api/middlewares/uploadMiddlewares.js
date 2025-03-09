@@ -1,13 +1,19 @@
-// IMPORTANDO DEPENDENCIAS
 import multer from "multer";
 
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image/")) {
+  const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+  if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Apenas arquivos de imagem são permitidos!"), false);
+    cb(
+      new Error(
+        "Apenas arquivos de imagem (JPEG, PNG, GIF, WEBP) são permitidos!"
+      ),
+      false
+    );
   }
 };
 
