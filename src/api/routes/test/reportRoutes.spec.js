@@ -11,13 +11,13 @@ const environment = {
       email: "vakeiro20051965@gmail.com",
       password: "admin123",
       access:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZha2Vpcm8yMDA1MTk2NUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJhY3RpdmUiOnRydWUsImlhdCI6MTc0MTUzODYzMywiZXhwIjoxNzQ0MTMwNjMzfQ.YXDOWK8e634NvbDXJ2pa_PgqYw_Z9s5mjhq_MQbx4xU",
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZha2Vpcm8yMDA1MTk2NUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJhY3RpdmUiOnRydWUsImlhdCI6MTc0MTYxNzI1OCwiZXhwIjoxNzQ0MjA5MjU4fQ.u9aV6YyBy7RMUQchInK6Nh4MufU88v-3NIsRXxQFxvs",
     },
     user2: {
       email: "wisdombigrobotcompany@gmail.com",
       password: "admin123",
       access:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Indpc2RvbWJpZ3JvYm90Y29tcGFueUBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImFjdGl2ZSI6dHJ1ZSwiaWF0IjoxNzQxNTM4NjA2LCJleHAiOjE3NDQxMzA2MDZ9.yS7N_FrZp6eMfCxXqylTYYHZKoUSZe_PzX9IcfSvDjA",
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Indpc2RvbWJpZ3JvYm90Y29tcGFueUBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImFjdGl2ZSI6dHJ1ZSwiaWF0IjoxNzQxNjE3MjgzLCJleHAiOjE3NDQyMDkyODN9.3WhwFdV8Cf5M6YlkXaW9pkdiTYAFIRTG1cy2gJFnxS4",
     },
   },
 
@@ -184,11 +184,7 @@ describe("Report Routes", () => {
       )
       .set("Authorization", environment.users.user1.access);
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("message");
-    expect(response.body.report).toHaveProperty("id");
-    expect(response.body.report).toHaveProperty("address");
-    expect(response.body.report).toHaveProperty("geohash");
+    expect(response.statusCode).toBe(204);
   });
 
   test("Deletar report 10 com user 2", async () => {
@@ -198,10 +194,6 @@ describe("Report Routes", () => {
       )
       .set("Authorization", environment.users.user2.access);
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("message");
-    expect(response.body.report).toHaveProperty("id");
-    expect(response.body.report).toHaveProperty("address");
-    expect(response.body.report).toHaveProperty("geohash");
+    expect(response.statusCode).toBe(204);
   });
 });

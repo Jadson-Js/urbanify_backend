@@ -10,9 +10,9 @@ dotenv.config();
 export default function authMiddlewares(typeUser) {
   if (!typeUser) {
     throw new AppError(
-      500,
-      "Tipo do usuario não fornecido",
-      "Forneça o tipo do usuario que deseja autenticar."
+      400, // Código de status apropriado para erros de validação de entrada
+      "User type not provided",
+      "Please provide the user type you want to authenticate."
     );
   }
 
@@ -21,26 +21,26 @@ export default function authMiddlewares(typeUser) {
       const token = req.headers.authorization?.split(" ")[1];
       if (!token) {
         throw new AppError(
-          401,
-          "Token não fornecido",
-          "O token de autenticação é obrigatório."
+          401, // Código de status apropriado para falta de autenticação
+          "Token not provided",
+          "The authentication token is mandatory and must be included."
         );
       }
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET_ACCESS);
       if (!decoded.active) {
         throw new AppError(
-          403,
-          "Usuário com verificação de e-mail pendente",
-          "Verifique seu e-mail para ativar a conta."
+          403, // Código de status para acesso proibido devido à condição do usuário
+          "User with pending email verification",
+          "Please verify your email to activate your account."
         );
       }
 
       if (typeUser === "ADMIN" && decoded.role !== "ADMIN") {
         throw new AppError(
-          403,
-          "Acesso negado",
-          "Você não tem permissão para acessar este recurso."
+          403, // Código de status para acesso proibido devido à falta de permissão
+          "Access denied",
+          "You do not have permission to access this resource."
         );
       }
 

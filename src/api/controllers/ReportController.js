@@ -7,7 +7,9 @@ class ReportController {
 
     const reports = await reportService.get();
 
-    res.status(200).json({ message: "Busca concluida!", reports });
+    res
+      .status(200)
+      .json({ message: "Reports retrieved successfully", reports });
   }
 
   async getMyReports(req, res) {
@@ -20,7 +22,7 @@ class ReportController {
     const reports = await reportService.getMyReports();
 
     res.status(200).json({
-      message: "Busca feita com sucesso!",
+      message: "Reports retrieved successfully",
       reports,
     });
   }
@@ -37,7 +39,7 @@ class ReportController {
     const response = await reportService.getReport();
 
     res.status(200).json({
-      message: "Busca feita com sucesso!",
+      message: "Report retrieved successfully",
       data: response,
     });
   }
@@ -55,7 +57,7 @@ class ReportController {
     const status = await reportService.getStatus();
 
     res.status(200).json({
-      message: "Busca feita com sucesso!",
+      message: "Status retrieved successfully",
       status: status,
     });
   }
@@ -72,7 +74,7 @@ class ReportController {
     const putReport = await reportService.processCreate();
 
     res.status(201).json({
-      message: "Report cadastrado com sucesso!",
+      message: "Report created successfully",
       report: putReport,
     });
   }
@@ -89,7 +91,7 @@ class ReportController {
     const report = await reportService.updateStatus();
 
     res.status(200).json({
-      message: "Edição feita com sucesso!",
+      message: "Report status updated successfully",
       report,
     });
   }
@@ -104,12 +106,9 @@ class ReportController {
 
     const reportService = new ReportService(data);
 
-    const deleteReport = await reportService.processDelete();
+    await reportService.processDelete();
 
-    res.status(200).json({
-      message: "Report deletado com sucesso!",
-      report: deleteReport,
-    });
+    res.status(204).send();
   }
 }
 

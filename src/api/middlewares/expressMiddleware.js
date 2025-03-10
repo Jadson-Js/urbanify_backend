@@ -9,14 +9,14 @@ class Validator {
     return checkSchema({
       email: {
         isEmail: {
-          errorMessage: "Email incorreto",
+          errorMessage: "Incorrect email", // Main message for invalid email format
         },
         notEmpty: {
-          errorMessage: "preencha o email",
+          errorMessage: "Please provide the email", // Message for missing email input
         },
         isLength: {
           options: { max: 250 },
-          errorMessage: "Seu email não pode conter mais de 250 caracteres",
+          errorMessage: "Your email cannot exceed 250 characters", // Message for overly long email input
         },
       },
     });
@@ -26,15 +26,14 @@ class Validator {
     return checkSchema({
       password: {
         isString: {
-          errorMessage: "Senha deve ser uma string",
+          errorMessage: "Password must be a string", // Message for ensuring password is a valid string
         },
         isLength: {
           options: { min: 6, max: 64 },
-          errorMessage:
-            "Senha não pode conter menos de 6 ou mais de 64 caracteres",
+          errorMessage: "Password must be between 6 and 64 characters long", // Detailed message about length requirements
         },
         notEmpty: {
-          errorMessage: "preencha a senha",
+          errorMessage: "Please provide the password", // Message for missing password input
         },
       },
     });
@@ -44,15 +43,14 @@ class Validator {
     return checkSchema({
       new_password: {
         isString: {
-          errorMessage: "Senha deve ser uma string",
+          errorMessage: "Password must be a string", // Ensures the input is a valid string
         },
         isLength: {
           options: { min: 6, max: 64 },
-          errorMessage:
-            "Senha não pode conter menos de 6 ou mais de 64 caracteres",
+          errorMessage: "Password must be between 6 and 64 characters long", // Specifies the acceptable password length
         },
         notEmpty: {
-          errorMessage: "preencha a senha",
+          errorMessage: "Please provide the password", // Informs the user to fill in the password field
         },
       },
     });
@@ -62,15 +60,14 @@ class Validator {
     return checkSchema({
       accessToken: {
         isString: {
-          errorMessage: "O token deve ser uma string",
+          errorMessage: "The token must be a string", // Ensures the token is provided as a valid string
         },
         isLength: {
           options: { min: 10, max: 600 },
-          errorMessage:
-            "Token não pode conter menos de 10 ou mais de 600 caracteres",
+          errorMessage: "The token must be between 10 and 600 characters long", // Specifies the valid length for the token
         },
         notEmpty: {
-          errorMessage: "preencha o token",
+          errorMessage: "Please provide the token", // Informs the user to include the token
         },
       },
     });
@@ -80,15 +77,14 @@ class Validator {
     return checkSchema({
       refreshToken: {
         isString: {
-          errorMessage: "O token deve ser uma string",
+          errorMessage: "The token must be a string", // Ensures the refresh token is provided as a valid string
         },
         isLength: {
           options: { min: 10, max: 600 },
-          errorMessage:
-            "Token não pode conter menos de 10 ou mais de 600 caracteres",
+          errorMessage: "The token must be between 10 and 600 characters long", // Specifies the valid length for the refresh token
         },
         notEmpty: {
-          errorMessage: "preencha o token",
+          errorMessage: "Please provide the token", // Informs the user to fill in the refresh token field
         },
       },
     });
@@ -101,9 +97,9 @@ class Validator {
 
     if (!coordinates?.latitude || !coordinates?.longitude) {
       throw new AppError(
-        400,
-        "Campos não informados",
-        "Latitude e longitude são obrigatórias."
+        400, // Appropriate HTTP status code for missing required fields
+        "Fields not provided", // Main message indicating missing fields
+        "Latitude and longitude are required fields." // Detailed explanation emphasizing the importance of the fields
       );
     }
 
@@ -123,9 +119,9 @@ class Validator {
     );
     if (emptyField) {
       throw new AppError(
-        400,
-        "Campos não informados",
-        `O campo '${emptyField[0]}' é obrigatório.`
+        400, // Appropriate HTTP status code for missing required fields
+        "Fields not provided", // Main message indicating missing fields
+        `'${emptyField[0]}' are required fields.` // Detailed explanation emphasizing the importance of the fields
       );
     }
 
@@ -135,9 +131,9 @@ class Validator {
     );
     if (invalidField) {
       throw new AppError(
-        400,
-        "Quantidade de caracteres inadequada",
-        `O campo '${invalidField[0]}' deve ter entre 2 e 125 caracteres.`
+        400, // Appropriate HTTP status code for invalid input length
+        "Invalid character count", // Main message indicating an issue with field length
+        `The field '${invalidField[0]}' must contain between 2 and 125 characters.` // Detailed message specifying the valid character range
       );
     }
 
@@ -148,15 +144,14 @@ class Validator {
     return checkSchema({
       address: {
         isString: {
-          errorMessage: "O address deve ser uma string",
+          errorMessage: "The address must be a string", // Ensures the address is provided as a valid string
         },
         isLength: {
           options: { min: 2, max: 125 },
-          errorMessage:
-            "Address não pode conter menos de 2 ou mais de 125 caracteres",
+          errorMessage: "The address must be between 2 and 125 characters long", // Specifies the valid length for the address field
         },
         notEmpty: {
-          errorMessage: "Preencha o address",
+          errorMessage: "Please provide the address", // Informs the user to fill in the address field
         },
       },
     });
@@ -166,15 +161,14 @@ class Validator {
     return checkSchema({
       geohash: {
         isString: {
-          errorMessage: "O geohash deve ser uma string",
+          errorMessage: "The geohash must be a string", // Ensures the geohash is a valid string
         },
         isLength: {
           options: { min: 6, max: 8 },
-          errorMessage:
-            "geohash não pode conter menos de 2 ou mais de 125 caracteres",
+          errorMessage: "The geohash must be between 6 and 8 characters long", // Specifies the valid length for the geohash
         },
         notEmpty: {
-          errorMessage: "Preencha o geohash",
+          errorMessage: "Please provide the geohash", // Informs the user to fill in the geohash field
         },
       },
     });
@@ -184,15 +178,14 @@ class Validator {
     return checkSchema({
       status: {
         isNumeric: {
-          errorMessage: "O status deve ser um number",
+          errorMessage: "The status must be a number", // Ensures the status is provided as a numeric value
         },
         isLength: {
           options: { min: 0, max: 2 },
-          errorMessage:
-            "geohash não pode conter menos de 0 ou mais de 2 caracteres",
+          errorMessage: "The status must contain between 0 and 2 digits", // Corrected and clarified length requirement message
         },
         notEmpty: {
-          errorMessage: "Preencha o status",
+          errorMessage: "Please provide the status", // Informs the user to fill in the status field
         },
       },
     });
@@ -202,15 +195,14 @@ class Validator {
     return checkSchema({
       id: {
         isString: {
-          errorMessage: "O id deve ser uma string",
+          errorMessage: "The ID must be a string", // Ensures the ID is provided as a valid string
         },
         isLength: {
           options: { min: 4, max: 64 },
-          errorMessage:
-            "Id não pode conter menos de 4 ou mais de 64 caracteres",
+          errorMessage: "The ID must be between 4 and 64 characters long", // Specifies the valid length for the ID
         },
         notEmpty: {
-          errorMessage: "Preencha o id",
+          errorMessage: "Please provide the ID", // Informs the user to fill in the ID field
         },
       },
     });
@@ -220,15 +212,15 @@ class Validator {
     return checkSchema({
       created_at: {
         isString: {
-          errorMessage: "O created_at deve ser uma string",
+          errorMessage: "The created_at must be a string", // Ensures the created_at field is provided as a valid string
         },
         isLength: {
           options: { min: 4, max: 64 },
           errorMessage:
-            "created_at não pode conter menos de 4 ou mais de 64 caracteres",
+            "The created_at must be between 4 and 64 characters long", // Specifies the valid length for the created_at field
         },
         notEmpty: {
-          errorMessage: "Preencha o created_at",
+          errorMessage: "Please provide the created_at field", // Informs the user to fill in the created_at field
         },
       },
     });

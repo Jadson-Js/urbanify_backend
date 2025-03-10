@@ -3,13 +3,10 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
-// generateJWT
-// generateAccessToken
-
 // IMPORTANDO UTILS
 import JWT from "../utils/JWT.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
-import Tamplate from "../utils/tamplatesEmail.js";
+import Tamplate from "../utils/Tamplate.js";
 import AppError from "../utils/AppError.js";
 
 // IMPORTANDO MODELS
@@ -33,11 +30,13 @@ class UserService {
 
     await this.sendConfirmEmail(email, user);
 
-    return await UserModel.signup(user);
+    await UserModel.signup(user);
+
+    return { id: user.id, email: user.email };
   }
 
   async sendConfirmEmail(email, user) {
-    const token = JWT.generateJWT(user);
+    const token = JWT.generate(user);
 
     const params = Tamplate.emailConfirm(email, token);
 
@@ -51,9 +50,9 @@ class UserService {
       async (error, decoded) => {
         if (error) {
           throw new AppError(
-            400,
-            "Token invalido",
-            "O token enviado era invalido"
+            400, // Código de status apropriado para entrada de dados inválida
+            "Invalid token",
+            "The token sent was invalid."
           );
         } else {
           await UserModel.active(decoded.email);
@@ -71,22 +70,22 @@ class UserService {
 
     if (user.active == false) {
       throw new AppError(
-        401,
-        "Email do usuario está pendente",
-        "Email do usuario está pendente"
+        401, // Código de status apropriado para erros de autorização
+        "User email is pending",
+        "User email is pending."
       );
     }
 
     const passwordDecrypt = decrypt(user.password);
 
     if (password === passwordDecrypt) {
-      user.token = JWT.generateJWT(user);
+      user.token = JWT.generate(user);
       return user;
     }
   }
 
   async generateAccessToken(refreshToken) {
-    const accessToken = JWT.generateAccessToken(refreshToken);
+    const accessToken = JWT.generateAccess(refreshToken);
 
     return accessToken;
   }
@@ -100,7 +99,7 @@ class UserService {
   }
 
   async formToResetPassword(token) {
-    await JWT.verifyToken(token);
+    await JWT.verify(token);
 
     return Tamplate.responseResetPasswordForm(token);
   }
@@ -115,9 +114,9 @@ class UserService {
 
     if (!user) {
       throw new AppError(
-        404,
-        "Usuario não encontrado",
-        "Email incorreto ou inexistente"
+        404, // Código de status apropriado para recursos ou usuários não encontrados
+        "User not found",
+        "Incorrect or non-existent email."
       );
     }
 

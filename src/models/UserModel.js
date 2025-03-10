@@ -37,9 +37,9 @@ class UserModel {
       return data.Item;
     } catch (error) {
       throw new AppError(
-        404,
-        "Usuario não encontrado",
-        "Email incorreto ou inexistente"
+        404, // Código de status apropriado para recursos ou usuários não encontrados
+        "User not found",
+        "Incorrect or non-existent email."
       );
     }
   }
@@ -59,7 +59,12 @@ class UserModel {
       return data;
     } catch (error) {
       // Classe para tratar erros dentro do event loop
-      throw new AppError(400, "Usuario ja existente", "Digite outro email");
+      throw new AppError(
+        400, // Código de status apropriado para entrada de dados inválida
+        "User already exists",
+        "Please use a different email."
+      );
+
       // Informa status code, error e uma mensagem
     }
   }
@@ -71,7 +76,11 @@ class UserModel {
 
       return data;
     } catch (err) {
-      throw new AppError(400, "Email não enviado", "Email não foi enviado");
+      throw new AppError(
+        400, // Código de status apropriado para entrada de dados inválida
+        "Email not sent",
+        "The email was not sent."
+      );
     }
   }
 
@@ -95,7 +104,11 @@ class UserModel {
 
       return putReportId;
     } catch (error) {
-      throw new AppError(404, "Usuario não encontrado", "Digite outro email");
+      throw new AppError(
+        404, // Código de status apropriado para recursos ou usuários não encontrados
+        "User not found",
+        "Please provide a different email."
+      );
     }
   }
 
@@ -118,7 +131,11 @@ class UserModel {
 
       return putReportId;
     } catch (error) {
-      throw new AppError(404, "Usuario não encontrado", "Digite outro email");
+      throw new AppError(
+        404, // Código de status apropriado para recursos ou usuários não encontrados
+        "User not found",
+        "Please enter a different email."
+      );
     }
   }
 
@@ -141,7 +158,11 @@ class UserModel {
 
       return putReportId;
     } catch (error) {
-      throw new AppError(404, "Usuario não encontrado", "Digite outro email");
+      throw new AppError(
+        404, // Código de status apropriado para recursos ou usuários não encontrados
+        "User not found",
+        "Please enter a different email."
+      );
     }
   }
 }

@@ -43,9 +43,9 @@ class ReportModel {
       return data.Items;
     } catch (error) {
       throw new AppError(
-        404,
-        "Usuario não encontrado",
-        "Email incorreto ou inexistente"
+        404, // Código de status apropriado para recursos ou usuários não encontrados
+        "User not found",
+        "Incorrect or non-existent email address."
       );
     }
   }
@@ -65,9 +65,9 @@ class ReportModel {
       return response.Items;
     } catch (error) {
       throw new AppError(
-        404,
-        "Report não encontrado",
-        "Report id mal definido ou inexistente"
+        404, // Código de status apropriado para recursos ou relatórios não encontrados
+        "Report not found",
+        "Malformed or non-existent report ID."
       );
     }
   }
@@ -88,9 +88,9 @@ class ReportModel {
       return data.Item;
     } catch (error) {
       throw new AppError(
-        404,
-        "Report não encontrado",
-        "Address e Geohash foram mal definidos ou não encontrado"
+        404, // Código de status apropriado para recursos não encontrados
+        "Report not found",
+        "Address and Geohash were malformed or not found."
       );
     }
   }
@@ -102,9 +102,9 @@ class ReportModel {
       return listResponse;
     } catch (error) {
       throw new AppError(
-        404,
-        "Prefixos não encontrado",
-        "Tente outro prefixo mais tarde"
+        404, // Código de status apropriado para recursos não encontrados
+        "Prefixes not found",
+        "Please try another prefix later."
       );
     }
   }
@@ -127,9 +127,9 @@ class ReportModel {
       return urls;
     } catch (error) {
       throw new AppError(
-        400,
-        "Prefixo mal definido",
-        "Prefixo não foi enviado ou está mal definido"
+        400, // Código de status apropriado para entrada de dados inválida
+        "Malformed prefix",
+        "The prefix was not provided or is malformed."
       );
     }
   }
@@ -149,9 +149,9 @@ class ReportModel {
       return report;
     } catch (error) {
       throw new AppError(
-        400,
-        "Arquivo não enviado",
-        "Arquivo pode está corrompido"
+        400, // Código de status apropriado para entrada de dados inválida
+        "File not sent",
+        "The file may be corrupted."
       );
     }
   }
@@ -163,9 +163,9 @@ class ReportModel {
       return response;
     } catch (error) {
       throw new AppError(
-        400,
-        "Arquivo não enviado",
-        "Arquivo pode está corrompido"
+        400, // Código de status apropriado para erros de entrada de dados inválidos
+        "File not sent",
+        "The file may be corrupted."
       );
     }
   }
@@ -191,9 +191,9 @@ class ReportModel {
       return putChildren;
     } catch (error) {
       throw new AppError(
-        400,
-        "Children mal definido",
-        "Report ou children podem está mal definido"
+        400, // Código de status apropriado para entrada de dados inválida
+        "Malformed children",
+        "The report or children may be malformed."
       );
     }
   }
@@ -221,9 +221,9 @@ class ReportModel {
       return response.Attributes;
     } catch (error) {
       throw new AppError(
-        400,
-        "Parametros mal definido",
-        "Parametros foram mal definidos "
+        400, // Código de status apropriado para entrada de dados inválida
+        "Malformed parameters",
+        "The parameters were malformed."
       );
     }
   }
@@ -246,9 +246,9 @@ class ReportModel {
       return removeChildren;
     } catch (error) {
       throw new AppError(
-        400,
-        "Index ou Local mal definidos",
-        "Address, Geohash ou children podem está mal definido"
+        400, // Código de status apropriado para entrada de dados inválida
+        "Malformed Index or Location",
+        "Address, Geohash, or children may be malformed."
       );
     }
   }
@@ -268,9 +268,9 @@ class ReportModel {
       return deleteReport;
     } catch (error) {
       throw new AppError(
-        404,
-        "Report não encontrado",
-        "Address ou Geohash podem está mal definido"
+        404, // Código de status apropriado para recursos não encontrados
+        "Report not found",
+        "Address or Geohash may be malformed."
       );
     }
   }
@@ -284,9 +284,9 @@ class ReportModel {
       return deleteResponse;
     } catch (error) {
       throw new AppError(
-        400,
-        "Lista mal definida",
-        "A lista de arquivos não encontrada ou mal definida"
+        400, // Código de status apropriado para entrada de dados inválida
+        "Malformed list",
+        "The file list was not found or is malformed."
       );
     }
   }

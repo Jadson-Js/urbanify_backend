@@ -5,8 +5,8 @@ class UserController {
   async signup(req, res) {
     const { email, password } = req.body;
 
-    await UserService.signup(email, password);
-    res.status(201).json({ message: "Usuário criado com sucesso!" });
+    const user = await UserService.signup(email, password);
+    res.status(201).json({ message: "User created successfully", user });
   }
 
   async verifyEmailToken(req, res) {
@@ -23,7 +23,7 @@ class UserController {
     const user = await UserService.login(email, password);
 
     res.status(200).json({
-      message: "Usuário logado com sucesso!",
+      message: "Login successful",
       accessToken: user.token.access,
       refreshToken: user.token.refresh,
     });
@@ -35,7 +35,7 @@ class UserController {
     const accessToken = await UserService.generateAccessToken(refreshToken);
 
     res.status(200).json({
-      message: "Novo token de acesso gerado",
+      message: "Access token generated successfully",
       accessToken,
     });
   }
@@ -46,7 +46,7 @@ class UserController {
     const data = await UserService.sendEmailToResetPassword(email);
 
     res.status(200).json({
-      message: "Email enviado com sucesso!",
+      message: "Send email successfully!",
       data,
     });
   }
@@ -68,7 +68,7 @@ class UserController {
     await UserService.resetPassword(data);
 
     res.status(200).json({
-      message: "Senha redefinida!",
+      message: "Reset password successfully",
     });
   }
 }

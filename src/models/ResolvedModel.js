@@ -32,9 +32,9 @@ class ResolvedModel {
       return data.Items;
     } catch (error) {
       throw new AppError(
-        404,
-        "Usuario não encontrado",
-        "Email incorreto ou inexistente"
+        404, // Código de status apropriado para recursos ou usuários não encontrados
+        "User not found",
+        "Incorrect or non-existent email."
       );
     }
   }
@@ -55,9 +55,9 @@ class ResolvedModel {
       return data.Item;
     } catch (error) {
       throw new AppError(
-        404,
-        "Report não encontrado",
-        "Id ou created_at foram mal definidos ou não encontrado"
+        404, // Código de status apropriado para recursos não encontrados
+        "Report not found",
+        "Id or created_at were malformed or not found."
       );
     }
   }
@@ -69,9 +69,9 @@ class ResolvedModel {
       return listResponse;
     } catch (error) {
       throw new AppError(
-        404,
-        "Prefixos não encontrado",
-        "Tente outro prefixo mais tarde"
+        404, // Código de status apropriado para recursos não encontrados
+        "Prefixes not found",
+        "Please try another prefix later."
       );
     }
   }
@@ -94,9 +94,9 @@ class ResolvedModel {
       return urls;
     } catch (error) {
       throw new AppError(
-        400,
-        "Prefixo mal definido",
-        "Prefixo não foi enviado ou está mal definido"
+        400, // Código de status apropriado para entrada de dados inválida
+        "Malformed prefix",
+        "The prefix was not provided or is malformed."
       );
     }
   }
@@ -114,9 +114,9 @@ class ResolvedModel {
       return data;
     } catch (error) {
       throw new AppError(
-        500,
-        "Erro ao criar o report",
-        "Não foi possível criar o report, tente novamente mais tarde"
+        400, // Código de status apropriado para erros internos do servidor
+        "Malformed report",
+        "The report was not provided or is malformed."
       );
     }
   }

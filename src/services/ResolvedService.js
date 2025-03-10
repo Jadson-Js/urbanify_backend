@@ -37,9 +37,9 @@ export default class ResolvedService {
 
     if (!report) {
       throw new AppError(
-        404,
-        "Report não encontrado",
-        "id e created_at não foram encontrados no banco de dados"
+        404, // Código de status apropriado para recursos não encontrados
+        "Report not found",
+        "id and created_at were not found in the database."
       );
     }
 

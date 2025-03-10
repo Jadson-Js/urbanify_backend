@@ -140,9 +140,9 @@ export default class ReportService {
 
     if (alreadyExist === -1) {
       throw new AppError(
-        401,
-        "Usuário não autorizado",
-        "O usuário não tem autorização para acessar os dados de um report que não faça parte"
+        401, // Código de status apropriado para erros de autorização
+        "User not authorized",
+        "The user is not authorized to access data for a report they are not part of."
       );
     }
 
@@ -299,9 +299,9 @@ export default class ReportService {
 
     if (!report) {
       throw new AppError(
-        404,
-        "Report não encontrado",
-        "Address e geohash não foram encontrados no banco de dados"
+        404, // Código de status apropriado para recursos não encontrados
+        "Report not found",
+        "Address and geohash were not found in the database."
       );
     }
 
@@ -313,9 +313,9 @@ export default class ReportService {
 
     if (index === -1) {
       throw new AppError(
-        404,
-        "Children não encontrado",
-        "Children não foi encontrado dentro do report"
+        404, // Código de status apropriado para recursos não encontrados
+        "Children not found",
+        "Children was not found within the report."
       );
     }
 

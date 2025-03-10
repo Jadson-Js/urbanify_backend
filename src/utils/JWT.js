@@ -4,7 +4,7 @@ import AppError from "../utils/AppError.js";
 dotenv.config();
 
 class JWT {
-  generateJWT(user) {
+  generate(user) {
     const { email, role, active } = user;
 
     const access = jwt.sign(
@@ -25,7 +25,7 @@ class JWT {
     return { access, refresh };
   }
 
-  generateAccessToken(refreshToken) {
+  generateAccess(refreshToken) {
     const accessToken = jwt.verify(
       refreshToken,
       process.env.JWT_SECRET_REFRESH,
@@ -55,7 +55,7 @@ class JWT {
     return accessToken;
   }
 
-  verifyJwt(token) {
+  verify(token) {
     const valid = jwt.verify(
       token,
       process.env.JWT_SECRET_ACCESS,
