@@ -6,194 +6,26 @@ Esta API foi desenvolvida para um aplicativo que permite aos usuários reportare
 
 ## 🚀 Tecnologias Utilizadas
 
-- **Node.js**
-- **Express**
-- **DynamoDB**
-- **AWS EC2**
-- **AWS S3**
-- **Geohash**
-- **Sharp**
-- **Multer**
-- **JWT**
-- **Dotenv**
+- **aws-dynamodb**
+- **aws-s3**
+- **aws-ses**
+- **aws-sns**
+- **cors**
+- **dotenv-safe**
+- **express**
+- **express-async-errors**
+- **express-validator**
+- **jsonwebtoken**
+- **multer": "^1.**
+- **ngeohash**
+- **nodemon**
+- **sharp**
 
 ---
-
-## 📂 Estrutura do Projeto
-
-```
-/src
-   ├── api
-      ├── controllers
-      ├── middlewares
-      ├── routes
-   ├── config
-   ├── models
-   ├── services
-   ├── utils
-```
-
----
-
-## 🔧 Instalação e Configuração
-
-### 📌 Pré-requisitos
-
-- **Node.js** instalado
-- **AWS CLI** configurado (para acesso ao DynamoDB e S3)
-
-### 📥 Passos para Rodar Localmente
-
-1. Clone o repositório:
-   ```sh
-   git clone https://github.com/Jadson-Js/urbanify_backend.git
-   ```
-2. Entre na pasta do projeto:
-   ```sh
-   cd urbanify_backend
-   ```
-3. Instale as dependências:
-   ```sh
-   npm install
-   ```
-4. Configure as variáveis de ambiente (`.env`):
-
-   ```env
-   JWT_SECRET="XXX-XXX-XXX"
-   CRYPTO_UPDATE="XXX-XXX-XXX"
-   AWS_REGION="XXX-XXX-XXX"
-   AWS_ACCESSKEYID="XXX-XXX-XXX"
-   AWS_SECRETACCESSKEY="XXX-XXX-XXX"
-   DYNAMODB_ENDPOINT="XXX-XXX-XXX"
-   S3_BUCKET="XXX-XXX-XXX"
-   ```
-
-````
-5. Inicie o servidor:
-```sh
-npm start
-````
-
----
-
-## 📡 Endpoints
-
-### 🔹 Criar Usuário
-
-**POST** `/user/signup`
-
-```json
-{
-  "email": "email@gmail.com",
-  "password": "senha123"
-}
-```
-
-### 🔹 Login
-
-**POST** `/user/login`
-
-```json
-{
-  "email": "email@gmail.com",
-  "password": "senha123"
-}
-```
-
-**Resposta:**
-
-```json
-{
-  "message": "Login realizado com sucesso.",
-  "token": "SEU_TOKEN_AQUI"
-}
-```
-
-### 🔹 Criar Report
-
-**POST** `/report`
-
-- **Headers:**
-  - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: multipart/form-data`
-- **Form-Data:**
-  - `file` (arquivo)
-  - `subregion` (string)
-  - `district` (string)
-  - `street` (string)
-  - `severity` (string)
-  - `coordinates` (objeto):
-    - `latitude` (string)
-    - `longitude` (string)
-
-### 🔹 Deletar Report
-
-**DELETE** `/report`
-
-- **Headers:**
-  - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: application/json`
-- **Body:**
-  - `address` (string)
-  - `geohash` (string)
-
-### 🔹 Listar Reports
-
-**GET** `/report`
-
-- **Headers:**
-  - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: application/json`
-
-### 🔹 Listar Reports do Usuário Autenticado
-
-**GET** `/report/my`
-
-- **Headers:**
-  - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: application/json`
-
-**GET** `/report/status/address/:address/geohash/:geohash`
-
-- **Headers:**
-  - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: application/json`
-
-### 🔹 Verificar Status do Report
-
-**GET** `/report/status`
-
-- **Headers:**
-  - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: application/json`
-- **Body:**
-  - `address` (string)
-  - `geohash` (string)
-
-### 🔹 Obter Logs do Sistema
-
-**GET** `/log`
-
-- **Headers:**
-  - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: application/json`
-
----
-
-**POST** `/log`
-
-- **Headers:**
-  - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: application/json`
-- **Body:**
-  - `report_count` (integer)
-  - `status` (string)
-  - `district` (string)
-  - `street` (string)
 
 ## 🔒 Autenticação
 
-Esta API utiliza **JWT (JSON Web Token)** para autenticação. Inclua o token no header `Authorization`:
+Esta API utiliza **JWT (JSON Web Token)** para autenticação. Inclua o token no header.
 
 ```
 Authorization: Bearer SEU_TOKEN
@@ -201,17 +33,276 @@ Authorization: Bearer SEU_TOKEN
 
 ---
 
-## 📸 Upload de Imagens
+## 📡 Endpoints
 
-As imagens enviadas pelos usuários são armazenadas no **AWS S3** e processadas pelo **Sharp** para otimização de tamanho.
+### 🔹 SIGNUP
+
+**POST** `/user/signup`
+
+**_Request_**
+
+- Header
+
+  - `Content-Type: application/json`
+
+- Body
+  - `email: (String)`
+  - `password: (String)`
+
+**_Response_**
+
+```
+{
+	"message": "User created successfully",
+	"user": {
+		"id": "123",
+		"email": "email@gmail.com"
+	}
+}
+```
 
 ---
 
-## 📌 Deploy e Produção
+### 🔹 LOGIN
 
-A API está hospedada na **AWS EC2** e utiliza **DynamoDB** para armazenamento de dados.
+**POST** `/user/login`
 
-🔗 **Base URL:** `http://18.235.148.108:3000/`
+**_Request_**
+
+- Header
+
+  - `Content-Type: application/json`
+
+- Body
+  - `email: (String)`
+  - `password: (String)`
+
+**_Response_**
+
+```
+{
+	"message": "Login successful",
+	"accessToken": "123456789",
+	"refreshToken": "123456789"
+}
+```
+
+---
+
+### 🔹 BUSCAR REPORTS
+
+**GET** `/report`
+
+**_Request_**
+
+- Header
+  - `Authorization: Bearer SEU_TOKEN`
+
+**_Response_**
+
+```
+{
+	"message": "Reports retrieved successfully",
+	"reports": [
+		{
+			"district": "São Paulo",
+			"created_at": "2025-03-09T16:48:00.230Z",
+			"status": 1,
+			"geohash": "12345678",
+			"subregion": "Campinas",
+			"childrens": [
+				{
+					"severity": 1,
+					"created_at": "2025-03-09T16:48:00.230Z"
+				}
+			],
+			"address": "Campinas_São Paulo",
+			"id": "123",
+			"coordinates": {
+				"latitude": "12.3456789",
+				"longitude": "12.3456789"
+			},
+			"street": "Augusta"
+		}
+	]
+}
+```
+
+---
+
+### 🔹 BUSCAR REPORT
+
+**GET** `/report/address/:reportAddress/geohash/:reportGeohash`
+
+**_Request_**
+
+- Header
+  - `Authorization: Bearer SEU_TOKEN`
+
+**_Response_**
+
+```
+{
+  "message": "Report retrieved successfully",
+  "data": {
+    "report": {
+      "district": "Cambuí",
+      "created_at": "2025-03-10T18:02:53.060Z",
+      "status": 1,
+      "geohash": "6gkz123",
+      "subregion": "Região Central",
+      "childrens": [
+        {
+          "severity": 2,
+          "coordinates": {
+            "latitude": "-22.907104",
+            "longitude": "-47.061604"
+          },
+          "created_at": "2025-03-10T18:08:59.115Z",
+          "user_email": "usuario_campinas@gmail.com",
+          "s3_photo_key": "2025-03-10T18:08:59.115Z-avaria.jpg"
+        }
+      ],
+      "address": "Camipinas_São Paulo",
+      "id": "Abc123Xyz",
+      "coordinates": {
+        "latitude": "-22.906847",
+        "longitude": "-47.061798"
+      },
+      "street": "Rua Barreto Leme"
+    },
+    "urls": [
+      "https://urbanify.com/imagem.jpg",
+      "https://urbanify.com/imagem.jpg"
+    ]
+  }
+}
+
+```
+
+---
+
+### 🔹 BUSCAR MEUS REPORTS
+
+**GET** `/report/my`
+
+**_Request_**
+
+- Header
+  - `Authorization: Bearer SEU_TOKEN`
+
+**_Response_**
+
+```
+{
+  "message": "Report retrieved successfully",
+  "reports": [
+		{
+			"severity": 1,
+			"coordinates": {
+				"latitude": "-42.4291",
+				"longitude": "-25.23923"
+			},
+			"created_at": "2025-03-09T16:48:00.230Z",
+			"user_email": "usuario_qualquer@gmail.com",
+			"s3_photo_key": "2025-03-09T16:48:00.230Z-baki.jpg"
+		}
+	]
+}
+
+```
+
+---
+
+### 🔹 BUSCAR REPORT STATUS
+
+**GET** `/report/address/:reportAddress/geohash/:reportGeohash`
+
+**_Request_**
+
+- Header
+  - `Authorization: Bearer SEU_TOKEN`
+
+**_Response_**
+
+```
+{
+  "message": "Report retrieved successfully",
+  "status": 1
+}
+
+```
+
+---
+
+### 🔹 CREATE REPORT
+
+**POST** `/report`
+
+**_Request_**
+
+- Header
+
+  - `Authorization: Bearer SEU_TOKEN`
+  - `Content-Type: multipart/form-data`
+
+- Body
+  - file
+    - `(Arquivo)`
+  - Data
+    - `{ "subregion": (String), "district": (String), "street": (String), "severity": (String), "coordinates": { "latitude": (String), "longitude": (String) }}`
+
+**_Response_**
+
+```
+{
+    "message": "Report created successfully",
+    "report": {
+        "id": "123",
+        "address": "Campinas_São Paulo",
+        "geohash": "12345678"
+    }
+}
+```
+
+---
+
+### 🔹 EDITAR STATUS REPORT
+
+**PATCH** `/report/address/:reportAddress/geohash/:reportGeohash`
+
+**_Request_**
+
+- Header
+
+  - `Authorization: Bearer SEU_TOKEN`
+  - `Content-Type: application/json`
+
+- Body
+  - `status: (Number)`
+
+**_Response_**
+
+```
+{
+	"message": "Report status updated successfully",
+	"report": {
+		"address": "Campinas_São Paulo",
+		"geohash": "1234567",
+		"status": 1
+	}
+}
+```
+
+### 🔹 DELETAR REPORT
+
+**DELETE** `/report/address/:reportAddress/geohash/:reportGeohash`
+
+**_Request_**
+
+- Header
+
+  - `Authorization: Bearer SEU_TOKEN`
 
 ---
 

@@ -60,7 +60,7 @@ class UserModel {
     } catch (error) {
       // Classe para tratar erros dentro do event loop
       throw new AppError(
-        400, // Código de status apropriado para entrada de dados inválida
+        409, // Código de status apropriado para entrada de dados inválida
         "User already exists",
         "Please use a different email."
       );

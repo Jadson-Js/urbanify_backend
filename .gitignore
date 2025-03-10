@@ -1,2 +1,5 @@
+node_modules
 .env
 roteiroTest.txt
+babel.config.js
+jest.config.js
