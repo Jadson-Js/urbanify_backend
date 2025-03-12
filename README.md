@@ -250,7 +250,7 @@ Authorization: Bearer SEU_TOKEN
   - file
     - `(Arquivo)`
   - Data
-    - `{ "subregion": (String), "district": (String), "street": (String), "severity": (String), "coordinates": { "latitude": (String), "longitude": (String) }}`
+    - `{ "subregion": (String), "district": (String), "street": (String), "severity": (Number), "coordinates": { "latitude": (String), "longitude": (String) }}`
 
 **_Response_**
 
