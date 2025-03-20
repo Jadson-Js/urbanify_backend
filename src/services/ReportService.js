@@ -221,7 +221,15 @@ export default class ReportService {
 
     if (status === 2) {
       const report = await this.verifyReportExist(address, geohash);
-      await ResolvedReportModel.create(report);
+
+      const resolvedReport = {
+        ...report,
+        expiration_timestamp: Math.floor(
+          new Date().setFullYear(new Date().getFullYear() + 4) / 1000
+        ),
+      };
+
+      await ResolvedReportModel.create(resolvedReport);
       await ReportModel.delete(address, geohash);
     }
 
