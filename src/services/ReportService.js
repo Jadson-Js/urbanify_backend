@@ -273,7 +273,11 @@ export default class ReportService {
     }
 
     if (report.childrens.length < 10) {
-      await this.uploadFile(report.id);
+      const user = await UserModel.getByEmail(this.user_email);
+
+      if (user.reports_id.length < 100) {
+        await this.uploadFile(report.id);
+      }
     }
 
     await UserModel.addReport(this.user_email, report.id);

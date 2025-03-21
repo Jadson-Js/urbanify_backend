@@ -137,6 +137,32 @@ class Validator {
       );
     }
 
+    // Limites definidos
+    const limiteEsquerdo = -50;
+    const limiteDireito = -40;
+    const limiteInferior = -10;
+    const limiteSuperior = -1;
+
+    // Função para validar as coordenadas
+    function validarCoordenadas() {
+      console.log(parseFloat(coordinates.longitude));
+      return (
+        parseFloat(coordinates.longitude) >= limiteEsquerdo &&
+        parseFloat(coordinates.longitude) <= limiteDireito &&
+        parseFloat(coordinates.latitude) >= limiteInferior &&
+        parseFloat(coordinates.latitude) <= limiteSuperior
+      );
+    }
+
+    // Verificar e exibir a resposta
+    if (!validarCoordenadas()) {
+      throw new AppError(
+        400, // Appropriate HTTP status code for invalid coordinates
+        "Coordinates out of service area", // Main message indicating invalid coordinates
+        "The provided coordinates are outside the service area." // Detailed explanation emphasizing the issue
+      );
+    }
+
     next();
   }
 
