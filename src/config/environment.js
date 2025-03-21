@@ -4,6 +4,13 @@ import dotenv from "dotenv";
 // SETUP
 dotenv.config();
 
+export const rateLimitConfig = {
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // Máximo de 100 requisições por IP
+  message: "Too many requests, please try again later.",
+  headers: true,
+};
+
 export const dynamoConfig = {
   region: process.env.AWS_REGION,
   endpoint: process.env.DYNAMODB_ENDPOINT,

@@ -3,6 +3,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import "express-async-errors"; // Biblioteca que captura erros assincrono
+import rateLimit from "express-rate-limit";
+import { rateLimitConfig } from "../config/environment.js";
 
 // IMPORTANDO ROTAS
 import usersRoutes from "./routes/userRoutes.js";
@@ -14,8 +16,10 @@ import errorMiddleware from "./middlewares/errorMiddleware.js";
 
 // SETUP
 const app = express();
+const limiter = rateLimit(rateLimitConfig);
 app.use(cors());
 app.use(bodyParser.json());
+app.use(limiter);
 
 // INSTANCIANDO AS ROTAS
 app.use("/user", usersRoutes);
