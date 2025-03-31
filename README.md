@@ -102,7 +102,7 @@ Authorization: Bearer SEU_TOKEN
 
 ```
 {
-	"message": "Reports retrieved successfully",
+	"message": "Users retrieved successfully",
 	"reports": [
 		{
 			"created_at": "2025-03-31T12:36:09.809Z",
