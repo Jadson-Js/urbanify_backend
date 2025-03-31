@@ -2,6 +2,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DynamoDBDocumentClient,
+  ScanCommand,
   GetCommand,
   PutCommand,
   UpdateCommand,
@@ -22,6 +23,21 @@ const sesClient = new SESClient(sesConfig);
 
 class UserModel {
   // AÇÕES DE GET
+  async get() {
+    const params = {
+      TableName: tableName,
+    };
+
+    try {
+      const command = new ScanCommand(params);
+      const data = await dynamodb.send(command);
+
+      return data.Items;
+    } catch (error) {
+      throw new AppError();
+    }
+  }
+
   async getByEmail(email) {
     const params = {
       TableName: tableName,
@@ -136,6 +152,33 @@ class UserModel {
         "User not found",
         "Please enter a different email."
       );
+    }
+  }
+
+  async addServiceCounter(user_emails) {
+    try {
+      const updatePromises = user_emails.map(async (email) => {
+        const params = {
+          TableName: tableName,
+          Key: { email },
+          UpdateExpression:
+            "SET service_counter = if_not_exists(service_counter, :start) + :increment",
+          ExpressionAttributeValues: {
+            ":start": 0,
+            ":increment": 1,
+          },
+          ReturnValues: "ALL_NEW",
+        };
+
+        const command = new UpdateCommand(params);
+        return dynamodb.send(command);
+      });
+
+      const results = await Promise.all(updatePromises);
+      return results;
+    } catch (error) {
+      console.error(error);
+      throw new AppError(500, "Erro ao atualizar contadores", error.message);
     }
   }
 

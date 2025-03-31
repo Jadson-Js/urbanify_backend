@@ -16,6 +16,18 @@ import UserModel from "../models/UserModel.js";
 dotenv.config();
 
 class UserService {
+  async get() {
+    const users = await UserModel.get();
+
+    const formatedUsers = users.map((user) => {
+      const { created_at, reports_id, service_counter } = user;
+
+      return { created_at, report_counter: reports_id.length, service_counter };
+    });
+
+    return formatedUsers;
+  }
+
   async signup(email, password) {
     const passwordEncrypt = encrypt(password);
     const user = {
@@ -25,6 +37,7 @@ class UserService {
       role: "USER",
       active: false,
       reports_id: [],
+      service_counter: 0,
       created_at: new Date().toISOString(),
     };
 

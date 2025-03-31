@@ -42,11 +42,7 @@ class ReportModel {
 
       return data.Items;
     } catch (error) {
-      throw new AppError(
-        404, // Código de status apropriado para recursos ou usuários não encontrados
-        "User not found",
-        "Incorrect or non-existent email address."
-      );
+      throw new AppError();
     }
   }
 

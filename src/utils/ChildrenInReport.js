@@ -20,6 +20,16 @@ class ChildrenInReport {
 
     return findIndex;
   }
+
+  getAllEmailsInReport(report) {
+    const array = report.childrens;
+
+    const emails = array.map((child) => {
+      return child.user_email;
+    });
+
+    return emails;
+  }
 }
 
 export default new ChildrenInReport();

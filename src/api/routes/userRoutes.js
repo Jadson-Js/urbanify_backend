@@ -5,12 +5,15 @@ import express from "express";
 import UserController from "../controllers/UserController.js";
 
 // IMPORTANDO MIDDLEWARES
+import authMiddlewares from "../middlewares/authMiddlewares.js";
 import expressMiddleware from "../middlewares/expressMiddleware.js";
 
 // INSTANCIANDO O ROUTER
 const router = express.Router();
 
 // INSTANCIANDO ROTAS
+router.get("/", authMiddlewares("ADMIN"), UserController.get);
+
 router.post(
   "/signup",
   expressMiddleware.email(),

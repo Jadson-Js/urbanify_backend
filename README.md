@@ -89,6 +89,32 @@ Authorization: Bearer SEU_TOKEN
 
 ---
 
+### 🔹 BUSCAR USERS
+
+**GET** `/user`
+
+**_Request_**
+
+- Header
+  - `Authorization: Bearer SEU_TOKEN`
+
+**_Response_**
+
+```
+{
+	"message": "Reports retrieved successfully",
+	"reports": [
+		{
+			"created_at": "2025-03-31T12:36:09.809Z",
+			"report_counter": 3,
+			"service_counter": 1
+		}
+	]
+}
+```
+
+---
+
 ### 🔹 BUSCAR REPORTS
 
 **GET** `/report`

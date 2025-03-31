@@ -11,13 +11,13 @@ const environment = {
       email: "vakeiro20051965@gmail.com",
       password: "admin123",
       access:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZha2Vpcm8yMDA1MTk2NUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJhY3RpdmUiOnRydWUsImlhdCI6MTc0MTYxNzI1OCwiZXhwIjoxNzQ0MjA5MjU4fQ.u9aV6YyBy7RMUQchInK6Nh4MufU88v-3NIsRXxQFxvs",
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInJvbGUiOiJBRE1JTiIsImFjdGl2ZSI6dHJ1ZSwiaWF0IjoxNzQzNDI4ODA5LCJleHAiOjE3NDYwMjA4MDl9.P18A3nH3DH9HJ5gTIIF1Bs7sejuK8dcIKs_T7Y9oD0E",
     },
     user2: {
       email: "wisdombigrobotcompany@gmail.com",
       password: "admin123",
       access:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Indpc2RvbWJpZ3JvYm90Y29tcGFueUBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImFjdGl2ZSI6dHJ1ZSwiaWF0IjoxNzQxNjE3MjgzLCJleHAiOjE3NDQyMDkyODN9.3WhwFdV8Cf5M6YlkXaW9pkdiTYAFIRTG1cy2gJFnxS4",
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphZHNvbjIwMDUxOTY1QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiYWN0aXZlIjp0cnVlLCJpYXQiOjE3NDM0Mjg4MzksImV4cCI6MTc0NjAyMDgzOX0.kMVVGxyMnnUhi9Ffau_bIHwNs8L-p-09rcbCeUSzHVY",
     },
   },
 
@@ -195,5 +195,25 @@ describe("Report Routes", () => {
       .set("Authorization", environment.users.user2.access);
 
     expect(response.statusCode).toBe(204);
+  });
+
+  test("Buscar todos users com user 1", async () => {
+    const response = await supertest(app)
+      .get("/user")
+      .set("Authorization", environment.users.user1.access);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.users).toBeInstanceOf(Array);
+  });
+
+  test("Buscar todos resolved_reports com user 1", async () => {
+    const response = await supertest(app)
+      .get("/resolved")
+      .set("Authorization", environment.users.user1.access);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.reports).toBeInstanceOf(Array);
   });
 });

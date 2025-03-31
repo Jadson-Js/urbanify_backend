@@ -2,6 +2,11 @@
 import UserService from "../../services/UserService.js";
 
 class UserController {
+  async get(req, res) {
+    const users = await UserService.get();
+    res.status(200).json({ message: "Users retrieved successfully", users });
+  }
+
   async signup(req, res) {
     const { email, password } = req.body;
 

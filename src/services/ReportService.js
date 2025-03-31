@@ -98,7 +98,8 @@ export default class ReportService {
 
     const reportsFormatted = reports.map((report) => {
       const childrenFormatted = report.childrens.map(
-        ({ severity, created_at }) => ({
+        ({ user_email, severity, created_at }) => ({
+          user_email,
           severity,
           created_at,
         })
@@ -229,6 +230,9 @@ export default class ReportService {
         ),
       };
 
+      const user_emails = ChildrenInReport.getAllEmailsInReport(report);
+
+      await UserModel.addServiceCounter(user_emails);
       await ResolvedReportModel.create(resolvedReport);
       await ReportModel.delete(address, geohash);
     }
