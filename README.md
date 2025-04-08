@@ -89,6 +89,31 @@ Authorization: Bearer SEU_TOKEN
 
 ---
 
+### 🔹 AUTH GOOGLE
+
+**POST** `/user/auth/google`
+
+**_Request_**
+
+- Header
+
+  - `Content-Type: application/json`
+
+- Body
+  - `authToken: (String)`
+
+**_Response_**
+
+```
+{
+	"message": "Login successful",
+	"accessToken": "123456789",
+	"refreshToken": "123456789"
+}
+```
+
+---
+
 ### 🔹 BUSCAR USERS
 
 **GET** `/user`
@@ -302,10 +327,13 @@ Authorization: Bearer SEU_TOKEN
 - Header
 
   - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: application/json`
+  - `Content-Type: multipart/form-data`
 
 - Body
-  - `status: (Number)`
+  - file
+    - `(Arquivo)`
+  - Data
+    - `status: (Number)
 
 **_Response_**
 
