@@ -85,21 +85,6 @@ class UserModel {
     }
   }
 
-  async sendEmail(params) {
-    try {
-      const command = new SendEmailCommand(params);
-      const data = await sesClient.send(command);
-
-      return data;
-    } catch (err) {
-      throw new AppError(
-        400, // Código de status apropriado para entrada de dados inválida
-        "Email not sent",
-        "The email was not sent."
-      );
-    }
-  }
-
   // AÇÕES DE UPDATE
   async active(email) {
     const params = {
@@ -179,33 +164,6 @@ class UserModel {
     } catch (error) {
       console.error(error);
       throw new AppError(500, "Erro ao atualizar contadores", error.message);
-    }
-  }
-
-  async updatePassword(email, password) {
-    const params = {
-      TableName: tableName,
-      Key: {
-        email: email,
-      },
-      UpdateExpression: "SET password = :password",
-      ExpressionAttributeValues: {
-        ":password": password,
-      },
-      ReturnValues: "ALL_NEW",
-    };
-
-    try {
-      const command = new UpdateCommand(params);
-      const putReportId = await dynamodb.send(command);
-
-      return putReportId;
-    } catch (error) {
-      throw new AppError(
-        404, // Código de status apropriado para recursos ou usuários não encontrados
-        "User not found",
-        "Please enter a different email."
-      );
     }
   }
 }

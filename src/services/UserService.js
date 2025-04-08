@@ -48,36 +48,6 @@ class UserService {
     return { id: user.id, email: user.email };
   }
 
-  async sendConfirmEmail(email, user) {
-    const token = JWT.generate(user);
-
-    const params = Tamplate.emailConfirm(email, token);
-
-    await UserModel.sendEmail(params);
-  }
-
-  async verifyEmailToken(accessToken) {
-    jwt.verify(
-      accessToken,
-      process.env.JWT_SECRET_ACCESS,
-      async (error, decoded) => {
-        if (error) {
-          throw new AppError(
-            400, // Código de status apropriado para entrada de dados inválida
-            "Invalid token",
-            "The token sent was invalid."
-          );
-        } else {
-          await UserModel.active(decoded.email);
-        }
-      }
-    );
-
-    const response = Tamplate.responseConfirmEmail();
-
-    return response;
-  }
-
   async login(email, password) {
     const user = await this.verifyUserExist(email);
 
@@ -101,24 +71,6 @@ class UserService {
     const accessToken = JWT.generateAccess(refreshToken);
 
     return accessToken;
-  }
-
-  async sendEmailToResetPassword(email) {
-    const user = await this.verifyUserExist(email);
-
-    const params = Tamplate.emailResetPassword(email, JWT.generateJWT(user));
-
-    return await UserModel.sendEmail(params);
-  }
-
-  async formToResetPassword(token) {
-    await JWT.verify(token);
-
-    return Tamplate.responseResetPasswordForm(token);
-  }
-
-  async resetPassword(data) {
-    await UserModel.updatePassword(data.user_email, encrypt(data.new_password));
   }
 
   // UTILS PARA A CLASSE

@@ -22,13 +22,6 @@ router.post(
   UserController.signup
 );
 
-router.get(
-  "/verify/email/token/:accessToken",
-  expressMiddleware.accessToken(),
-  expressMiddleware.validate,
-  UserController.verifyEmailToken
-);
-
 router.post(
   "/login",
   expressMiddleware.email(),
@@ -42,27 +35,6 @@ router.post(
   expressMiddleware.refreshToken(),
   expressMiddleware.validate,
   UserController.generateAccessToken
-);
-
-router.post(
-  "/forgot-password",
-  expressMiddleware.email(),
-  expressMiddleware.validate,
-  UserController.sendEmailToResetPassword
-);
-
-router.get(
-  "/reset-password/token/:accessToken",
-  expressMiddleware.accessToken(),
-  expressMiddleware.validate,
-  UserController.formToResetPassword
-);
-
-router.post(
-  "/reset-password",
-  expressMiddleware.newPassword(),
-  expressMiddleware.validate,
-  UserController.resetPassword
 );
 
 export default router;
