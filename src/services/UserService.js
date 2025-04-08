@@ -42,6 +42,24 @@ class UserService {
     return { id: user.id, email: user.email };
   }
 
+  async signupOLD(email, password) {
+    const passwordEncrypt = encrypt(password);
+    const user = {
+      id: crypto.randomUUID(),
+      email: email,
+      password: passwordEncrypt,
+      role: "USER",
+      active: true,
+      reports_id: [],
+      service_counter: 0,
+      created_at: new Date().toISOString(),
+    };
+
+    await UserModel.signup(user);
+
+    return { id: user.id, email: user.email };
+  }
+
   async login(email) {
     const user = await this.verifyUserExist(email);
 
@@ -55,6 +73,25 @@ class UserService {
 
     user.token = JWT.generate(user);
     return user;
+  }
+
+  async loginOLD(email, password) {
+    const user = await this.verifyUserExist(email);
+
+    if (user.active == false) {
+      throw new AppError(
+        401, // Código de status apropriado para erros de autorização
+        "User email is pending",
+        "User email is pending."
+      );
+    }
+
+    const passwordDecrypt = decrypt(user.password);
+
+    if (password === passwordDecrypt) {
+      user.token = JWT.generate(user);
+      return user;
+    }
   }
 
   async generateAccessToken(refreshToken) {

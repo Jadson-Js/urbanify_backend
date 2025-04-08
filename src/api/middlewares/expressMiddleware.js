@@ -22,6 +22,23 @@ class Validator {
     });
   }
 
+  password() {
+    return checkSchema({
+      password: {
+        isString: {
+          errorMessage: "The password must be a string", // Ensures the token is provided as a valid string
+        },
+        isLength: {
+          options: { min: 2, max: 64 },
+          errorMessage: "The token must be between 2 and 64 characters long", // Specifies the valid length for the token
+        },
+        notEmpty: {
+          errorMessage: "Please provide the password", // Informs the user to include the token
+        },
+      },
+    });
+  }
+
   accessToken() {
     return checkSchema({
       accessToken: {
