@@ -7,22 +7,16 @@ class UserController {
     res.status(200).json({ message: "Users retrieved successfully", users });
   }
 
-  async signup(req, res) {
-    const { email, password } = req.body;
+  async authGoogle(req, res) {
+    const { authToken } = req.body;
 
-    const user = await UserService.signup(email, password);
-    res.status(201).json({ message: "User created successfully", user });
-  }
-
-  async login(req, res) {
-    const { email, password } = req.body;
-
-    const user = await UserService.login(email, password);
+    const user = await UserService.authGoogle(authToken);
 
     res.status(200).json({
       message: "Login successful",
-      accessToken: user.token.access,
-      refreshToken: user.token.refresh,
+      user,
+      // accessToken: user.token.access,
+      // refreshToken: user.token.refresh,
     });
   }
 

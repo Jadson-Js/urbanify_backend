@@ -22,40 +22,6 @@ class Validator {
     });
   }
 
-  password() {
-    return checkSchema({
-      password: {
-        isString: {
-          errorMessage: "Password must be a string", // Message for ensuring password is a valid string
-        },
-        isLength: {
-          options: { min: 6, max: 64 },
-          errorMessage: "Password must be between 6 and 64 characters long", // Detailed message about length requirements
-        },
-        notEmpty: {
-          errorMessage: "Please provide the password", // Message for missing password input
-        },
-      },
-    });
-  }
-
-  newPassword() {
-    return checkSchema({
-      new_password: {
-        isString: {
-          errorMessage: "Password must be a string", // Ensures the input is a valid string
-        },
-        isLength: {
-          options: { min: 6, max: 64 },
-          errorMessage: "Password must be between 6 and 64 characters long", // Specifies the acceptable password length
-        },
-        notEmpty: {
-          errorMessage: "Please provide the password", // Informs the user to fill in the password field
-        },
-      },
-    });
-  }
-
   accessToken() {
     return checkSchema({
       accessToken: {
@@ -81,6 +47,23 @@ class Validator {
         },
         isLength: {
           options: { min: 10, max: 600 },
+          errorMessage: "The token must be between 10 and 600 characters long", // Specifies the valid length for the refresh token
+        },
+        notEmpty: {
+          errorMessage: "Please provide the token", // Informs the user to fill in the refresh token field
+        },
+      },
+    });
+  }
+
+  authToken() {
+    return checkSchema({
+      authToken: {
+        isString: {
+          errorMessage: "The token must be a string", // Ensures the refresh token is provided as a valid string
+        },
+        isLength: {
+          options: { min: 10, max: 5000 },
           errorMessage: "The token must be between 10 and 600 characters long", // Specifies the valid length for the refresh token
         },
         notEmpty: {

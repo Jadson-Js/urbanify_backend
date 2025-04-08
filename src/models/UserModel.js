@@ -8,9 +8,14 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+import { OAuth2Client } from "google-auth-library";
 
 // IMPORTANDO CONFIGS
-import { dynamoConfig, sesConfig } from "../config/environment.js";
+import {
+  dynamoConfig,
+  sesConfig,
+  GOOGLE_CLIENT_ID,
+} from "../config/environment.js";
 
 // IMPORTANDO UTILS
 import AppError from "../utils/AppError.js";
@@ -20,6 +25,7 @@ const tableName = "users";
 const client = new DynamoDBClient(dynamoConfig);
 const dynamodb = DynamoDBDocumentClient.from(client);
 const sesClient = new SESClient(sesConfig);
+const clientGoogle = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 class UserModel {
   // AÇÕES DE GET
@@ -82,6 +88,26 @@ class UserModel {
       );
 
       // Informa status code, error e uma mensagem
+    }
+  }
+
+  async authGoogle(authToken) {
+    try {
+      const ticket = await clientGoogle.verifyIdToken({
+        idToken: authToken,
+        audience: GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      const { email } = payload;
+
+      // Simula cadastro/login (aqui entraria seu banco)
+
+      return email;
+    } catch (err) {
+      console.log(err);
+
+      throw new AppError();
     }
   }
 

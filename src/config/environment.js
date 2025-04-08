@@ -56,3 +56,5 @@ export const ReportSeverity = Object.freeze({
   GRAVE: 0,
   MODERADO: 1,
 });
+
+export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;

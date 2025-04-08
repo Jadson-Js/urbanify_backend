@@ -1,12 +1,10 @@
 // IMPORTANDO DEPENDENCIAS
 import crypto from "crypto";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 // IMPORTANDO UTILS
 import JWT from "../utils/JWT.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
-import Tamplate from "../utils/Tamplate.js";
 import AppError from "../utils/AppError.js";
 
 // IMPORTANDO MODELS
@@ -28,27 +26,23 @@ class UserService {
     return formatedUsers;
   }
 
-  async signup(email, password) {
-    const passwordEncrypt = encrypt(password);
+  async signup(email) {
     const user = {
       id: crypto.randomUUID(),
       email: email,
-      password: passwordEncrypt,
       role: "USER",
-      active: false,
+      active: true,
       reports_id: [],
       service_counter: 0,
       created_at: new Date().toISOString(),
     };
-
-    await this.sendConfirmEmail(email, user);
 
     await UserModel.signup(user);
 
     return { id: user.id, email: user.email };
   }
 
-  async login(email, password) {
+  async login(email) {
     const user = await this.verifyUserExist(email);
 
     if (user.active == false) {
@@ -59,18 +53,27 @@ class UserService {
       );
     }
 
-    const passwordDecrypt = decrypt(user.password);
-
-    if (password === passwordDecrypt) {
-      user.token = JWT.generate(user);
-      return user;
-    }
+    user.token = JWT.generate(user);
+    return user;
   }
 
   async generateAccessToken(refreshToken) {
     const accessToken = JWT.generateAccess(refreshToken);
 
     return accessToken;
+  }
+
+  async authGoogle(authToken) {
+    const email_user = await UserModel.authGoogle(authToken);
+
+    console.log(email_user);
+    const user = await UserModel.getByEmail(email_user);
+
+    if (!user) await this.signup(email_user);
+
+    const response = this.login(email_user);
+
+    return response;
   }
 
   // UTILS PARA A CLASSE

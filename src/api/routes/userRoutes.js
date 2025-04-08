@@ -15,19 +15,10 @@ const router = express.Router();
 router.get("/", authMiddlewares("ADMIN"), UserController.get);
 
 router.post(
-  "/signup",
-  expressMiddleware.email(),
-  expressMiddleware.password(),
+  "/auth/google",
+  expressMiddleware.authToken(),
   expressMiddleware.validate,
-  UserController.signup
-);
-
-router.post(
-  "/login",
-  expressMiddleware.email(),
-  expressMiddleware.password(),
-  expressMiddleware.validate,
-  UserController.login
+  UserController.authGoogle
 );
 
 router.post(
