@@ -198,6 +198,26 @@ export default class ReportService {
     return ReportModel.uploadFile(putData);
   }
 
+  async uploadFileToResolved({ report_id, file }) {
+    const key = `${this.date}-${file.originalname}`;
+
+    // Processa a imagem com Sharp (redimensiona e comprime)
+    const imageBuffer = await sharp(file.buffer)
+      .resize(500) // Redimensiona para 200px
+      .jpeg({ quality: 100 }) // Comprime para JPEG qualidade 1
+      .toBuffer();
+
+    const putData = {
+      Bucket: process.env.S3_BUCKET_RESOLVED,
+      Key: `${report_id}/${key}`,
+      StorageClass: "STANDARD",
+      Body: imageBuffer,
+      ContentType: "image/jpeg",
+    };
+
+    return ReportModel.uploadFile(putData);
+  }
+
   // AÇÕES DE UPDATE
   async addChildren() {
     const { reportFormated: report, childrenFormated: children } = this;
@@ -216,15 +236,20 @@ export default class ReportService {
   }
 
   async updateStatus() {
-    const { id, address, geohash, status } = await ReportModel.updateStatus(
-      this.update
-    );
+    const { file, status, address, geohash } = this.update;
+
+    if (status === 1) {
+      await ReportModel.updateStatus(this.update);
+    }
 
     if (status === 2) {
       const report = await this.verifyReportExist(address, geohash);
 
+      await this.uploadFileToResolved({ report_id: report.id, file });
+
       const resolvedReport = {
         ...report,
+        status: 2,
         expiration_timestamp: Math.floor(
           new Date().setFullYear(new Date().getFullYear() + 4) / 1000
         ),
@@ -238,7 +263,7 @@ export default class ReportService {
     }
 
     // Resposta final
-    const report = { id, address, geohash, status };
+    const report = { address, geohash, status };
 
     return report;
   }

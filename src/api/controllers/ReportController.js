@@ -80,11 +80,11 @@ class ReportController {
   }
 
   async updateStatus(req, res) {
-    const { status } = req.body;
+    const status = Number(req.body.status);
     const { address, geohash } = req.params;
 
     const data = {
-      update: { status, address, geohash },
+      update: { file: req.file, status, address, geohash },
     };
 
     const reportService = new ReportService(data);

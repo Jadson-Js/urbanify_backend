@@ -145,7 +145,6 @@ class Validator {
 
     // Função para validar as coordenadas
     function validarCoordenadas() {
-      console.log(parseFloat(coordinates.longitude));
       return (
         parseFloat(coordinates.longitude) >= limiteEsquerdo &&
         parseFloat(coordinates.longitude) <= limiteDireito &&
@@ -160,6 +159,28 @@ class Validator {
         400, // Appropriate HTTP status code for invalid coordinates
         "Coordinates out of service area", // Main message indicating invalid coordinates
         "The provided coordinates are outside the service area." // Detailed explanation emphasizing the issue
+      );
+    }
+
+    next();
+  }
+
+  pathReport(req, res, next) {
+    const status = Number(req.body.status);
+
+    if (!status) {
+      throw new AppError(
+        400, // Appropriate HTTP status code for missing required fields
+        "Fields not provided", // Main message indicating missing fields
+        `'status' are required fields.` // Detailed explanation emphasizing the importance of the fields
+      );
+    }
+
+    if (status != 1 && status != 2) {
+      throw new AppError(
+        400, // Appropriate HTTP status code for invalid input length
+        "Invalid character count", // Main message indicating an issue with field length
+        `The field 'status' must contain between 1 and 2 values.` // Detailed message specifying the valid character range
       );
     }
 

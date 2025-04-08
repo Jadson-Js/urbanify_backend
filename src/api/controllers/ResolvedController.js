@@ -26,6 +26,23 @@ class ResolvedController {
       report,
     });
   }
+
+  async getRegistration(req, res) {
+    const { id, created_at } = req.params;
+
+    const data = {
+      keys: { id, created_at },
+    };
+
+    const resolvedService = new ResolvedService(data);
+
+    const url = await resolvedService.getRegistration();
+
+    res.status(200).json({
+      message: "Busca feita com sucesso!",
+      url,
+    });
+  }
 }
 
 export default new ResolvedController();

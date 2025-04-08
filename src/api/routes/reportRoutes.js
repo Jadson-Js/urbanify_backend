@@ -43,12 +43,14 @@ router.post(
   ReportController.create
 );
 
+// Vai receber como conteudo um form-data contendo uma imagem
 router.patch(
   "/address/:address/geohash/:geohash",
   authMiddlewares("ADMIN"),
+  uploadMiddlewares.single("file"),
+  expressMiddleware.pathReport,
   expressMiddleware.address(),
   expressMiddleware.geohash(),
-  expressMiddleware.status(),
   expressMiddleware.validate,
   ReportController.updateStatus
 );

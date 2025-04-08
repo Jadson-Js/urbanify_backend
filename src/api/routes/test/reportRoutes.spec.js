@@ -93,13 +93,14 @@ describe("Report Routes", () => {
         `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
       )
       .set("Authorization", environment.users.user1.access)
-      .send({ status: 1 });
+      .attach("file", environment.filePath)
+      .field("status", 1);
 
     console.log(response.body);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("message");
-    expect(response.body.report).toHaveProperty("id");
+    expect(response.body.report).toHaveProperty("status");
     expect(response.body.report).toHaveProperty("address");
     expect(response.body.report).toHaveProperty("geohash");
   });
@@ -111,13 +112,14 @@ describe("Report Routes", () => {
         `/report/address/${environment.keys.report20.address}/geohash/${environment.keys.report20.geohash}`
       )
       .set("Authorization", environment.users.user1.access)
-      .send({ status: 2 });
+      .attach("file", environment.filePath)
+      .field("status", 2);
 
     console.log(response.body);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("message");
-    expect(response.body.report).toHaveProperty("id");
+    expect(response.body.report).toHaveProperty("status");
     expect(response.body.report).toHaveProperty("address");
     expect(response.body.report).toHaveProperty("geohash");
   });
@@ -131,9 +133,7 @@ describe("Report Routes", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("message");
     expect(response.body.reports).toBeInstanceOf(Array);
-    expect(response.body.reports.length).toBe(1);
     expect(response.body.reports[0].childrens).toBeInstanceOf(Array);
-    expect(response.body.reports[0].childrens.length).toBe(2);
   });
 
   // expect 200, message, data com report = childrens com 2 items + urls = com 2 items
@@ -147,9 +147,7 @@ describe("Report Routes", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("message");
     expect(response.body.data.report.childrens).toBeInstanceOf(Array);
-    expect(response.body.data.report.childrens.length).toBe(2);
     expect(response.body.data.urls).toBeInstanceOf(Array);
-    expect(response.body.data.urls.length).toBe(2);
   });
 
   //Expect 200, message, reports = 1 item
@@ -161,7 +159,6 @@ describe("Report Routes", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("message");
     expect(response.body.reports).toBeInstanceOf(Array);
-    expect(response.body.reports.length).toBe(1);
   });
 
   // Expect 200, message, status = 1

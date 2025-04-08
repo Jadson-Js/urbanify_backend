@@ -81,7 +81,7 @@ class ResolvedModel {
       const urls = await Promise.all(
         Contents.map(async (item) => {
           const paramsToGet = {
-            Bucket: process.env.S3_BUCKET,
+            Bucket: process.env.S3_BUCKET_RESOLVED,
             Key: item.Key,
           };
 

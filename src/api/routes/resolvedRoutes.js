@@ -23,4 +23,13 @@ router.get(
   ResolvedController.getResolved
 );
 
+router.get(
+  "/registration/id/:id/created_at/:created_at",
+  authMiddlewares("USER"),
+  expressMiddleware.id(),
+  expressMiddleware.created_at(),
+  expressMiddleware.validate,
+  ResolvedController.getRegistration
+);
+
 export default router;

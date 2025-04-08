@@ -48,13 +48,32 @@ export default class ResolvedService {
     return { report, urls };
   }
 
+  async getRegistration() {
+    const report = await ResolvedModel.getByKeys(this.keys);
+
+    if (!report) {
+      throw new AppError(
+        404, // Código de status apropriado para recursos não encontrados
+        "Report not found",
+        "id and created_at were not found in the database."
+      );
+    }
+
+    const urls = await this.generatePresignedUrl(report.id);
+
+    return urls;
+  }
+
   async generatePresignedUrl(prefix) {
     const paramsToGet = {
-      Bucket: process.env.S3_BUCKET,
+      Bucket: process.env.S3_BUCKET_RESOLVED,
       Prefix: prefix,
     };
 
     const { Contents } = await ResolvedModel.getFilesByPrefix(paramsToGet);
+
+    console.log(Contents);
+
     const urls = await ResolvedModel.getPresignedUrl(Contents);
 
     return urls;
