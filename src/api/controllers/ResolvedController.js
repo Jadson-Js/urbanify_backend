@@ -36,11 +36,11 @@ class ResolvedController {
 
     const resolvedService = new ResolvedService(data);
 
-    const url = await resolvedService.getRegistration();
+    const urls = await resolvedService.getRegistration();
 
     res.status(200).json({
       message: "Busca feita com sucesso!",
-      url,
+      urls,
     });
   }
 }
