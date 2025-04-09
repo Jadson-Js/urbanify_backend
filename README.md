@@ -355,8 +355,121 @@ Authorization: Bearer SEU_TOKEN
 **_Request_**
 
 - Header
-
   - `Authorization: Bearer SEU_TOKEN`
+
+---
+
+### 🔹 BUSCAR REPORTS CONCLUIDOS
+
+**GET** `/resolved`
+
+**_Request_**
+
+- Header
+  - `Authorization: Bearer SEU_TOKEN`
+
+**_Response_**
+
+```
+{
+	"message": "Report retrieved successfully",
+	"report": {
+	  "district": "Rua Augusta",
+	  "created_at": "2025-03-31T13:47:59.470Z",
+	  "geohash": "5f8281e",
+	  "status": 2,
+	  "subregion": "São Paulo",
+	  "childrens": [
+	  	{
+	  		"severity": 1,
+	  		"created_at": "2025-03-31T13:47:59.470Z"
+	  	}
+	  ],
+	  "address": "São Paulo_Rua Augusta",
+	  "id": "tRQN1Z97pm40bKq",
+	  "expiration_timestamp": 1869659280,
+	  "coordinates": {
+	  	"latitude": "9.332163770071811",
+	  	"longitude": "-21.283837136673467"
+	  },
+	  "street": "Rua Agostinho"
+  }
+}
+```
+
+---
+
+### 🔹 BUSCAR REPORT CONCLUIDO
+
+**GET** `/resolved/id/:id/created_at/:created_at`
+
+**_Request_**
+
+- Header
+  - `Authorization: Bearer SEU_TOKEN`
+
+**_Response_**
+
+```
+{
+	"message": "Busca feita com sucesso!",
+	"report": {
+		"report": {
+			"district": "Bairro Fictício",
+			"created_at": "2000-01-01T00:00:00.000Z",
+			"falseId": "0000-00-00T00:00:00.000Z",
+			"geohash": "abcdefg",
+			"status": 0,
+			"subregion": "Região Inventada",
+			"childrens": [
+				{
+					"severity": 3,
+					"coordinates": {
+						"latitude": "-10.000000",
+						"longitude": "-50.000000"
+					},
+					"created_at": "2000-01-01T00:00:00.000Z",
+					"user_email": "exemplo@falso.com",
+					"s3_photo_key": "0000-00-00T00:00:00.000Z-FOTO.jpeg"
+				}
+			],
+			"address": "Rua Imaginária, Bairro Fictício",
+			"id": "XXXXXXXXXXXXXXX",
+			"expiration_timestamp": 9999999999,
+			"coordinates": {
+				"latitude": "-10.000000",
+				"longitude": "-50.000000"
+			},
+			"street": "Rua Inventada"
+		},
+		"urls": [
+			"https://exemplo-bucket-falso.s3.region.amazonaws.com/XXXXXXXXXXXXXXX/0000-00-00T00%3A00%3A00.000Z-FOTO.jpeg"
+		]
+	}
+}
+```
+
+---
+
+### 🔹 BUSCAR REGISTRO
+
+**GET** `/resolved/registration/id/:id/created_at/:created_at`
+
+**_Request_**
+
+- Header
+  - `Authorization: Bearer SEU_TOKEN`
+
+**_Response_**
+
+```
+{
+	"message": "Busca feita com sucesso!",
+	"urls": [
+		"https://exemplo-bucket-falso.s3.region.amazonaws.com/XXXXXXXXXXXXXXX/0000-00-00T00%3A00%3A00.000Z-FOTO.jpeg"
+	]
+}
+```
 
 ---
 
