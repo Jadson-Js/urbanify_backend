@@ -318,22 +318,14 @@ Authorization: Bearer SEU_TOKEN
 
 ---
 
-### 🔹 EDITAR STATUS REPORT
+### 🔹 EDITAR STATUS REPORT PARA AVALIADO
 
 **PATCH** `/report/address/:reportAddress/geohash/:reportGeohash`
 
 **_Request_**
 
 - Header
-
   - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: multipart/form-data`
-
-- Body
-  - file
-    - `(Arquivo)`
-  - Data
-    - `status: (Number)
 
 **_Response_**
 
@@ -347,6 +339,40 @@ Authorization: Bearer SEU_TOKEN
 	}
 }
 ```
+
+---
+
+### 🔹 EDITAR STATUS REPORT PARA CONCLUIDO
+
+**PATCH** `/report/repaired`
+
+**_Request_**
+
+- Header
+
+  - `Authorization: Bearer SEU_TOKEN`
+  - `Content-Type: multipart/form-data`
+
+- Body
+  - file
+    - `(Arquivo)`
+  - Data
+    - `{ "subregion": (String), "district": (String), "street": (String), "severity": (Number), "coordinates": { "latitude": (String), "longitude": (String) }}`
+
+**_Response_**
+
+```
+{
+	"message": "Report status updated successfully",
+	"report": {
+		"address": "Campinas_São Paulo",
+		"geohash": "1234567",
+		"status": 2
+	}
+}
+```
+
+---
 
 ### 🔹 DELETAR REPORT
 

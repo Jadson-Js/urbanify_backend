@@ -47,12 +47,19 @@ router.post(
 router.patch(
   "/address/:address/geohash/:geohash",
   authMiddlewares("ADMIN"),
-  uploadMiddlewares.single("file"),
-  expressMiddleware.pathReport,
   expressMiddleware.address(),
   expressMiddleware.geohash(),
   expressMiddleware.validate,
   ReportController.updateStatus
+);
+
+router.patch(
+  "/repaired",
+  authMiddlewares("ADMIN"),
+  uploadMiddlewares.single("file"),
+  expressMiddleware.postReport,
+  expressMiddleware.validate,
+  ReportController.repaired
 );
 
 router.delete(

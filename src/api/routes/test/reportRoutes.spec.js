@@ -92,9 +92,7 @@ describe("Report Routes", () => {
       .patch(
         `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
       )
-      .set("Authorization", environment.users.user1.access)
-      .attach("file", environment.filePath)
-      .field("status", 1);
+      .set("Authorization", environment.users.user1.access);
 
     console.log(response.body);
 
@@ -108,12 +106,10 @@ describe("Report Routes", () => {
   // Expect 200, message, report: id, address, geohash, status 2
   test("Editar report 20 com user 1 status 2", async () => {
     const response = await supertest(app)
-      .patch(
-        `/report/address/${environment.keys.report20.address}/geohash/${environment.keys.report20.geohash}`
-      )
+      .patch(`/report/repaired`)
       .set("Authorization", environment.users.user1.access)
-      .attach("file", environment.filePath)
-      .field("status", 2);
+      .field("data", environment.reports.report20)
+      .attach("file", environment.filePath);
 
     console.log(response.body);
 

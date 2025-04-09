@@ -72,8 +72,6 @@ export default class ResolvedService {
 
     const { Contents } = await ResolvedModel.getFilesByPrefix(paramsToGet);
 
-    console.log(Contents);
-
     const urls = await ResolvedModel.getPresignedUrl(Contents);
 
     return urls;

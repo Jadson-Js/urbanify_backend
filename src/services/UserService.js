@@ -103,7 +103,6 @@ class UserService {
   async authGoogle(authToken) {
     const email_user = await UserModel.authGoogle(authToken);
 
-    console.log(email_user);
     const user = await UserModel.getByEmail(email_user);
 
     if (!user) await this.signup(email_user);

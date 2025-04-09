@@ -80,15 +80,29 @@ class ReportController {
   }
 
   async updateStatus(req, res) {
-    const status = Number(req.body.status);
     const { address, geohash } = req.params;
 
     const data = {
-      update: { file: req.file, status, address, geohash },
+      update: { address, geohash },
     };
 
     const reportService = new ReportService(data);
     const report = await reportService.updateStatus();
+
+    res.status(200).json({
+      message: "Report status updated successfully",
+      report,
+    });
+  }
+
+  async repaired(req, res) {
+    const data = {
+      form: JSON.parse(req.body.data),
+      file: req.file,
+    };
+
+    const reportService = new ReportService(data);
+    const report = await reportService.repaired();
 
     res.status(200).json({
       message: "Report status updated successfully",

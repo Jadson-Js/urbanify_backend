@@ -198,18 +198,15 @@ export default class ReportService {
     return ReportModel.uploadFile(putData);
   }
 
-  async uploadFileToResolved({ report_id, file }) {
-    const key = `${this.date}-${file.originalname}`;
-
-    // Processa a imagem com Sharp (redimensiona e comprime)
-    const imageBuffer = await sharp(file.buffer)
-      .resize(500) // Redimensiona para 200px
+  async uploadFileToResolved(report_id) {
+    const imageBuffer = await sharp(this.file.image.buffer)
+      .resize(600) // Redimensiona para 200px
       .jpeg({ quality: 100 }) // Comprime para JPEG qualidade 1
       .toBuffer();
 
     const putData = {
       Bucket: process.env.S3_BUCKET_RESOLVED,
-      Key: `${report_id}/${key}`,
+      Key: `${report_id}/${this.file.key}`,
       StorageClass: "STANDARD",
       Body: imageBuffer,
       ContentType: "image/jpeg",
@@ -236,36 +233,41 @@ export default class ReportService {
   }
 
   async updateStatus() {
-    const { file, status, address, geohash } = this.update;
+    const { address, geohash } = this.update;
 
-    if (status === 1) {
-      await ReportModel.updateStatus(this.update);
-    }
-
-    if (status === 2) {
-      const report = await this.verifyReportExist(address, geohash);
-
-      await this.uploadFileToResolved({ report_id: report.id, file });
-
-      const resolvedReport = {
-        ...report,
-        status: 2,
-        expiration_timestamp: Math.floor(
-          new Date().setFullYear(new Date().getFullYear() + 4) / 1000
-        ),
-      };
-
-      const user_emails = ChildrenInReport.getAllEmailsInReport(report);
-
-      await UserModel.addServiceCounter(user_emails);
-      await ResolvedReportModel.create(resolvedReport);
-      await ReportModel.delete(address, geohash);
-    }
+    await ReportModel.updateStatus({ address, geohash, status: 1 });
 
     // Resposta final
-    const report = { address, geohash, status };
+    const report = { address, geohash, status: 1 };
 
     return report;
+  }
+
+  async repaired() {
+    const { address, geohash } = this.formDataToReport();
+
+    const report = await this.verifyReportExist(address, geohash);
+
+    await this.uploadFileToResolved(report.id);
+
+    const resolvedReport = {
+      ...report,
+      status: 2,
+      expiration_timestamp: Math.floor(
+        new Date().setFullYear(new Date().getFullYear() + 4) / 1000
+      ),
+    };
+
+    const user_emails = ChildrenInReport.getAllEmailsInReport(report);
+
+    await UserModel.addServiceCounter(user_emails);
+    await ResolvedReportModel.create(resolvedReport);
+    await ReportModel.delete(address, geohash);
+
+    // Resposta final
+    const response = { address, geohash, status: 2 };
+
+    return response;
   }
 
   // AÇÕES DE DELETE
