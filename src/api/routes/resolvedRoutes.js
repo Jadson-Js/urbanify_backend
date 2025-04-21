@@ -12,11 +12,11 @@ import ResolvedController from "../controllers/ResolvedController.js";
 const router = express.Router();
 
 // INSTANCIANDO ROTAS
-router.get("/", authMiddlewares(["ADMIN", "USER"]), ResolvedController.get);
+router.get("/", authMiddlewares(["ADMIN"]), ResolvedController.get);
 
 router.get(
   "/id/:id/created_at/:created_at",
-  authMiddlewares(["ADMIN", "USER"]),
+  authMiddlewares(["ADMIN"]),
   expressMiddleware.id(),
   expressMiddleware.created_at(),
   expressMiddleware.validate,
@@ -25,7 +25,7 @@ router.get(
 
 router.get(
   "/registration/id/:id/created_at/:created_at",
-  authMiddlewares(["USER"]),
+  authMiddlewares(["ADMIN", "USER"]),
   expressMiddleware.id(),
   expressMiddleware.created_at(),
   expressMiddleware.validate,

@@ -51,7 +51,7 @@ class ReportModel {
       TableName: tableName,
       FilterExpression: reports_id.map((_, i) => `id = :id${i}`).join(" OR "),
       ExpressionAttributeValues: Object.fromEntries(
-        reports_id.map((id, i) => [`:id${i}`, id])
+        reports_id.map((id, i) => [`:id${i}`, id]),
       ),
     };
 
@@ -63,7 +63,7 @@ class ReportModel {
       throw new AppError(
         404, // Código de status apropriado para recursos ou relatórios não encontrados
         "Report not found",
-        "Malformed or non-existent report ID."
+        "Malformed or non-existent report ID.",
       );
     }
   }
@@ -86,7 +86,7 @@ class ReportModel {
       throw new AppError(
         404, // Código de status apropriado para recursos não encontrados
         "Report not found",
-        "Address and Geohash were malformed or not found."
+        "Address and Geohash were malformed or not found.",
       );
     }
   }
@@ -100,7 +100,7 @@ class ReportModel {
       throw new AppError(
         404, // Código de status apropriado para recursos não encontrados
         "Prefixes not found",
-        "Please try another prefix later."
+        "Please try another prefix later.",
       );
     }
   }
@@ -117,7 +117,7 @@ class ReportModel {
           const command = new GetObjectCommand(paramsToGet);
           const url = await getSignedUrl(s3Client, command, { expiresIn: 300 });
           return url;
-        })
+        }),
       );
 
       return urls;
@@ -125,7 +125,7 @@ class ReportModel {
       throw new AppError(
         400, // Código de status apropriado para entrada de dados inválida
         "Malformed prefix",
-        "The prefix was not provided or is malformed."
+        "The prefix was not provided or is malformed.",
       );
     }
   }
@@ -147,7 +147,7 @@ class ReportModel {
       throw new AppError(
         400, // Código de status apropriado para entrada de dados inválida
         "File not sent",
-        "The file may be corrupted."
+        "The file may be corrupted.",
       );
     }
   }
@@ -161,7 +161,7 @@ class ReportModel {
       throw new AppError(
         400, // Código de status apropriado para erros de entrada de dados inválidos
         "File not sent",
-        "The file may be corrupted."
+        "The file may be corrupted.",
       );
     }
   }
@@ -189,7 +189,7 @@ class ReportModel {
       throw new AppError(
         400, // Código de status apropriado para entrada de dados inválida
         "Malformed children",
-        "The report or children may be malformed."
+        "The report or children may be malformed.",
       );
     }
   }
@@ -219,7 +219,7 @@ class ReportModel {
       throw new AppError(
         400, // Código de status apropriado para entrada de dados inválida
         "Malformed parameters",
-        "The parameters were malformed."
+        "The parameters were malformed.",
       );
     }
   }
@@ -244,7 +244,7 @@ class ReportModel {
       throw new AppError(
         400, // Código de status apropriado para entrada de dados inválida
         "Malformed Index or Location",
-        "Address, Geohash, or children may be malformed."
+        "Address, Geohash, or children may be malformed.",
       );
     }
   }
@@ -266,7 +266,7 @@ class ReportModel {
       throw new AppError(
         404, // Código de status apropriado para recursos não encontrados
         "Report not found",
-        "Address or Geohash may be malformed."
+        "Address or Geohash may be malformed.",
       );
     }
   }
@@ -274,7 +274,7 @@ class ReportModel {
   async deleteFiles(list) {
     try {
       const deleteResponse = await s3Client.send(
-        new DeleteObjectsCommand(list)
+        new DeleteObjectsCommand(list),
       );
 
       return deleteResponse;
@@ -282,7 +282,7 @@ class ReportModel {
       throw new AppError(
         400, // Código de status apropriado para entrada de dados inválida
         "Malformed list",
-        "The file list was not found or is malformed."
+        "The file list was not found or is malformed.",
       );
     }
   }

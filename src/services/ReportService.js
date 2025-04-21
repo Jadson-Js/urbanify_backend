@@ -114,6 +114,29 @@ export default class ReportService {
     return reportsFormatted;
   }
 
+  async getEvaluated() {
+    const reports = await ReportModel.get();
+
+    const reportsFormatted = reports.map((report) => {
+      if (report.status !== 1) return;
+
+      const childrenFormatted = report.childrens.map(
+        ({ user_email, severity, created_at }) => ({
+          user_email,
+          severity,
+          created_at,
+        }),
+      );
+
+      return {
+        ...report,
+        childrens: childrenFormatted,
+      };
+    });
+
+    return reportsFormatted;
+  }
+
   async getReport() {
     const { address, geohash } = this.local;
     const report = await this.verifyReportExist(address, geohash);

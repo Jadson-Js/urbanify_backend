@@ -8,16 +8,22 @@ const environment = {
 
   users: {
     user1: {
+      email: "admin@admin.com",
+      password: "admin123",
+      access:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInJvbGUiOiJBRE1JTiIsImFjdGl2ZSI6dHJ1ZSwiaWF0IjoxNzQ1MjYyMzA1LCJleHAiOjE3NDc4NTQzMDV9.2hti2fhWs4TJSe7BTbQTnKNVOpt8h-nKUKmMhSUfyo8",
+    },
+    user2: {
+      email: "jadson20051965@gmail.com",
+      password: "admin123",
+      access:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphZHNvbjIwMDUxOTY1QGdtYWlsLmNvbSIsInJvbGUiOiJFTkdJTkVFUiIsImFjdGl2ZSI6dHJ1ZSwiaWF0IjoxNzQ1MjYyMzM1LCJleHAiOjE3NDc4NTQzMzV9.IrPtqSPggWilr00pZA33F1o-26VE3YTLWD1rxFaAagk",
+    },
+    user3: {
       email: "vakeiro20051965@gmail.com",
       password: "admin123",
       access:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInJvbGUiOiJBRE1JTiIsImFjdGl2ZSI6dHJ1ZSwiaWF0IjoxNzQzNDI4ODA5LCJleHAiOjE3NDYwMjA4MDl9.P18A3nH3DH9HJ5gTIIF1Bs7sejuK8dcIKs_T7Y9oD0E",
-    },
-    user2: {
-      email: "wisdombigrobotcompany@gmail.com",
-      password: "admin123",
-      access:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphZHNvbjIwMDUxOTY1QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiYWN0aXZlIjp0cnVlLCJpYXQiOjE3NDM0Mjg4MzksImV4cCI6MTc0NjAyMDgzOX0.kMVVGxyMnnUhi9Ffau_bIHwNs8L-p-09rcbCeUSzHVY",
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZha2Vpcm8yMDA1MTk2NUBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImFjdGl2ZSI6dHJ1ZSwiaWF0IjoxNzQ1MjYyMzUzLCJleHAiOjE3NDc4NTQzNTN9._aUCceYU1HCz1_8lr6hhjGg9wuFa6TK2fPxCsUMg7Yc",
     },
   },
 
@@ -53,10 +59,10 @@ describe("Report Routes", () => {
   });
 
   // Expect 201, message e report: id, address, geohash
-  test("Criar report 11 com user 2", async () => {
+  test("Criar report 11 com user 3", async () => {
     const response = await supertest(app)
       .post("/report")
-      .set("Authorization", environment.users.user2.access)
+      .set("Authorization", environment.users.user3.access)
       .field("data", environment.reports.report11)
       .attach("file", environment.filePath);
 
@@ -70,10 +76,10 @@ describe("Report Routes", () => {
   });
 
   // Expect 201, message e report: id, address, geohash
-  test("Criar report 20 com user 2", async () => {
+  test("Criar report 20 com user 3", async () => {
     const response = await supertest(app)
       .post("/report")
-      .set("Authorization", environment.users.user2.access)
+      .set("Authorization", environment.users.user3.access)
       .field("data", environment.reports.report20)
       .attach("file", environment.filePath);
 
@@ -104,10 +110,10 @@ describe("Report Routes", () => {
   });
 
   // Expect 200, message, report: id, address, geohash, status 2
-  test("Editar report 20 com user 1 status 2", async () => {
+  test("Editar report 20 com user 2 status 2", async () => {
     const response = await supertest(app)
       .patch(`/report/repaired`)
-      .set("Authorization", environment.users.user1.access)
+      .set("Authorization", environment.users.user2.access)
       .field("data", environment.reports.report20)
       .attach("file", environment.filePath);
 
@@ -125,6 +131,18 @@ describe("Report Routes", () => {
     const response = await supertest(app)
       .get("/report")
       .set("Authorization", environment.users.user1.access);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.reports).toBeInstanceOf(Array);
+    expect(response.body.reports[0].childrens).toBeInstanceOf(Array);
+  });
+
+  // Expect 200, message, reports: array com 1 item, dentro do item no childrens outro array com 2 items
+  test("Buscar reports filtrado com user 2 ", async () => {
+    const response = await supertest(app)
+      .get("/report/evaluated")
+      .set("Authorization", environment.users.user2.access);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("message");
@@ -180,12 +198,12 @@ describe("Report Routes", () => {
     expect(response.statusCode).toBe(204);
   });
 
-  test("Deletar report 10 com user 2", async () => {
+  test("Deletar report 10 com user 3", async () => {
     const response = await supertest(app)
       .delete(
         `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`,
       )
-      .set("Authorization", environment.users.user2.access);
+      .set("Authorization", environment.users.user3.access);
 
     expect(response.statusCode).toBe(204);
   });

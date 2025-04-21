@@ -48,6 +48,10 @@ export default function authMiddlewares(allowedRoles = []) {
       req.role = decoded.role;
       next();
     } catch (error) {
+      if (error instanceof AppError) {
+        return next(error); // preserve o que já foi lançado antes
+      }
+
       const status = error instanceof jwt.JsonWebTokenError ? 403 : 500;
       next(
         new AppError(status, "Falha na autenticação do Token", error.message),

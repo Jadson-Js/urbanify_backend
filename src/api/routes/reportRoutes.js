@@ -15,7 +15,17 @@ const router = express.Router();
 // INSTANCIANDO ROTAS
 router.get("/", authMiddlewares(["ADMIN"]), ReportController.get);
 
-router.get("/my", authMiddlewares(["USER"]), ReportController.getMyReports);
+router.get(
+  "/evaluated",
+  authMiddlewares(["ENGINEER"]),
+  ReportController.getEvaluated,
+);
+
+router.get(
+  "/my",
+  authMiddlewares(["ADMIN", "USER"]),
+  ReportController.getMyReports,
+);
 
 router.get(
   "/address/:address/geohash/:geohash",
@@ -64,7 +74,7 @@ router.patch(
 
 router.delete(
   "/address/:address/geohash/:geohash",
-  authMiddlewares(["USER"]),
+  authMiddlewares(["ADMIN", "USER"]),
   expressMiddleware.address(),
   expressMiddleware.geohash(),
   ReportController.delete,

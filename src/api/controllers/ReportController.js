@@ -12,6 +12,16 @@ class ReportController {
       .json({ message: "Reports retrieved successfully", reports });
   }
 
+  async getEvaluated(req, res) {
+    const reportService = new ReportService();
+
+    const reports = await reportService.getEvaluated();
+
+    res
+      .status(200)
+      .json({ message: "Reports retrieved successfully", reports });
+  }
+
   async getMyReports(req, res) {
     const data = {
       user_email: req.user_email,
