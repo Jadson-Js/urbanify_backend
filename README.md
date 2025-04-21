@@ -181,6 +181,47 @@ Authorization: Bearer SEU_TOKEN
 
 ---
 
+### 🔹 BUSCAR REPORTS AVALIADOS
+
+**GET** `/report/evaluated`
+
+**_Request_**
+
+- Header
+  - `Authorization: Bearer SEU_TOKEN`
+
+**_Response_**
+
+```
+{
+	"message": "Reports retrieved successfully",
+	"reports": [
+		{
+			"district": "São Paulo",
+			"created_at": "2025-03-09T16:48:00.230Z",
+			"status": 1,
+			"geohash": "12345678",
+			"subregion": "Campinas",
+			"childrens": [
+				{
+					"severity": 1,
+					"created_at": "2025-03-09T16:48:00.230Z"
+				}
+			],
+			"address": "Campinas_São Paulo",
+			"id": "123",
+			"coordinates": {
+				"latitude": "12.3456789",
+				"longitude": "12.3456789"
+			},
+			"street": "Augusta"
+		}
+	]
+}
+```
+
+---
+
 ### 🔹 BUSCAR REPORT
 
 **GET** `/report/address/:reportAddress/geohash/:reportGeohash`
