@@ -12,14 +12,14 @@ import expressMiddleware from "../middlewares/expressMiddleware.js";
 const router = express.Router();
 
 // INSTANCIANDO ROTAS
-router.get("/", authMiddlewares("ADMIN"), UserController.get);
+router.get("/", authMiddlewares(["ADMIN"]), UserController.get);
 
 router.post(
   "/signup",
   expressMiddleware.email(),
   expressMiddleware.password(),
   expressMiddleware.validate,
-  UserController.signup
+  UserController.signup,
 );
 
 router.post(
@@ -27,21 +27,21 @@ router.post(
   expressMiddleware.email(),
   expressMiddleware.password(),
   expressMiddleware.validate,
-  UserController.login
+  UserController.login,
 );
 
 router.post(
   "/auth/google",
   expressMiddleware.authToken(),
   expressMiddleware.validate,
-  UserController.authGoogle
+  UserController.authGoogle,
 );
 
 router.post(
   "/access",
   expressMiddleware.refreshToken(),
   expressMiddleware.validate,
-  UserController.generateAccessToken
+  UserController.generateAccessToken,
 );
 
 export default router;

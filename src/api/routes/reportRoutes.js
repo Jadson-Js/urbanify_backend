@@ -13,61 +13,61 @@ import ReportController from "../controllers/ReportController.js";
 const router = express.Router();
 
 // INSTANCIANDO ROTAS
-router.get("/", authMiddlewares("ADMIN"), ReportController.get);
+router.get("/", authMiddlewares(["ADMIN"]), ReportController.get);
 
-router.get("/my", authMiddlewares("USER"), ReportController.getMyReports);
+router.get("/my", authMiddlewares(["USER"]), ReportController.getMyReports);
 
 router.get(
   "/address/:address/geohash/:geohash",
-  authMiddlewares("ADMIN"),
+  authMiddlewares(["ADMIN"]),
   expressMiddleware.address(),
   expressMiddleware.geohash(),
   expressMiddleware.validate,
-  ReportController.getReport
+  ReportController.getReport,
 );
 
 router.get(
   "/status/address/:address/geohash/:geohash",
-  authMiddlewares("USER"),
+  authMiddlewares(["ADMIN", "USER"]),
   expressMiddleware.address(),
   expressMiddleware.geohash(),
   expressMiddleware.validate,
-  ReportController.getStatus
+  ReportController.getStatus,
 );
 
 router.post(
   "/",
-  authMiddlewares("USER"),
+  authMiddlewares(["ADMIN", "USER"]),
   uploadMiddlewares.single("file"),
   expressMiddleware.postReport,
-  ReportController.create
+  ReportController.create,
 );
 
 // Vai receber como conteudo um form-data contendo uma imagem
 router.patch(
   "/address/:address/geohash/:geohash",
-  authMiddlewares("ADMIN"),
+  authMiddlewares(["ADMIN"]),
   expressMiddleware.address(),
   expressMiddleware.geohash(),
   expressMiddleware.validate,
-  ReportController.updateStatus
+  ReportController.updateStatus,
 );
 
 router.patch(
   "/repaired",
-  authMiddlewares("ADMIN"),
+  authMiddlewares(["ENGINEER"]),
   uploadMiddlewares.single("file"),
   expressMiddleware.postReport,
   expressMiddleware.validate,
-  ReportController.repaired
+  ReportController.repaired,
 );
 
 router.delete(
   "/address/:address/geohash/:geohash",
-  authMiddlewares("USER"),
+  authMiddlewares(["USER"]),
   expressMiddleware.address(),
   expressMiddleware.geohash(),
-  ReportController.delete
+  ReportController.delete,
 );
 
 export default router;

@@ -7,23 +7,23 @@ import AppError from "../../utils/AppError.js";
 
 // SETUP
 dotenv.config();
-export default function authMiddlewares(typeUser) {
-  if (!typeUser) {
-    throw new AppError(
-      400, // Código de status apropriado para erros de validação de entrada
-      "User type not provided",
-      "Please provide the user type you want to authenticate."
-    );
-  }
-
+export default function authMiddlewares(allowedRoles = []) {
   return (req, res, next) => {
     try {
+      if (!Array.isArray(allowedRoles) || allowedRoles.length === 0) {
+        throw new AppError(
+          400,
+          "User roles not provided",
+          "Please provide at least one user role to authenticate.",
+        );
+      }
+
       const token = req.headers.authorization?.split(" ")[1];
       if (!token) {
         throw new AppError(
           401, // Código de status apropriado para falta de autenticação
           "Token not provided",
-          "The authentication token is mandatory and must be included."
+          "The authentication token is mandatory and must be included.",
         );
       }
 
@@ -32,15 +32,15 @@ export default function authMiddlewares(typeUser) {
         throw new AppError(
           403, // Código de status para acesso proibido devido à condição do usuário
           "User with pending email verification",
-          "Please verify your email to activate your account."
+          "Please verify your email to activate your account.",
         );
       }
 
-      if (typeUser === "ADMIN" && decoded.role !== "ADMIN") {
+      if (!allowedRoles.includes(decoded.role)) {
         throw new AppError(
-          403, // Código de status para acesso proibido devido à falta de permissão
+          403,
           "Access denied",
-          "You do not have permission to access this resource."
+          "You do not have permission to access this resource.",
         );
       }
 
@@ -50,7 +50,7 @@ export default function authMiddlewares(typeUser) {
     } catch (error) {
       const status = error instanceof jwt.JsonWebTokenError ? 403 : 500;
       next(
-        new AppError(status, "Falha na autenticação do Token", error.message)
+        new AppError(status, "Falha na autenticação do Token", error.message),
       );
     }
   };

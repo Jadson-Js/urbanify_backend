@@ -102,7 +102,7 @@ export default class ReportService {
           user_email,
           severity,
           created_at,
-        })
+        }),
       );
 
       return {
@@ -143,7 +143,7 @@ export default class ReportService {
       throw new AppError(
         401, // Código de status apropriado para erros de autorização
         "User not authorized",
-        "The user is not authorized to access data for a report they are not part of."
+        "The user is not authorized to access data for a report they are not part of.",
       );
     }
 
@@ -167,7 +167,7 @@ export default class ReportService {
 
     const geohash = generateGeohash(
       coordinates.latitude,
-      coordinates.longitude
+      coordinates.longitude,
     );
 
     return ReportModel.getByLocal(address, geohash);
@@ -254,7 +254,7 @@ export default class ReportService {
       ...report,
       status: 2,
       expiration_timestamp: Math.floor(
-        new Date().setFullYear(new Date().getFullYear() + 4) / 1000
+        new Date().setFullYear(new Date().getFullYear() + 4) / 1000,
       ),
     };
 
@@ -344,7 +344,7 @@ export default class ReportService {
       throw new AppError(
         404, // Código de status apropriado para recursos não encontrados
         "Report not found",
-        "Address and geohash were not found in the database."
+        "Address and geohash were not found in the database.",
       );
     }
 
@@ -358,7 +358,7 @@ export default class ReportService {
       throw new AppError(
         404, // Código de status apropriado para recursos não encontrados
         "Children not found",
-        "Children was not found within the report."
+        "Children was not found within the report.",
       );
     }
 

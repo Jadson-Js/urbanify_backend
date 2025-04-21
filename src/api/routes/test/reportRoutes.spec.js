@@ -4,7 +4,7 @@ import app from "../../app.js";
 console.clear();
 
 const environment = {
-  filePath: "/home/magnus/Pictures/baki.jpg",
+  filePath: "/home/magnus/Pictures/Yugiro.jpg",
 
   users: {
     user1: {
@@ -90,7 +90,7 @@ describe("Report Routes", () => {
   test("Editar report 10 com user 1 status 1", async () => {
     const response = await supertest(app)
       .patch(
-        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
+        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`,
       )
       .set("Authorization", environment.users.user1.access);
 
@@ -136,7 +136,7 @@ describe("Report Routes", () => {
   test("Buscar report 10 com user 1", async () => {
     const response = await supertest(app)
       .get(
-        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
+        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`,
       )
       .set("Authorization", environment.users.user1.access);
 
@@ -161,7 +161,7 @@ describe("Report Routes", () => {
   test("Buscar status report 10 com user 1", async () => {
     const response = await supertest(app)
       .get(
-        `/report/status/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
+        `/report/status/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`,
       )
       .set("Authorization", environment.users.user1.access);
 
@@ -173,7 +173,7 @@ describe("Report Routes", () => {
   test("Deletar report 10 com user 1", async () => {
     const response = await supertest(app)
       .delete(
-        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
+        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`,
       )
       .set("Authorization", environment.users.user1.access);
 
@@ -183,7 +183,7 @@ describe("Report Routes", () => {
   test("Deletar report 10 com user 2", async () => {
     const response = await supertest(app)
       .delete(
-        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`
+        `/report/address/${environment.keys.report10.address}/geohash/${environment.keys.report10.geohash}`,
       )
       .set("Authorization", environment.users.user2.access);
 

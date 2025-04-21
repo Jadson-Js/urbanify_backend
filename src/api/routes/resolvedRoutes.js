@@ -12,24 +12,24 @@ import ResolvedController from "../controllers/ResolvedController.js";
 const router = express.Router();
 
 // INSTANCIANDO ROTAS
-router.get("/", authMiddlewares("ADMIN"), ResolvedController.get);
+router.get("/", authMiddlewares(["ADMIN", "USER"]), ResolvedController.get);
 
 router.get(
   "/id/:id/created_at/:created_at",
-  authMiddlewares("ADMIN"),
+  authMiddlewares(["ADMIN", "USER"]),
   expressMiddleware.id(),
   expressMiddleware.created_at(),
   expressMiddleware.validate,
-  ResolvedController.getResolved
+  ResolvedController.getResolved,
 );
 
 router.get(
   "/registration/id/:id/created_at/:created_at",
-  authMiddlewares("USER"),
+  authMiddlewares(["USER"]),
   expressMiddleware.id(),
   expressMiddleware.created_at(),
   expressMiddleware.validate,
-  ResolvedController.getRegistration
+  ResolvedController.getRegistration,
 );
 
 export default router;
