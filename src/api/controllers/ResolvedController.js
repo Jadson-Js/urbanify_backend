@@ -1,11 +1,9 @@
-// IMPORTANDO SERVICES
-import ResolvedService from "../../services/ResolvedService.js";
+// IMPORTANDO SERVICES - Usando serviço local para demonstração (sem AWS)
+import LocalReportService from "../../services/LocalReportService.js";
 
 class ResolvedController {
   async get(req, res) {
-    const resolvedService = new ResolvedService();
-
-    const reports = await resolvedService.get();
+    const reports = await LocalReportService.getResolved();
 
     res.status(200).json({ message: "Status retrieved successfully", reports });
   }
@@ -13,13 +11,7 @@ class ResolvedController {
   async getResolved(req, res) {
     const { id, created_at } = req.params;
 
-    const data = {
-      keys: { id, created_at },
-    };
-
-    const resolvedService = new ResolvedService(data);
-
-    const report = await resolvedService.getReport();
+    const report = await LocalReportService.getResolvedByKeys(id, created_at);
 
     res.status(200).json({
       message: "Status retrieved successfully",
@@ -28,19 +20,10 @@ class ResolvedController {
   }
 
   async getRegistration(req, res) {
-    const { id, created_at } = req.params;
-
-    const data = {
-      keys: { id, created_at },
-    };
-
-    const resolvedService = new ResolvedService(data);
-
-    const urls = await resolvedService.getRegistration();
-
+    // Retorna URLs de placeholder
     res.status(200).json({
       message: "Status retrieved successfully",
-      urls,
+      urls: ["https://via.placeholder.com/400x300?text=Report+Registration"],
     });
   }
 }

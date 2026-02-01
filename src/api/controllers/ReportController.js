@@ -1,11 +1,9 @@
-// IMPORTANDO SERVICES
-import ReportService from "../../services/ReportService.js";
+// IMPORTANDO SERVICES - Usando serviço local para demonstração (sem AWS)
+import LocalReportService from "../../services/LocalReportService.js";
 
 class ReportController {
   async get(req, res) {
-    const reportService = new ReportService();
-
-    const reports = await reportService.get();
+    const reports = await LocalReportService.getAll();
 
     res
       .status(200)
@@ -13,9 +11,7 @@ class ReportController {
   }
 
   async getEvaluated(req, res) {
-    const reportService = new ReportService();
-
-    const reports = await reportService.getEvaluated();
+    const reports = await LocalReportService.getEvaluated();
 
     res
       .status(200)
@@ -23,30 +19,20 @@ class ReportController {
   }
 
   async getMyReports(req, res) {
-    const data = {
-      user_email: req.user_email,
-    };
-
-    const reportService = new ReportService(data);
-
-    const reports = await reportService.getMyReports();
+    // Retorna alguns reports mockados como se fossem do usuário
+    const reports = await LocalReportService.getAll();
+    const myReports = reports.slice(0, 2); // Primeiros 2 reports
 
     res.status(200).json({
       message: "Reports retrieved successfully",
-      reports,
+      reports: myReports,
     });
   }
 
   async getReport(req, res) {
     const { address, geohash } = req.params;
 
-    const data = {
-      local: { address, geohash },
-    };
-
-    const reportService = new ReportService(data);
-
-    const response = await reportService.getReport();
+    const response = await LocalReportService.getByLocal(address, geohash);
 
     res.status(200).json({
       message: "Report retrieved successfully",
@@ -55,83 +41,55 @@ class ReportController {
   }
 
   async getStatus(req, res) {
-    const { address, geohash } = req.params;
-
-    const data = {
-      user_email: req.user_email,
-      local: { address, geohash },
-    };
-
-    const reportService = new ReportService(data);
-
-    const status = await reportService.getStatus();
-
+    // Retorna status mockado
     res.status(200).json({
       message: "Status retrieved successfully",
-      status: status,
+      status: 1,
     });
   }
 
   async create(req, res) {
-    const data = {
-      user_email: req.user_email,
-      form: JSON.parse(req.body.data),
-      file: req.file,
-    };
-
-    const reportService = new ReportService(data);
-
-    const putReport = await reportService.processCreate();
+    // Simula criação de report
+    console.log("[LOCAL] Simulando criação de report");
 
     res.status(201).json({
-      message: "Report created successfully",
-      report: putReport,
+      message: "Report created successfully (demo mode)",
+      report: {
+        id: `demo-${Date.now()}`,
+        address: "Demo_Address",
+        geohash: "demo123",
+      },
     });
   }
 
   async updateStatus(req, res) {
     const { address, geohash } = req.params;
 
-    const data = {
-      update: { address, geohash },
-    };
-
-    const reportService = new ReportService(data);
-    const report = await reportService.updateStatus();
-
     res.status(200).json({
-      message: "Report status updated successfully",
-      report,
+      message: "Report status updated successfully (demo mode)",
+      report: {
+        address,
+        geohash,
+        status: 1,
+      },
     });
   }
 
   async repaired(req, res) {
-    const data = {
-      form: JSON.parse(req.body.data),
-      file: req.file,
-    };
-
-    const reportService = new ReportService(data);
-    const report = await reportService.repaired();
+    console.log("[LOCAL] Simulando report como reparado");
 
     res.status(200).json({
-      message: "Report status updated successfully",
-      report,
+      message: "Report status updated successfully (demo mode)",
+      report: {
+        address: "Demo_Address",
+        geohash: "demo123",
+        status: 2,
+      },
     });
   }
 
   async delete(req, res) {
-    const { address, geohash } = req.params;
-
-    const data = {
-      user_email: req.user_email,
-      local: { address, geohash },
-    };
-
-    const reportService = new ReportService(data);
-
-    await reportService.processDelete();
-
+    console.log("[LOCAL] Simulando exclusão de report");
     res.status(204).send();
   }
 }
