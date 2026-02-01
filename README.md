@@ -15,6 +15,14 @@
 
 ---
 
+## 🎬 Demonstração
+
+<p align="center">
+  <img src="public/presentation.gif" alt="Demonstração do Urbanify Dashboard" width="100%" />
+</p>
+
+---
+
 ## 📋 Sobre o Projeto
 
 O **Urbanify Backend** é uma API RESTful desenvolvida para um sistema de gestão de infraestrutura urbana que permite cidadãos reportarem irregularidades em vias públicas (buracos, problemas de iluminação, etc.) através de fotografias geolocalizadas. A plataforma conecta a população com órgãos públicos, otimizando o planejamento e execução de reparos.
