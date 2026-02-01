@@ -1,546 +1,319 @@
-# 📌 URBANIFY
+<p align="center">
+  <h1 align="center">🏗️ URBANIFY - Backend API</h1>
+  <p align="center">
+    <strong>API RESTful robusta para gerenciamento de infraestrutura urbana com arquitetura serverless na AWS</strong>
+  </p>
+</p>
 
-Esta API foi desenvolvida para um aplicativo que permite aos usuários reportarem irregularidades nas vias públicas, enviando fotografias e informações de localização. As autoridades estaduais utilizam esses dados para planejar e executar obras de reparo de forma eficiente. O sistema abrange autenticação, gerenciamento de obras, notificações e suporte a coordenadas geográficas, empregando tecnologias desenvolvidas pelo MIT.
-
----
-
-## 🚀 Tecnologias Utilizadas
-
-- **aws-dynamodb**
-- **aws-s3**
-- **aws-ses**
-- **aws-sns**
-- **cors**
-- **dotenv-safe**
-- **express**
-- **express-async-errors**
-- **express-validator**
-- **jsonwebtoken**
-- **multer": "^1.**
-- **ngeohash**
-- **nodemon**
-- **sharp**
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white" alt="AWS" />
+  <img src="https://img.shields.io/badge/DynamoDB-4053D6?style=for-the-badge&logo=amazondynamodb&logoColor=white" alt="DynamoDB" />
+  <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT" />
+</p>
 
 ---
 
-## 🔒 Autenticação
+## 📋 Sobre o Projeto
 
-Esta API utiliza **JWT (JSON Web Token)** para autenticação. Inclua o token no header.
+O **Urbanify Backend** é uma API RESTful desenvolvida para um sistema de gestão de infraestrutura urbana que permite cidadãos reportarem irregularidades em vias públicas (buracos, problemas de iluminação, etc.) através de fotografias geolocalizadas. A plataforma conecta a população com órgãos públicos, otimizando o planejamento e execução de reparos.
 
-```
-Authorization: Bearer SEU_TOKEN
-```
+### 🎯 Problema Resolvido
 
----
-
-## 📡 Endpoints
-
-### 🔹 SIGNUP
-
-**POST** `/user/signup`
-
-**_Request_**
-
-- Header
-
-  - `Content-Type: application/json`
-
-- Body
-  - `email: (String)`
-  - `password: (String)`
-
-**_Response_**
-
-```
-{
-	"message": "User created successfully",
-	"user": {
-		"id": "123",
-		"email": "email@gmail.com"
-	}
-}
-```
+- **Para cidadãos**: Canal direto para reportar problemas urbanos com acompanhamento de status
+- **Para gestores públicos**: Dashboard centralizado com métricas e visualização geográfica dos reports
+- **Para a cidade**: Priorização inteligente de reparos baseada em geolocalização e severidade
 
 ---
 
-### 🔹 LOGIN
-
-**POST** `/user/login`
-
-**_Request_**
-
-- Header
-
-  - `Content-Type: application/json`
-
-- Body
-  - `email: (String)`
-  - `password: (String)`
-
-**_Response_**
+## 🏛️ Arquitetura do Sistema
 
 ```
-{
-	"message": "Login successful",
-	"accessToken": "123456789",
-	"refreshToken": "123456789"
-}
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              ARQUITETURA MVC                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────┐    ┌──────────────┐    ┌──────────────┐    ┌───────────┐  │
+│  │   ROUTES    │───▶│ MIDDLEWARES  │───▶│ CONTROLLERS  │───▶│ SERVICES  │  │
+│  │             │    │              │    │              │    │           │  │
+│  │ • /user     │    │ • Auth JWT   │    │ • User       │    │ • User    │  │
+│  │ • /report   │    │ • Validation │    │ • Report     │    │ • Report  │  │
+│  │ • /resolved │    │ • Rate Limit │    │ • Resolved   │    │ • Resolved│  │
+│  │             │    │ • Error      │    │              │    │           │  │
+│  └─────────────┘    └──────────────┘    └──────────────┘    └─────┬─────┘  │
+│                                                                    │        │
+│                                                                    ▼        │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         CLOUD SERVICES (AWS)                        │   │
+│  ├─────────────┬─────────────┬─────────────┬─────────────┬─────────────┤   │
+│  │  DynamoDB   │     S3      │     SES     │     SNS     │   Geohash   │   │
+│  │  (NoSQL DB) │  (Storage)  │   (Email)   │   (Push)    │  (MIT Lib)  │   │
+│  └─────────────┴─────────────┴─────────────┴─────────────┴─────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 📁 Estrutura de Pastas
+
+```
+src/
+├── api/
+│   ├── controllers/     # Lógica de controle das requisições
+│   │   ├── UserController.js
+│   │   ├── ReportController.js
+│   │   └── ResolvedController.js
+│   ├── middlewares/     # Interceptadores de requisição
+│   │   ├── authMiddleware.js      # Validação JWT
+│   │   ├── validationMiddleware.js # Express Validator
+│   │   └── errorMiddleware.js     # Tratamento centralizado de erros
+│   ├── routes/          # Definição dos endpoints
+│   │   ├── userRoutes.js
+│   │   ├── reportRoutes.js
+│   │   └── resolvedRoutes.js
+│   └── app.js           # Configuração Express
+├── config/              # Configurações do ambiente
+├── models/              # Schemas e modelos de dados
+├── services/            # Camada de negócio e integração AWS
+│   ├── UserService.js       # CRUD usuários + Auth Google
+│   ├── ReportService.js     # Gestão de reports + Geohash
+│   └── ResolvedService.js   # Reports concluídos + TTL
+└── utils/               # Utilitários e helpers
 ```
 
 ---
 
-### 🔹 AUTH GOOGLE
+## 🛠️ Stack Tecnológica
 
-**POST** `/user/auth/google`
+### Backend Core
+| Tecnologia | Propósito |
+|------------|-----------|
+| **Node.js** | Runtime JavaScript server-side |
+| **Express.js** | Framework web minimalista e flexível |
+| **ES Modules** | Importação moderna (import/export) |
 
-**_Request_**
+### Segurança & Autenticação
+| Tecnologia | Propósito |
+|------------|-----------|
+| **JWT** | Tokens stateless para autenticação |
+| **Google Auth Library** | OAuth 2.0 com Google |
+| **Express Rate Limit** | Proteção contra DDoS/brute force |
+| **Express Validator** | Sanitização e validação de inputs |
 
-- Header
+### AWS Cloud Services
+| Serviço | Propósito |
+|---------|-----------|
+| **DynamoDB** | Banco NoSQL com latência de milissegundos |
+| **S3** | Armazenamento de imagens com URLs pré-assinadas |
+| **SES** | Notificações por email |
+| **SNS** | Push notifications |
 
-  - `Content-Type: application/json`
+### Processamento
+| Tecnologia | Propósito |
+|------------|-----------|
+| **Sharp** | Processamento e otimização de imagens |
+| **Multer** | Upload de arquivos multipart |
+| **NGeohash** | Algoritmo MIT para coordenadas → hash |
 
-- Body
-  - `authToken: (String)`
+### Qualidade de Código
+| Tecnologia | Propósito |
+|------------|-----------|
+| **Jest** | Framework de testes unitários |
+| **Supertest** | Testes de integração HTTP |
+| **Nodemon** | Hot reload em desenvolvimento |
 
-**_Response_**
+---
 
+## 🔐 Sistema de Autenticação
+
+O sistema implementa **autenticação JWT stateless** com suporte a múltiplos métodos:
+
+```javascript
+// Fluxo de Autenticação
+┌──────────────────────────────────────────────────────────────┐
+│                    AUTHENTICATION FLOW                        │
+├──────────────────────────────────────────────────────────────┤
+│                                                               │
+│   Login Tradicional          OAuth Google                     │
+│   ┌─────────────┐            ┌─────────────┐                 │
+│   │ Email/Pass  │            │ Google Token│                 │
+│   └──────┬──────┘            └──────┬──────┘                 │
+│          │                          │                         │
+│          └──────────┬───────────────┘                         │
+│                     ▼                                         │
+│            ┌───────────────┐                                  │
+│            │ Validate User │                                  │
+│            └───────┬───────┘                                  │
+│                    ▼                                          │
+│            ┌───────────────┐                                  │
+│            │  Generate JWT │                                  │
+│            │ (Access+Refresh) │                               │
+│            └───────┬───────┘                                  │
+│                    ▼                                          │
+│            ┌───────────────┐                                  │
+│            │Return Tokens  │                                  │
+│            └───────────────┘                                  │
+│                                                               │
+└──────────────────────────────────────────────────────────────┘
 ```
-{
-	"message": "Login successful",
-	"accessToken": "123456789",
-	"refreshToken": "123456789"
-}
+
+**Headers de Requisição:**
+```
+Authorization: Bearer <access_token>
 ```
 
 ---
 
-### 🔹 BUSCAR USERS
+## 🌍 Sistema de Geolocalização
 
-**GET** `/user`
+Utiliza o algoritmo **Geohash** (desenvolvido pelo MIT) para:
 
-**_Request_**
+- **Agrupamento espacial**: Reports próximos compartilham prefixos de hash
+- **Busca eficiente**: Queries por região sem full table scan
+- **Clustering**: Visualização agregada no mapa
 
-- Header
-  - `Authorization: Bearer SEU_TOKEN`
-
-**_Response_**
-
-```
-{
-	"message": "Users retrieved successfully",
-	"reports": [
-		{
-			"created_at": "2025-03-31T12:36:09.809Z",
-			"report_counter": 3,
-			"service_counter": 1
-		}
-	]
-}
+```javascript
+// Exemplo de precisão Geohash
+// 7 caracteres = ~153m x 153m de precisão
+coordinates: { lat: -22.906847, lng: -47.061798 }
+    ↓
+geohash: "6gkz88v"
 ```
 
 ---
 
-### 🔹 BUSCAR REPORTS
+## 📡 API Endpoints
 
-**GET** `/report`
+### 👤 Usuários
 
-**_Request_**
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `POST` | `/user/signup` | Cadastro de usuário |
+| `POST` | `/user/login` | Login com email/senha |
+| `POST` | `/user/auth/google` | Login via Google OAuth |
+| `GET` | `/user` | Listar usuários (admin) |
 
-- Header
-  - `Authorization: Bearer SEU_TOKEN`
+### 📝 Reports (Denúncias)
 
-**_Response_**
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `POST` | `/report` | Criar novo report (multipart) |
+| `GET` | `/report` | Listar todos os reports |
+| `GET` | `/report/my` | Meus reports |
+| `GET` | `/report/evaluated` | Reports avaliados |
+| `GET` | `/report/address/:addr/geohash/:geo` | Buscar report específico |
+| `PATCH` | `/report/address/:addr/geohash/:geo` | Atualizar status para avaliado |
+| `PATCH` | `/report/repaired` | Marcar como concluído |
+| `DELETE` | `/report/address/:addr/geohash/:geo` | Remover report |
 
+### ✅ Reports Concluídos
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `GET` | `/resolved` | Listar concluídos |
+| `GET` | `/resolved/id/:id/created_at/:date` | Detalhes do concluído |
+| `GET` | `/resolved/registration/...` | Registro fotográfico |
+
+---
+
+## 🔧 Configuração do Projeto
+
+### Pré-requisitos
+
+- Node.js 18+
+- Conta AWS com credenciais configuradas
+- Variáveis de ambiente configuradas
+
+### Instalação
+
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/urbanify-backend.git
+
+# Instale as dependências
+npm install
+
+# Configure as variáveis de ambiente
+cp .env.example .env
+
+# Execute em modo desenvolvimento
+npm start
 ```
-{
-	"message": "Reports retrieved successfully",
-	"reports": [
-		{
-			"district": "São Paulo",
-			"created_at": "2025-03-09T16:48:00.230Z",
-			"status": 1,
-			"geohash": "12345678",
-			"subregion": "Campinas",
-			"childrens": [
-				{
-					"severity": 1,
-					"created_at": "2025-03-09T16:48:00.230Z"
-				}
-			],
-			"address": "Campinas_São Paulo",
-			"id": "123",
-			"coordinates": {
-				"latitude": "12.3456789",
-				"longitude": "12.3456789"
-			},
-			"street": "Augusta"
-		}
-	]
-}
+
+### Variáveis de Ambiente
+
+```env
+# AWS
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_key
+AWS_SECRET_ACCESS_KEY=your_secret
+
+# DynamoDB
+DYNAMODB_TABLE_USERS=users
+DYNAMODB_TABLE_REPORTS=reports
+DYNAMODB_TABLE_RESOLVED=resolved
+
+# S3
+S3_BUCKET_NAME=urbanify-images
+
+# JWT
+JWT_SECRET=your_secret_key
+JWT_EXPIRES_IN=1h
+JWT_REFRESH_EXPIRES_IN=7d
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_client_id
 ```
 
 ---
 
-### 🔹 BUSCAR REPORTS AVALIADOS
+## 🧪 Testes
 
-**GET** `/report/evaluated`
+```bash
+# Executar todos os testes
+npm test
 
-**_Request_**
-
-- Header
-  - `Authorization: Bearer SEU_TOKEN`
-
-**_Response_**
-
-```
-{
-	"message": "Reports retrieved successfully",
-	"reports": [
-		{
-			"district": "São Paulo",
-			"created_at": "2025-03-09T16:48:00.230Z",
-			"status": 1,
-			"geohash": "12345678",
-			"subregion": "Campinas",
-			"childrens": [
-				{
-					"severity": 1,
-					"created_at": "2025-03-09T16:48:00.230Z"
-				}
-			],
-			"address": "Campinas_São Paulo",
-			"id": "123",
-			"coordinates": {
-				"latitude": "12.3456789",
-				"longitude": "12.3456789"
-			},
-			"street": "Augusta"
-		}
-	]
-}
+# Executar com coverage
+npm test -- --coverage
 ```
 
 ---
 
-### 🔹 BUSCAR REPORT
-
-**GET** `/report/address/:reportAddress/geohash/:reportGeohash`
-
-**_Request_**
-
-- Header
-  - `Authorization: Bearer SEU_TOKEN`
-
-**_Response_**
-
-```
-{
-  "message": "Report retrieved successfully",
-  "data": {
-    "report": {
-      "district": "Cambuí",
-      "created_at": "2025-03-10T18:02:53.060Z",
-      "status": 1,
-      "geohash": "6gkz123",
-      "subregion": "Região Central",
-      "childrens": [
-        {
-          "severity": 2,
-          "coordinates": {
-            "latitude": "-22.907104",
-            "longitude": "-47.061604"
-          },
-          "created_at": "2025-03-10T18:08:59.115Z",
-          "user_email": "usuario_campinas@gmail.com",
-          "s3_photo_key": "2025-03-10T18:08:59.115Z-avaria.jpg"
-        }
-      ],
-      "address": "Camipinas_São Paulo",
-      "id": "Abc123Xyz",
-      "coordinates": {
-        "latitude": "-22.906847",
-        "longitude": "-47.061798"
-      },
-      "street": "Rua Barreto Leme"
-    },
-    "urls": [
-      "https://urbanify.com/imagem.jpg",
-      "https://urbanify.com/imagem.jpg"
-    ]
-  }
-}
-
-```
-
----
-
-### 🔹 BUSCAR MEUS REPORTS
-
-**GET** `/report/my`
-
-**_Request_**
-
-- Header
-  - `Authorization: Bearer SEU_TOKEN`
-
-**_Response_**
-
-```
-{
-  "message": "Report retrieved successfully",
-  "reports": [
-		{
-			"severity": 1,
-			"coordinates": {
-				"latitude": "-42.4291",
-				"longitude": "-25.23923"
-			},
-			"created_at": "2025-03-09T16:48:00.230Z",
-			"user_email": "usuario_qualquer@gmail.com",
-			"s3_photo_key": "2025-03-09T16:48:00.230Z-baki.jpg"
-		}
-	]
-}
-
-```
-
----
-
-### 🔹 BUSCAR REPORT STATUS
-
-**GET** `/report/address/:reportAddress/geohash/:reportGeohash`
-
-**_Request_**
-
-- Header
-  - `Authorization: Bearer SEU_TOKEN`
-
-**_Response_**
-
-```
-{
-  "message": "Report retrieved successfully",
-  "status": 1
-}
-
-```
-
----
-
-### 🔹 CREATE REPORT
-
-**POST** `/report`
-
-**_Request_**
-
-- Header
-
-  - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: multipart/form-data`
-
-- Body
-  - file
-    - `(Arquivo)`
-  - Data
-    - `{ "subregion": (String), "district": (String), "street": (String), "severity": (Number), "coordinates": { "latitude": (String), "longitude": (String) }}`
-
-**_Response_**
-
-```
-{
-    "message": "Report created successfully",
-    "report": {
-        "id": "123",
-        "address": "Campinas_São Paulo",
-        "geohash": "12345678"
-    }
-}
-```
-
----
-
-### 🔹 EDITAR STATUS REPORT PARA AVALIADO
-
-**PATCH** `/report/address/:reportAddress/geohash/:reportGeohash`
-
-**_Request_**
-
-- Header
-  - `Authorization: Bearer SEU_TOKEN`
-
-**_Response_**
-
-```
-{
-	"message": "Report status updated successfully",
-	"report": {
-		"address": "Campinas_São Paulo",
-		"geohash": "1234567",
-		"status": 1
-	}
-}
-```
-
----
-
-### 🔹 EDITAR STATUS REPORT PARA CONCLUIDO
-
-**PATCH** `/report/repaired`
-
-**_Request_**
-
-- Header
-
-  - `Authorization: Bearer SEU_TOKEN`
-  - `Content-Type: multipart/form-data`
-
-- Body
-  - file
-    - `(Arquivo)`
-  - Data
-    - `{ "subregion": (String), "district": (String), "street": (String), "severity": (Number), "coordinates": { "latitude": (String), "longitude": (String) }}`
-
-**_Response_**
-
-```
-{
-	"message": "Report status updated successfully",
-	"report": {
-		"address": "Campinas_São Paulo",
-		"geohash": "1234567",
-		"status": 2
-	}
-}
-```
-
----
-
-### 🔹 DELETAR REPORT
-
-**DELETE** `/report/address/:reportAddress/geohash/:reportGeohash`
-
-**_Request_**
-
-- Header
-  - `Authorization: Bearer SEU_TOKEN`
-
----
-
-### 🔹 BUSCAR REPORTS CONCLUIDOS
-
-**GET** `/resolved`
-
-**_Request_**
-
-- Header
-  - `Authorization: Bearer SEU_TOKEN`
-
-**_Response_**
-
-```
-{
-	"message": "Report retrieved successfully",
-	"report": {
-	  "district": "Rua Augusta",
-	  "created_at": "2025-03-31T13:47:59.470Z",
-	  "geohash": "5f8281e",
-	  "status": 2,
-	  "subregion": "São Paulo",
-	  "childrens": [
-	  	{
-	  		"severity": 1,
-	  		"created_at": "2025-03-31T13:47:59.470Z"
-	  	}
-	  ],
-	  "address": "São Paulo_Rua Augusta",
-	  "id": "tRQN1Z97pm40bKq",
-	  "expiration_timestamp": 1869659280,
-	  "coordinates": {
-	  	"latitude": "9.332163770071811",
-	  	"longitude": "-21.283837136673467"
-	  },
-	  "street": "Rua Agostinho"
-  }
-}
-```
-
----
-
-### 🔹 BUSCAR REPORT CONCLUIDO
-
-**GET** `/resolved/id/:id/created_at/:created_at`
-
-**_Request_**
-
-- Header
-  - `Authorization: Bearer SEU_TOKEN`
-
-**_Response_**
-
-```
-{
-	"message": "Busca feita com sucesso!",
-	"data": {
-		"report": {
-			"district": "Bairro Fictício",
-			"created_at": "2000-01-01T00:00:00.000Z",
-			"falseId": "0000-00-00T00:00:00.000Z",
-			"geohash": "abcdefg",
-			"status": 0,
-			"subregion": "Região Inventada",
-			"childrens": [
-				{
-					"severity": 3,
-					"coordinates": {
-						"latitude": "-10.000000",
-						"longitude": "-50.000000"
-					},
-					"created_at": "2000-01-01T00:00:00.000Z",
-					"user_email": "exemplo@falso.com",
-					"s3_photo_key": "0000-00-00T00:00:00.000Z-FOTO.jpeg"
-				}
-			],
-			"address": "Rua Imaginária, Bairro Fictício",
-			"id": "XXXXXXXXXXXXXXX",
-			"expiration_timestamp": 9999999999,
-			"coordinates": {
-				"latitude": "-10.000000",
-				"longitude": "-50.000000"
-			},
-			"street": "Rua Inventada"
-		},
-		"urls": [
-			"https://exemplo-bucket-falso.s3.region.amazonaws.com/XXXXXXXXXXXXXXX/0000-00-00T00%3A00%3A00.000Z-FOTO.jpeg"
-		]
-	}
-}
-```
-
----
-
-### 🔹 BUSCAR REGISTRO
-
-**GET** `/resolved/registration/id/:id/created_at/:created_at`
-
-**_Request_**
-
-- Header
-  - `Authorization: Bearer SEU_TOKEN`
-
-**_Response_**
-
-```
-{
-	"message": "Busca feita com sucesso!",
-	"urls": [
-		"https://exemplo-bucket-falso.s3.region.amazonaws.com/XXXXXXXXXXXXXXX/0000-00-00T00%3A00%3A00.000Z-FOTO.jpeg"
-	]
-}
-```
+## 📊 Decisões Técnicas
+
+### Por que DynamoDB?
+- **Escalabilidade automática** para picos de uso
+- **Single-digit millisecond latency** para reads
+- **Pay-per-request** otimiza custos
+- **Geohash como partition key** para queries geográficas eficientes
+
+### Por que Geohash?
+- Converte coordenadas 2D em string 1D
+- Permite range queries por proximidade
+- Agrupa reports vizinhos automaticamente
+- Desenvolvido pelo MIT, vastamente testado
+
+### Por que JWT Stateless?
+- Elimina necessidade de session store
+- Escalabilidade horizontal sem state sync
+- Tokens auto-contidos com claims
+- Refresh tokens para renovação segura
 
 ---
 
 ## 📞 Contato
 
-- 📧 Email: jadson20051965@gmail.com
-- 💼 LinkedIn: [Jadson Abreu](https://www.linkedin.com/in/jadson-abreu/)
+<p align="center">
+  <a href="mailto:jadson20051965@gmail.com">
+    <img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
+  </a>
+  <a href="https://www.linkedin.com/in/jadson-abreu/">
+    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
+  </a>
+</p>
+
+---
+
+<p align="center">
+  <strong>Desenvolvido por Jadson Abreu</strong>
+</p>
